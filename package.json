@@ -1,0 +1,13 @@
+{
+  "name": "uskpa",
+  "version": "1.0.0",
+  "description": "USKPA website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "license": "CC0-1.0",
+  "author": "18f",
+  "repository": "https://github.com/18F/uskpa"
+}
