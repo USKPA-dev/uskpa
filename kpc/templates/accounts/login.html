@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="usa-grid usa-grid-section">
+
+{% if form.errors %}
+<div class="usa-alert usa-alert-error">
+    <div class="usa-alert-body">
+        <h3 class="usa-alert-heading">Login Failed</h3>
+        <p class="usa-alert-text">Your username and password didn't match. Please try again.</p>
+    </div>
+</div>
+{% endif %}
+
+<form class="usa-form" method='POST' action="{% url 'login' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}" />
+    <fieldset>
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocapitalize="off" autocorrect="off">
+
+        <label for="password-sign-in">Password</label>
+        <input id="password-sign-in" name="password" type="password">
+        <p class="usa-form-note">
+        <a title="Show password" href="javascript:void(0);"
+            class="usa-show_password"
+            aria-controls="password-sign-in">Show password</a>
+        </p>
+        <input type="submit" value="Sign in">
+        <p><a href="{% url 'password_reset' %}" title="Forgot password">
+        Forgot password?</a></p>
+        <p><a href="javascript:void(0);" title="Forgot password">
+                Request an Account</a></p>
+    </fieldset>
+</form>
+
+</section>
+
+{% endblock %}

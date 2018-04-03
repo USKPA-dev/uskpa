@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+      <title>{% block "title" %}{% block "subject" %}{% endblock %}{% endblock %}</title>
+
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uswds/1.6.1/css/uswds.min.css">
+
+      <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"
+              integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+              crossorigin="anonymous">
+      </script>
+      {% block "header" %}{% endblock %}
+  </head>
+  <body>
+    {% include 'banner.html' %}
+    <header class="usa-header usa-header-extended" role="banner">
+      <div class="usa-navbar">
+        <div class="usa-logo" id="extended-logo">
+          <em class="usa-logo-text">
+            <a href="{% url 'home' %}"
+              title="Home"
+              aria-label="Home">
+              USKPA.org
+            </a>
+          </em>
+        </div>
+        <button class="usa-menu-btn">Menu</button>
+      </div>
+      {% include 'nav.html' %}
+    </header>
+  <div class="usa-overlay"></div>
+
+  <main id="main-content">
+    {% include 'messages.html' %}
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  {% include 'footer.html' %}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uswds/1.6.1/js/uswds.min.js"></script>
+  </body>
+</html>
