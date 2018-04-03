@@ -4,6 +4,11 @@
 
 See [CONTRIBUTING](CONTRIBUTING.md) for additional information.
 
+## Documentation
+
+Developer documentation is located wthin in the [docs](docs/) directory.
+To get started, see the [local development guide](docs/local-development.md).
+
 ## Public domain
 
 This project is in the worldwide [public domain](LICENSE.md). As stated in [CONTRIBUTING](CONTRIBUTING.md):
