@@ -12,6 +12,7 @@ Documentation](../docs)
     ```shell
     $ docker-compose build
     $ docker-compose up
+    $ docker-compose run app python manage.py migrate
     ```
 
 1. If desired, create a super-user account:
@@ -23,11 +24,28 @@ Documentation](../docs)
 1. Visit [http://localhost:8000/] to access the site.
 
 
+### Continuous Integration
+
+We use [CircleCI](https://circleci.com) for continuous integration testing.
+
+On each build, the CI suite will:
+1. Execute the project's test suite: `python manage.py test`
+1. Execute [flake8] linting: `flake8`
+1. Execute [bandit] linting: `bandit -r .`
+1. Execute [Pipenv's package vulnerability scan](https://docs.pipenv.org/advanced/#detection-of-security-vulnerabilities): `pipenv check --dev`
+
+The CI suite can be executed locally using the
+[CircleCI Local CLI](https://circleci.com/docs/2.0/local-cli/) tool. Once Installed, run from the project's root directory:
+
+```shell
+$circleci build
+```
+
 ### Running static analysis tools
 
 We run two linting tools in continuous integration,
-[`flake8`](http://flake8.pycqa.org/en/latest/) for general linting of unused
-variables, style, etc. and [`bandit`](https://pypi.python.org/pypi/bandit), a
+[flake8] for general linting of unused
+variables, style, etc. and [bandit], a
 security-focused linter.
 
 To run these within the docker container, run:
@@ -54,4 +72,5 @@ docker-compose run app bash
 
 [Docker]: https://www.docker.com/
 [http://localhost:8000/]: http://localhost:8000/
-[18F Docker guide]: https://pages.18f.gov/dev-environment-standardization/virtualization/docker/
+[flake8]: http://flake8.pycqa.org/en/latest/
+[bandit]: https://pypi.python.org/pypi/bandit/
