@@ -1,5 +1,7 @@
 # USKPA website
 
+[![CircleCI](https://circleci.com/gh/18F/uskpa.svg?style=svg)](https://circleci.com/gh/18F/uskpa)
+
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for additional information.
