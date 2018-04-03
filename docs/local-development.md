@@ -14,6 +14,12 @@ Documentation](../docs)
     $ docker-compose up
     ```
 
+1. If desired, create a super-user account:
+
+    ```shell
+    $ docker-compose run app python manage.py createsuperuser
+    ```
+
 1. Visit [http://localhost:8000/] to access the site.
 
 
