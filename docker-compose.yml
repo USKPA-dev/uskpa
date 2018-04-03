@@ -20,7 +20,7 @@ services:
     links:
       - db
   db:
-    image: postgres
+    image: postgres:10
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
