@@ -68,3 +68,5 @@ typings/
 
 # local vscode settings
 .vscode
+
+.DS_STORE
