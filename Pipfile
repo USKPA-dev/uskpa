@@ -12,6 +12,7 @@ dj-database-url = "*"
 pytz = "*"
 django = "*"
 whitenoise = "*"
+"argon2-cffi" = "*"
 
 
 [dev-packages]
