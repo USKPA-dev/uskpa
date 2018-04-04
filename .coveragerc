@@ -1,0 +1,12 @@
+[run]
+branch = True
+source =
+    kpc
+    uskpa
+omit =
+    .venv/*
+    manage.py
+    */tests/*
+    uskpa/wsgi.py
+    uskpa/settings.py
+

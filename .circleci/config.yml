@@ -32,7 +32,11 @@ jobs:
 
       - run:
           name: USKPA Test Suite
-          command: pipenv run python manage.py test --noinput --settings=uskpa.settings
+          command: pipenv run coverage run manage.py test --noinput --settings=uskpa.settings
+
+      - run:
+          name: Build Coverage report
+          command: pipenv run coverage report
 
       - run:
           name: Flake8

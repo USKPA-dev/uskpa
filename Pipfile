@@ -8,17 +8,19 @@ name = "pypi"
 [packages]
 
 dj-database-url = "*"
-"psycopg2" = "*"
 pytz = "*"
 django = "*"
 whitenoise = "*"
 "argon2-cffi" = "*"
+"psycopg2-binary" = "*"
 
 
 [dev-packages]
 
 "flake8" = "*"
 bandit = "*"
+coverage = "*"
+codecov = "*"
 
 
 [requires]

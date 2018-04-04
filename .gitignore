@@ -3,6 +3,7 @@
 .cache
 .python-version
 .pytest_cache
+.coverage
 
 # Logs
 logs
