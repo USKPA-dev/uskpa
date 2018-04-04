@@ -50,3 +50,6 @@ jobs:
           name: Pipenv Security Check
           command: pipenv check --dev
 
+      - run:
+          name: Codecov
+          command: pipenv run codecov
