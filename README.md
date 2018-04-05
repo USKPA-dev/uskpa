@@ -13,6 +13,11 @@ See [CONTRIBUTING](CONTRIBUTING.md) for additional information.
 Developer documentation is located wthin in the [docs](docs/) directory.
 To get started, see the [local development guide](docs/local-development.md).
 
+## Deploying
+
+The staging, and production instances of the USKPA website are deployed
+using Heroku, additional documentation is located in [deploy.md](docs/deploy.md).
+
 ## Public domain
 
 This project is in the worldwide [public domain](LICENSE.md). As stated in [CONTRIBUTING](CONTRIBUTING.md):
