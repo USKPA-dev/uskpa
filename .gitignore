@@ -3,6 +3,7 @@
 .cache
 .python-version
 .pytest_cache
+.coverage
 
 # Logs
 logs
@@ -68,3 +69,5 @@ typings/
 
 # local vscode settings
 .vscode
+
+.DS_STORE

@@ -1,0 +1,55 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.5
+        environment:
+          TZ: America/New_York
+          PIPENV_VENV_IN_PROJECT: true
+          DATABASE_URL: postgres://postgres@localhost/uskpa
+
+      - image: circleci/postgres:10
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: uskpa
+
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-py-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+
+      - run:
+          name: Setup environment
+          command: |
+            pip install pipenv
+            pipenv install --dev --deploy
+
+      - save_cache:
+          paths:
+            - ./.venv
+          key: v1-py-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+
+      - run:
+          name: USKPA Test Suite
+          command: pipenv run coverage run manage.py test --noinput --settings=uskpa.settings
+
+      - run:
+          name: Build Coverage report
+          command: pipenv run coverage report
+
+      - run:
+          name: Flake8
+          command: pipenv run flake8
+
+      - run:
+          name: Bandit
+          command: pipenv run bandit -r .
+
+      - run:
+          name: Pipenv Security Check
+          command: pipenv check --dev
+
+      - run:
+          name: Codecov
+          command: pipenv run codecov

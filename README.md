@@ -1,8 +1,17 @@
 # USKPA website
 
+[![CircleCI](https://circleci.com/gh/18F/uskpa.svg?style=svg)](https://circleci.com/gh/18F/uskpa)
+[![codecov](https://codecov.io/gh/18F/uskpa/branch/master/graph/badge.svg)](https://codecov.io/gh/18F/uskpa)
+
+
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for additional information.
+
+## Documentation
+
+Developer documentation is located wthin in the [docs](docs/) directory.
+To get started, see the [local development guide](docs/local-development.md).
 
 ## Public domain
 

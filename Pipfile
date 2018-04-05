@@ -1,0 +1,28 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+dj-database-url = "*"
+pytz = "*"
+django = "*"
+whitenoise = "*"
+"argon2-cffi" = "*"
+"psycopg2-binary" = "*"
+
+
+[dev-packages]
+
+"flake8" = "*"
+bandit = "*"
+coverage = "*"
+codecov = "*"
+
+
+[requires]
+
+python_version = "3.6"

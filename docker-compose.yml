@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    working_dir: /uskpa
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - PYTHONBUFFERED=True
+      - DATABASE_URL=postgres://postgres@db/postgres
+      - DJANGO_SETTINGS_MODULE=uskpa.settings
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/uskpa
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    links:
+      - db
+  db:
+    image: postgres:10
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
