@@ -15,6 +15,11 @@ Documentation](../docs)
     $ docker-compose run app python manage.py migrate
     ```
 
+1. Load initial data:
+
+    ```shell
+    $ docker-compose run app python manage.py loaddata groups.json
+    ```
 1. If desired, create a super-user account:
 
     ```shell
@@ -22,7 +27,6 @@ Documentation](../docs)
     ```
 
 1. Visit [http://localhost:8000/] to access the site.
-
 
 ### Continuous Integration
 
