@@ -36,8 +36,9 @@
 
   <main id="main-content">
     {% include 'messages.html' %}
+    {% block content_title %}{% endblock content_title %}
     {% block content %}
-    {% endblock %}
+    {% endblock content %}
   </main>
 
   {% include 'footer.html' %}

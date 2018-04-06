@@ -15,6 +15,11 @@ Documentation](../docs)
     $ docker-compose run app python manage.py migrate
     ```
 
+1. Load initial data:
+
+    ```shell
+    $ docker-compose run app python manage.py loaddata groups.json
+    ```
 1. If desired, create a super-user account:
 
     ```shell
@@ -22,7 +27,6 @@ Documentation](../docs)
     ```
 
 1. Visit [http://localhost:8000/] to access the site.
-
 
 ### Continuous Integration
 
@@ -40,6 +44,14 @@ The CI suite can be executed locally using the
 ```shell
 $circleci build
 ```
+
+### Testing Email functionality
+
+We use [Mailhog](https://github.com/mailhog/MailHog) for testing email
+functionality in a development environment.
+
+In development, all outbound email will be intercepted by mailhog and is available
+for review at http://localhost:8025
 
 ### Running static analysis tools
 

@@ -1,0 +1,16 @@
+[
+{
+    "model": "auth.group",
+    "fields": {
+        "name": "Licensee",
+        "permissions": []
+    }
+},
+{
+    "model": "auth.group",
+    "fields": {
+        "name": "Auditor",
+        "permissions": []
+    }
+}
+]

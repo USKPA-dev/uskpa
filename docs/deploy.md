@@ -49,3 +49,18 @@ Future host of the production USKPA website.
 
 [Heroku]: https://heroku.com
 [Heroku CLI]: https://devcenter.heroku.com/articles/heroku-cli
+
+### Initial Data
+
+The USKPA system depends on several models being populated
+to enable a complete environment for both users and adminitrators.
+
+To load this initial data upon release to a new environment we
+use functionality provided by Django.
+
+Currently, only Django's Group model is populated. Additional
+data will be included as development continues.
+
+```shell
+$ heroku run python manage.py loaddata groups.json
+```

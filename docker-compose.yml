@@ -17,10 +17,16 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - mailhog
     links:
       - db
+      - mailhog
   db:
     image: postgres:10
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
+  mailhog:
+    image: mailhog/mailhog:v1.0.0
+    ports:
+      - "8025:8025"
