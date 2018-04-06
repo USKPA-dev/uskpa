@@ -23,11 +23,6 @@ class ProfileUserAdmin(UserAdmin):
     add_form = UserCreationForm
     add_fieldsets = (
         (None, {
-            'description': (
-                "Enter the new user's name and email address and click save."
-                " The user will be emailed a link allowing them to login to"
-                " the site and set their password."
-            ),
             'fields': ('email', 'username',),
         }),
         ('Password', {
@@ -51,7 +46,9 @@ class ProfileUserAdmin(UserAdmin):
         # Generate reset password key and send email to new user
         if reset_password:
             reset_form = PasswordResetForm({'email': obj.email})
-            assert reset_form.is_valid()
+            # Not checking results of form validation here as
+            # the incoming email is validated by the User ModelForm
+            reset_form.is_valid()
             reset_form.save(
                 request=request,
                 use_https=request.is_secure(),
