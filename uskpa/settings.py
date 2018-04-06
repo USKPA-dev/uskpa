@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
+    'localflavor',
     'kpc.apps.KpcConfig',
     'accounts.apps.AccountsConfig',
 ]
@@ -144,6 +145,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # MAIL
-if DEBUG:
-    EMAIL_HOST = "mailhog"
-    EMAIL_PORT = 1025
+# default to mailhog for development, let env configure it otherwise
+EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', 'mailhog')
+EMAIL_PORT = os.environ.get('DJANGO_EMAIL_PORT', 1025)

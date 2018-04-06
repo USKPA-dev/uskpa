@@ -14,6 +14,7 @@ whitenoise = "*"
 "argon2-cffi" = "*"
 "psycopg2-binary" = "*"
 gunicorn = "*"
+django-localflavor = "*"
 
 
 [dev-packages]
