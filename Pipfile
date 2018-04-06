@@ -22,6 +22,7 @@ gunicorn = "*"
 bandit = "*"
 coverage = "*"
 codecov = "*"
+model-mommy = "*"
 
 
 [requires]

@@ -3,8 +3,10 @@ branch = True
 source =
     kpc
     uskpa
+    accounts
 omit =
     .venv/*
+    /*migrations*/
     manage.py
     */tests/*
     uskpa/wsgi.py

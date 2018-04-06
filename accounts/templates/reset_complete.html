@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="usa-grid usa-section">
+
+<p>Your password has successfully been reset.</p>
+
+<p>Please <a href="{{ login_url }}">Log in</a>.</p>
+</section>
+{% endblock %}

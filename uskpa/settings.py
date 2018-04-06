@@ -27,7 +27,10 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '!!NOT-A-SECRET!!')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.herokuapp.com']
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['.herokuapp.com']
 
 
 # Application definition
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'kpc.apps.KpcConfig',
+    'accounts.apps.AccountsConfig',
 ]
 
 
@@ -137,3 +141,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# MAIL
+if DEBUG:
+    EMAIL_HOST = "mailhog"
+    EMAIL_PORT = 1025
