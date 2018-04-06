@@ -41,6 +41,14 @@ The CI suite can be executed locally using the
 $circleci build
 ```
 
+### Testing Email functionality
+
+We use [Mailhog](https://github.com/mailhog/MailHog) for testing email
+functionality in a development environment.
+
+In development, all outbound email will be intercepted by mailhog and is available
+for review at http://localhost:8025
+
 ### Running static analysis tools
 
 We run two linting tools in continuous integration,
