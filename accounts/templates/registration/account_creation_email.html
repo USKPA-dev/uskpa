@@ -1,0 +1,12 @@
+A user account has been created for you on {{ site_name }}.
+
+Your username: {{ user.get_username }}
+
+To confirm your email address and set your password please
+go to the following page.
+
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+If you believe you've received this email in error please contact us.
+
+- The {{ site_name }} team.
