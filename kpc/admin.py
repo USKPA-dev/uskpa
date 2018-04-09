@@ -4,4 +4,4 @@ from .models import Licensee
 
 @admin.register(Licensee)
 class LicenseeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'address', 'primary_contact', 'city', 'state', 'zip_code', 'tax_id', )
