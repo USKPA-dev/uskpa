@@ -9,6 +9,7 @@ services:
       - PYTHONBUFFERED=True
       - DATABASE_URL=postgres://postgres@db/postgres
       - DJANGO_SETTINGS_MODULE=uskpa.settings
+      - DEBUG=TRUE
     stdin_open: true
     tty: true
     volumes:

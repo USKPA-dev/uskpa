@@ -64,3 +64,9 @@ data will be included as development continues.
 ```shell
 $ heroku run python manage.py loaddata groups.json
 ```
+
+### Email - One time Setup
+
+Additional steps are required to enable outgoing email functionality from a new Heroku instance.
+
+Please see the [Email documentation](email.md) for detailed instructions.
