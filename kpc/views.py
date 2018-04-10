@@ -21,7 +21,7 @@ def licensee_contacts(request):
         licensee_id = request.GET.get('licensee',)
         contacts = User.objects.filter(profile__licensees=licensee_id) if licensee_id else []
         if contacts:
-            contacts_json = [{'id': user.id, 'name': user.get_full_name()} for user in contacts]
+            contacts_json = [{'id': user.id, 'name': user.profile.get_user_display_name()} for user in contacts]
         else:
             contacts_json = []
     else:

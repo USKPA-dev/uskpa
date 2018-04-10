@@ -56,7 +56,7 @@ class LicenseeContactsTests(TestCase):
         request.user = self.user
         response = licensee_contacts(request)
         self.assertEqual(json.loads(response.content),
-                         [{'id': self.user.id, 'name': self.user.get_full_name()}])
+                         [{'id': self.user.id, 'name': self.user.profile.get_user_display_name()}])
 
 
 class CertificateRegisterViewTests(TestCase):
