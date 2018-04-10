@@ -19,6 +19,7 @@ Documentation](../docs)
 
     ```shell
     $ docker-compose run app python manage.py loaddata groups.json
+    $ docker-compose run app python manage.py loaddata kpc-initial.json
     ```
 1. If desired, create a super-user account:
 
