@@ -17,6 +17,8 @@ gunicorn = "*"
 django-localflavor = "*"
 django-anymail = "*"
 django-simple-history = "*"
+django-countries = "*"
+django-datatables-view = "*"
 
 
 [dev-packages]

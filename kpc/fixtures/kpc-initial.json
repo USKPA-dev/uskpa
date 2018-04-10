@@ -1,0 +1,81 @@
+[
+{
+    "model": "kpc.paymentmethod",
+    "pk": 1,
+    "fields": {
+        "slug": "cash",
+        "label": "Cash",
+        "sort_order": 0
+    }
+},
+{
+    "model": "kpc.paymentmethod",
+    "pk": 2,
+    "fields": {
+        "slug": "credit-card",
+        "label": "Credit Card",
+        "sort_order": 0
+    }
+},
+{
+    "model": "kpc.paymentmethod",
+    "pk": 3,
+    "fields": {
+        "slug": "check",
+        "label": "Check",
+        "sort_order": 0
+    }
+},
+{
+    "model": "kpc.deliverystatus",
+    "pk": 4,
+    "fields": {
+        "slug": "assigned",
+        "label": "Assigned",
+        "sort_order": 0
+    }
+},
+{
+    "model": "kpc.deliverystatus",
+    "pk": 5,
+    "fields": {
+        "slug": "shipped",
+        "label": "Shipped",
+        "sort_order": 0
+    }
+},
+{
+    "model": "kpc.deliverystatus",
+    "pk": 6,
+    "fields": {
+        "slug": "void",
+        "label": "Void",
+        "sort_order": 0
+    }
+},
+{
+    "model": "kpc.deliverystatus",
+    "pk": 7,
+    "fields": {
+        "slug": "prepared",
+        "label": "Prepared",
+        "sort_order": 0
+    }
+},
+{
+    "model": "kpc.deliverystatus",
+    "pk": 8,
+    "fields": {
+        "slug": "delivered",
+        "label": "Delivered",
+        "sort_order": 0
+    }
+},
+{
+    "model": "kpc.hscode",
+    "pk": 1,
+    "fields": {
+        "name": "7021.30"
+    }
+}
+]
