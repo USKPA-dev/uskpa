@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block "header" %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+
+<script type="text/javascript" charset="utf8"
+src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+
+{% endblock "header" %}
+
+{% block content %}
+<section class="usa-grid">
+    <legend class="usa-drop_text">Certificates</legend>
+    <div>
+    <div class="usa-width-one-half">
+        <div role="search">
+            <form class="usa-search usa-search-big">
+                <label for="certSearch">Search by Certificate number</label>
+                <input id="certSearch" name="search">
+                <small>Numeric portion only, don't include 'US'.</small>
+            </form>
+        </div>
+    </div>
+    <div class="usa-width-one-half">
+            <div class="dataTables_length" id="certDataTable_length">
+                <label for="certDataTable_length">Certificates to Show</label>
+                <select id="certsShown" name="certDataTable_length" aria-controls="certDataTable">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+    </div>
+</div>
+    <table id='certDataTable'>
+        <thead>
+            <th>Number</th>
+            <th>Licensee</th>
+            <th>Status</th>
+            <th>Date Issued</th>
+            <th>Last Modified</th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</section>
+
+<script>
+    $(document).ready(function() {
+        var oTable = $('#certDataTable').DataTable({
+            "dom": "rtip",
+            "processing": true,
+            "serverSide": true,
+            "ajax": "{% url 'certificate-data' %}"
+        });
+
+
+        $('#certSearch').keyup(function(){
+        oTable.search($(this).val()).draw() ;
+        });
+        $('#certsShown').change(function(){
+            oTable.page.len( $(this).val() ).draw();
+        });
+    });
+</script>
+{% endblock content %}
