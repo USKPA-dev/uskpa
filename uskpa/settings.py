@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
+from django.core.exceptions import ImproperlyConfigured
 import dj_database_url
 import os
 
@@ -145,7 +145,23 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # MAIL
-# default to mailhog for development, let env configure it otherwise
+# default to mailhog for development, let env configure SendGrid otherwise
 EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', 'mailhog')
-EMAIL_PORT = os.environ.get('DJANGO_EMAIL_PORT', 1025)
+DEFAULT_FROM_EMAIL = os.environ.get(
+    'DJANGO_DEFAULT_FROM_EMAIL',
+    default='NOT-CONFIGURED@LOCALHOST.ORG'
+)
+EMAIL_SUBJECT_PREFIX = os.environ.get('DJANGO_EMAIL_SUBJECT_PREFIX', default='[LOCALHOST] ')
+
+if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+    # We're local, mailhog
+    EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', 'mailhog')
+    EMAIL_PORT = os.environ.get('DJANGO_EMAIL_PORT', 1025)
+elif EMAIL_BACKEND.startswith("anymail"):
+    INSTALLED_APPS += ['anymail']
+
+    ANYMAIL = {
+        "SENDGRID_API_KEY": os.environ.get('SENDGRID_API_KEY'),
+    }
+    if not ANYMAIL["SENDGRID_API_KEY"]:
+        raise ImproperlyConfigured(f'SENDGRID_API_KEY must be set when EMAIL_BACKEND={EMAIL_BACKEND}')
