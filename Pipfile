@@ -16,6 +16,7 @@ whitenoise = "*"
 gunicorn = "*"
 django-localflavor = "*"
 django-anymail = "*"
+django-simple-history = "*"
 
 
 [dev-packages]
