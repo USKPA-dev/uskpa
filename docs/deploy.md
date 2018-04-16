@@ -23,7 +23,7 @@ dicussed below is limited to those with the necessary permissions.
 ### Development
 *Heroku app: uskpa-dev*
 
-Deployed from via Heroku Github Deploy: [master]
+Deployed via Heroku Github Deploy from the [master] branch.
 
 The staging environment exists to test new releases prior
 to their production deployment.
