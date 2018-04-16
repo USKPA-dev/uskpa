@@ -10,7 +10,6 @@ class Licensee(models.Model):
     within the United States
     """
     name = models.CharField(max_length=256)
-    primary_contact = models.CharField(max_length=32)
     address = models.CharField(max_length=1024)
     address2 = models.CharField(verbose_name='Address continued',
                                 max_length=1024, blank=True)
