@@ -8,14 +8,6 @@ from .models import Certificate, Licensee, PaymentMethod
 User = get_user_model()
 
 
-def get_latest_cert():
-    """Starting point for new certificate ID generation"""
-    try:
-        return Certificate.objects.latest().number + 1
-    except Certificate.DoesNotExist:
-        return 1
-
-
 class UserModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_full_name()
@@ -46,7 +38,7 @@ class CertificateRegisterForm(forms.Form):
                 self.fields['contact'].initial = contact
         else:
             self.fields['contact'].choices = [('', 'Select a licensee')]
-        self.fields['cert_from'].initial = get_latest_cert()
+        self.fields['cert_from'].initial = Certificate.objects.next_available()
 
     def clean(self):
         """Validations requiring cross-field checks"""

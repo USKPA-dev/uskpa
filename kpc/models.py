@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
-from django.utils import timezone
 from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
@@ -77,6 +76,16 @@ class HSCode(models.Model):
         return self.name
 
 
+class CertificateManager(models.Manager):
+
+    def next_available(self):
+        """Starting point for new certificate ID generation"""
+        try:
+            return Certificate.objects.latest().number + 1
+        except Certificate.DoesNotExist:
+            return 1
+
+
 class Certificate(models.Model):
 
     # Fields on physical certificate
@@ -94,7 +103,7 @@ class Certificate(models.Model):
     date_of_issue = models.DateTimeField(blank=True, null=True, help_text='Date of Issue')
     date_of_expiry = models.DateTimeField(blank=True, null=True, help_text='Date of Expiry')
     shipped_value = models.DecimalField(max_digits=20, decimal_places=2,
-                                        blank=True, null=True, help_text="Value in U.S. $")
+                                        blank=True, null=True, help_text="Value in USD")
     exporter = models.CharField(blank=True, max_length=256)
     exporter_address = models.TextField(blank=True)
     number_of_parcels = models.PositiveIntegerField(blank=True, null=True)
@@ -107,14 +116,15 @@ class Certificate(models.Model):
     assignor = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
     licensee = models.ForeignKey('Licensee', blank=True, null=True, on_delete=models.PROTECT)
     status = models.ForeignKey('DeliveryStatus', on_delete=models.PROTECT)
-    last_modified = models.DateTimeField(default=timezone.now)
+    last_modified = models.DateTimeField(auto_now=True)
     date_of_sale = models.DateTimeField(blank=True, null=True, help_text='Date of sale to licensee')
     payment_method = models.ForeignKey('PaymentMethod', blank=True, null=True, on_delete=models.PROTECT)
-    void = models.BooleanField(default=False, help_text="Certificate has been voided")
+    void = models.BooleanField(default=False, help_text="Certificate has been voided?")
     notes = models.TextField(blank=True)
     # port_of_export = models.ForeignKey('PortOfExport', blank=True, on_delete=models.PROTECT)
 
     history = HistoricalRecords()
+    objects = CertificateManager()
 
     class Meta:
         get_latest_by = ('number', )

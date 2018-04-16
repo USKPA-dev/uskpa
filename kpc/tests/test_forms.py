@@ -1,21 +1,7 @@
 from django.conf import settings
 from django.test import TestCase
 from model_mommy import mommy
-
-from kpc.forms import CertificateRegisterForm, get_latest_cert
-
-
-class UtilityTests(TestCase):
-
-    def test_get_latest_cert_when_no_certs(self):
-        """Next available cert number is 1 if no certs exist"""
-        self.assertEquals(get_latest_cert(), 1)
-
-    def test_get_latest_cert_when_certs(self):
-        """Next available cert number is highest existing+1"""
-        mommy.make('Certificate', number=1)
-        mommy.make('Certificate', number=2)
-        self.assertEquals(get_latest_cert(), 3)
+from kpc.forms import CertificateRegisterForm
 
 
 class CertificateRegistrationTests(TestCase):
