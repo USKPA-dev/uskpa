@@ -2,26 +2,28 @@
 [:arrow_left: Back to USKPA
 Documentation](../docs)
 
-Two instances of the USKPA website are hosted by [Heroku].
+All instances are hosted by [Heroku].
 
-* Staging - https://uskpa-staging.herokuapp.com/
-* Production - https://uskpa.herokuapp.com/
+* Development - https://uskpa-dev.herokuapp.com/
+* Production - TBD
 
 ### Heroku
 
-At this early stage we're using the [Heroku CLI]
-to manage all user-facing instances of the application. In the future we
-will transition to automated deployments via continuous integration.
+We use the [Heroku CLI], Heroku dashboard, and Heroku Github
+Integration to manage instances and automate releases.
+
+Currently, the [master] branch is deployed to the `Development` environment
+on each commit for which the unit test suite executes without error.
 
 Please see the Heroku CLI docs on [deploying with git](https://devcenter.heroku.com/articles/git).
 
 **Note:** Interacting with the specific Heroku Applications
 dicussed below is limited to those with the necessary permissions.
 
-### Staging
-*Heroku app: uskpa-staging*
+### Development
+*Heroku app: uskpa-dev*
 
-Deployed from: [master](https://github.com/18F/uskpa/tree/master)
+Deployed via Heroku Github Deploy from the [master] branch.
 
 The staging environment exists to test new releases prior
 to their production deployment.
@@ -29,11 +31,11 @@ to their production deployment.
 The staging database and application are indepedent of
 and share no data with the production instance.
 
-Example using the [Heroku CLI]:
+Example of a manual deploy using the [Heroku CLI]:
 
 ```shell
 $ heroku login
-$ heroku git:remote -a uskpa-staging
+$ heroku git:remote -a uskpa-dev
 $ git push heroku master
 
 # If migrations are required
@@ -41,14 +43,11 @@ $ heroku run python manage.py migrate
 ```
 
 ### Production
-*Heroku app: uskpa*
+*Heroku app: TBD*
 
 Deployed from: Tagged release
 
 Future host of the production USKPA website.
-
-[Heroku]: https://heroku.com
-[Heroku CLI]: https://devcenter.heroku.com/articles/heroku-cli
 
 ### Initial Data
 
@@ -58,8 +57,7 @@ to enable a complete environment for both users and adminitrators.
 To load this initial data upon release to a new environment we
 use functionality provided by Django.
 
-Currently, only Django's Group model is populated. Additional
-data will be included as development continues.
+Additional data will be included as development continues.
 
 ```shell
 $ heroku run python manage.py loaddata groups.json
@@ -70,3 +68,7 @@ $ heroku run python manage.py loaddata groups.json
 Additional steps are required to enable outgoing email functionality from a new Heroku instance.
 
 Please see the [Email documentation](email.md) for detailed instructions.
+
+[Heroku]: https://heroku.com
+[Heroku CLI]: https://devcenter.heroku.com/articles/heroku-cli
+[master]: https://github.com/18F/uskpa/tree/master

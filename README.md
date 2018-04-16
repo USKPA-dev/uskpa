@@ -1,7 +1,7 @@
 # USKPA website
 
-[![CircleCI](https://circleci.com/gh/18F/uskpa.svg?style=svg)](https://circleci.com/gh/18F/uskpa)
-[![codecov](https://codecov.io/gh/18F/uskpa/branch/master/graph/badge.svg)](https://codecov.io/gh/18F/uskpa)
+[![CircleCI](https://circleci.com/gh/USKPA-dev/uskpa.svg?style=svg)](https://circleci.com/gh/USKPA-dev/uskpa)
+[![codecov](https://codecov.io/gh/USKPA-dev/uskpa/branch/master/graph/badge.svg)](https://codecov.io/gh/USKPA-dev/uskpa)
 
 
 ## Contributing
