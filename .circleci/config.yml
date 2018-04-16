@@ -46,9 +46,9 @@ jobs:
           name: Bandit
           command: pipenv run bandit -r .
 
-      - run:
-          name: Pipenv Security Check
-          command: pipenv check --dev
+    #   - run:
+    #       name: Pipenv Security Check
+    #       command: pipenv check --dev
 
       - run:
           name: Codecov
