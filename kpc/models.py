@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from localflavor.us.models import USZipCodeField, USStateField
+from simple_history.models import HistoricalRecords
 
 
 class Licensee(models.Model):
@@ -24,6 +25,8 @@ class Licensee(models.Model):
                                                  )
                                         ]
                               )
+
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name

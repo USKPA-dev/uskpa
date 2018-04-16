@@ -86,3 +86,20 @@ docker-compose run app bash
 [http://localhost:8000/]: http://localhost:8000/
 [flake8]: http://flake8.pycqa.org/en/latest/
 [bandit]: https://pypi.python.org/pypi/bandit/
+
+
+### Change Tracking
+
+We use [django-simple-history](https://github.com/treyhunner/django-simple-history) to record history for **all** models.
+
+- ModelAdmins must be integrated with history.
+    - Inherit from `simple_history.admin.SimpleHistoryAdmin`
+    - https://django-simple-history.readthedocs.io/en/latest/usage.html#integration-with-django-admin
+
+- Models must be configured to record history.
+  - Add a `simple_history.models.HistoricalRecords` field on the model
+  - https://django-simple-history.readthedocs.io/en/latest/usage.html#models
+
+- Third party models must be configured to record history.
+  - Use `simple_history.register` and `makemigrations`
+  - https://django-simple-history.readthedocs.io/en/latest/advanced.html#history-for-a-third-party-model

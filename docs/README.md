@@ -8,5 +8,6 @@ Welcome to the USKPA website documentation. This documentation is written in
 - [Getting Started with Local Development](local-development.md)
 - [Deployment Process](deploy.md)
 - [Email configuration for new instances](email.md)
+- [Change Tracking & Data Lineage](history.md)
 
 [gh-md]: https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown
