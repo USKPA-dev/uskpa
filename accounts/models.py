@@ -24,6 +24,7 @@ class Profile(models.Model):
     """Store additional user information"""
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=32, blank=True)
+    licensees = models.ManyToManyField('kpc.Licensee', blank=True, related_name='contacts')
 
     history = HistoricalRecords()
 
