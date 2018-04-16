@@ -17,6 +17,21 @@ class UserModelChoiceField(forms.ModelChoiceField):
         return obj.get_full_name()
 
 
+class LicenseeCertificateForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        """All fields are required for Licensee to complete certificate"""
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs["required"] = "required"
+
+    class Meta:
+        model = Certificate
+        fields = ('aes', 'country_of_origin', 'shipped_value', 'exporter', 'exporter_address',
+                  'number_of_parcels', 'consignee', 'consignee_address', 'carat_weight', 'harmonized_code',
+                  'date_of_issue', 'date_of_expiry')
+
+
 class CertificateRegisterForm(forms.Form):
     LIST = 'list'
     SEQUENTIAL = 'sequential'
@@ -25,7 +40,7 @@ class CertificateRegisterForm(forms.Form):
 
     licensee = forms.ModelChoiceField(queryset=Licensee.objects.all())
     contact = UserModelChoiceField(queryset=User.objects.all())
-    date_of_sale = forms.DateTimeField(initial=datetime.date.today)
+    date_of_sale = forms.DateField(initial=datetime.date.today)
     registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS,
                                             widget=USWDSRadioSelect(attrs={'class': 'usa-unstyled-list'}),
                                             initial=SEQUENTIAL)

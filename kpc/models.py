@@ -109,6 +109,14 @@ class Certificate(models.Model):
     def __str__(self):
         return self.display_name
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('cert-details', args=[str(self.id)])
+
+    def get_anchor_tag(self):
+        """Link to this object"""
+        return f"<a href={self.get_absolute_url()}>{self.display_name}</a>"
+
     @property
     def display_name(self):
         return f"US{self.number}"
@@ -127,3 +135,15 @@ class Certificate(models.Model):
         q = QueryDict(mutable=True)
         q.setlist('status', cls.DEFAULT_SEARCH)
         return q.urlencode()
+
+    @property
+    def licensee_editable(self):
+        return self.status == self.ASSIGNED
+
+    def user_can_access(self, user):
+        """True if user can access this certificate"""
+        return user.profile.certificates().filter(id=self.id).exists()
+
+    def set_prepared(self):
+        self.status = self.PREPARED
+        self.save()

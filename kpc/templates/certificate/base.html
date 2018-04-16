@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificate US{{object.number}}{% endblock %}
+
+{% block content %}
+<div class="usa-grid">
+    <div class='cert-header'>
+        <div>
+            <legend>{{object}} {% if user.is_superuser %}
+                <a title='Edit certificate' href="{% url 'admin:kpc_certificate_change' object.id %}">
+                    <i class="far fa-edit"></i>
+                </a>
+                {% endif %}
+            </legend>
+        </div>
+        <div>
+            <div class="usa-width-one-third">
+                <span class="attr-label">Status: </span>{{object.get_status_display}}
+            </div>
+            <div class="usa-width-one-third">
+                <span class="attr-label">Licensee:</span> {{object.licensee}}
+            </div>
+            <div class="usa-width-one-third">
+                <span class="attr-label">Assignor:</span> {{object.assignor}}
+            </div>
+        </div>
+        <div>
+            <div class="usa-width-one-third">
+                <span class="attr-label">Modified:</span> {{object.last_modified}}
+            </div>
+            <div class="usa-width-one-third">
+                <span class="attr-label">Contact:</span> {{object.contact}}
+            </div>
+            <div class="usa-width-one-third">
+                <span class="attr-label">Date Sold:</span> {{object.date_of_sale}}
+            </div>
+        </div>
+        {% if object.notes %}
+        <div>
+            <span class="attr-label">Notes:</span> {{object.notes}}
+        </div>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div id="certificate-fields">
+        {% block certificate-body-fields %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
