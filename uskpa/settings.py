@@ -108,6 +108,8 @@ PASSWORD_HASHERS = [
 if DEBUG:
     AUTH_PASSWORD_VALIDATORS = []
 else:
+    # PRODUCTION SETTINGS
+    # ------------------------------------------------------------------------------
     AUTH_PASSWORD_VALIDATORS = [
         {
             'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -122,6 +124,24 @@ else:
             'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         },
     ]
+    # Logout users after 20 minutes of inactivity
+    SESSION_SAVE_EVERY_REQUEST = True
+    SESSION_COOKIE_AGE = 20 * 60
+
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', True)
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_CONTENT_TYPE_NOSNIFF = os.environ.get('DJANGO_SECURE_CONTENT_TYPE_NOSNIFF', True)
+    # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
+    SECURE_HSTS_SECONDS = 60
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', True)
+    SECURE_HSTS_PRELOAD = os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', True)
+
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
