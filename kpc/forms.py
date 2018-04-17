@@ -1,8 +1,9 @@
+import datetime
+
 from django import forms
 from django.contrib.auth import get_user_model
 
-from .models import Licensee, PaymentMethod, Certificate
-import datetime
+from .models import Certificate, Licensee, PaymentMethod
 
 User = get_user_model()
 
@@ -39,9 +40,10 @@ class CertificateRegisterForm(forms.Form):
         if data:
             licensee = data.get('licensee', None)
             contact = data.get('contact', None)
-        if data and licensee:
-            self.fields['contact'].queryset = User.objects.filter(profile__licensees__in=licensee)
-            self.fields['contact'].initial = contact
+            if licensee:
+                self.fields['contact'].queryset = User.objects.filter(profile__licensees__in=[licensee])
+            if contact:
+                self.fields['contact'].initial = contact
         else:
             self.fields['contact'].choices = [('', 'Select a licensee')]
         self.fields['cert_from'].initial = get_latest_cert()
@@ -57,7 +59,7 @@ class CertificateRegisterForm(forms.Form):
         method = cleaned_data.get('registration_method')
 
         if licensee and contact:
-            if licensee not in contact.profile.licensees.all():
+            if not contact.profile.licensees.filter(id=licensee.id).exists():
                 raise forms.ValidationError(
                     "Contact is not associated with selected Licensee"
                 )

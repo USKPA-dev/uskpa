@@ -1,7 +1,8 @@
-from django.test import TestCase
 from django.conf import settings
+from django.test import TestCase
 from model_mommy import mommy
-from kpc.forms import get_latest_cert, CertificateRegisterForm
+
+from kpc.forms import CertificateRegisterForm, get_latest_cert
 
 
 class UtilityTests(TestCase):

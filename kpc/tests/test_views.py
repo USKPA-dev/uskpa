@@ -1,13 +1,15 @@
-from django.test import TestCase, RequestFactory, Client
-from django.contrib.auth.models import Permission, AnonymousUser
-from django.contrib.contenttypes.models import ContentType
+import json
+
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
+from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from model_mommy import mommy
-from kpc.views import licensee_contacts, CertificateRegisterView
+
 from kpc.models import Certificate
-from django.core.exceptions import PermissionDenied
-import json
+from kpc.views import CertificateRegisterView, licensee_contacts
 
 
 class LicenseeContactsTests(TestCase):
@@ -66,6 +68,7 @@ class CertificateRegisterViewTests(TestCase):
         self.admin_user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
         self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         self.user.profile.licensees.add(self.licensee)
+
         payment = mommy.make('PaymentMethod')
         # Valid registration form input
         self.sequential_kwargs = {'registration_method': 'sequential',  'cert_from': 1, 'cert_to': 5}
@@ -91,7 +94,7 @@ class CertificateRegisterViewTests(TestCase):
             CertificateRegisterView.as_view()(request)
 
     def test_superuser_can_access(self):
-        """Non-superusers cannot access"""
+        """Superusers can access"""
         request = self.factory.post('')
         request.user = self.admin_user
         response = CertificateRegisterView.as_view()(request)
@@ -124,6 +127,7 @@ class CertificateRegisterViewTests(TestCase):
         self.form_kwargs.update(self.list_kwargs)
 
         response = client.post(reverse('cert-register'), self.form_kwargs, follow=True)
+
         self.assertEqual(Certificate.objects.count(), 2)
 
         message = list(response.context['messages']).pop()

@@ -1,22 +1,8 @@
-from django.test import SimpleTestCase, TestCase
 from django.core.exceptions import ValidationError
-
+from django.test import SimpleTestCase, TestCase
 from model_mommy import mommy
 
-from kpc.models import Licensee, Certificate, LabeledModel, HSCode
-
-
-# setup model_mommy for django-localflavor
-def _gen_zipcode():
-    return "00000-0000"
-
-
-def _gen_state():
-    return 'NY'
-
-
-mommy.generators.add('localflavor.us.models.USZipCodeField', _gen_zipcode)
-mommy.generators.add('localflavor.us.models.USStateField', _gen_state)
+from kpc.models import Certificate, HSCode, LabeledModel, Licensee
 
 
 class LicenseeTests(SimpleTestCase):

@@ -1,8 +1,9 @@
 from django.conf import settings
+from django.http import HttpRequest
 from django.test import TestCase
 from model_mommy import mommy
-from django.http import HttpRequest
-from kpc.admin import LicenseeAdminForm, LicenseeAdmin
+
+from kpc.admin import LicenseeAdmin, LicenseeAdminForm
 from kpc.models import Licensee
 
 
