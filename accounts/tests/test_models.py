@@ -27,3 +27,18 @@ class ProfileTests(TestCase):
         user.save()
         user.refresh_from_db()
         self.assertEqual(user.profile.phone_number, 'NEW_VALUE')
+
+    def test_certs_returns_all_for_superusers(self):
+        """Superusers can see all certiticates"""
+        mommy.make('Certificate')
+        user = mommy.make(User, is_superuser=True)
+        self.assertEqual(user.profile.certificates().count(), 1)
+
+    def test_certs_limited_by_licensees_for_users(self):
+        """Users can only see certificates associated with their licensees"""
+        licensee = mommy.make('Licensee')
+        mommy.make('Certificate', licensee=licensee)
+        user = mommy.make(User)
+        self.assertEqual(user.profile.certificates().count(), 0)
+        user.profile.licensees.add(licensee)
+        self.assertEqual(user.profile.certificates().count(), 1)
