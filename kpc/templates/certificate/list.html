@@ -57,7 +57,7 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
 
         $('#certSearch').keyup(function(){
-        oTable.search($(this).val()).draw() ;
+            oTable.search($(this).val()).draw() ;
         });
         $('#certsShown').change(function(){
             oTable.page.len( $(this).val() ).draw();
