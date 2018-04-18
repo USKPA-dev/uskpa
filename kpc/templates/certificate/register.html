@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="usa-grid">
+    <form target='' class="" method="POST">
+            {% csrf_token %}
+            <div id='no-contacts-warning' style="display: none">
+                <div class="usa-alert usa-alert-warning">
+                    <ul class="usa-checklist">
+                        <li>No contacts are currently associated with the selected Licensee.</li>
+                    </ul>
+                </div>
+            </div>
+            <fieldset class="usa-fieldset-inputs usa-sans">
+                <legend class="usa-drop_text">Register new Certificates</legend>
+
+                <span class="usa-form-hint">First select a Licensee and then an associated Contact</span>
+                {% if form.non_field_errors %}
+                    <div class="usa-alert usa-alert-error">
+                        <ul class="usa-checklist">
+                            {% for error in form.non_field_errors %}
+                                <li>{{error}}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <div>
+                    <div class="usa-input-grid usa-input-grid-medium">
+                        {% include 'uswds/form-field.html' with field=form.licensee %}
+                    </div>
+                    <div class="usa-input-grid usa-input-grid-small">
+                         {% include 'uswds/form-field.html' with field=form.contact %}
+                    </div>
+                </div>
+
+            </fieldset>
+
+            <fieldset>
+                {% include 'uswds/form-field.html' with field=form.date_of_issue %}
+            </fieldset>
+
+            <fieldset class="usa-fieldset-inputs usa-sans">
+                <legend class="usa-sr-only">Registration Method</legend>
+                <p>Registration Method</p>
+                 {{form.registration_method}}
+            </fieldset>
+
+            <fieldset class="usa-fieldset-inputs usa-sans  cert-generation"
+                        id='sequentialInputs'
+                        {% if form.registration_method.value == form.LIST %}
+                            style='display: none'
+                        {% endif %}
+                >
+                <div class="usa-input-grid usa-input-grid-small">
+                    {% include 'uswds/form-field.html' with field=form.cert_from %}
+                </div>
+                <div class="usa-input-grid usa-input-grid-small">
+                    {% include 'uswds/form-field.html' with field=form.cert_to %}
+                </div>
+            </fieldset>
+
+            <fieldset class="usa-fieldset-inputs usa-sans cert-generation"
+                        id='listInputs'
+                        {% if form.registration_method.value != form.LIST %}
+                            style='display: none'
+                        {% endif %}
+                    >
+                    {% include 'uswds/form-field.html' with field=form.cert_list %}
+                <span class="usa-input-label-helper">comma delimited</span>
+            </fieldset>
+
+            <fieldset class="usa-fieldset-inputs usa-sans">
+                <div class="usa-input-grid usa-input-grid-small">
+                    {% include 'uswds/form-field.html' with field=form.payment_method %}
+                </div>
+                <div class="usa-input-grid usa-input-grid-small">
+                    {% include 'uswds/form-field.html' with field=form.payment_amount%}
+                </div>
+            </fieldset>
+            <input type="submit" value="Issue Certificates">
+    </form>
+</section>
+
+<script>
+
+$( document ).ready(function() {
+
+    $("input[name='registration_method']").change( function(){
+        $(".cert-generation").toggle();
+    });
+
+    $('#id_licensee').change(function() {
+        var licensee = this.value;
+        updateContacts(licensee);
+    });
+
+    var initial_option = '<option value="">---------</option>';
+
+    function updateContacts(licensee) {
+        $('#no-contacts-warning').hide();
+        if (licensee == '') {
+            $('#id_contact').html(initial_option);
+        } else {
+            var options = initial_option;
+            $.getJSON({
+                url: "{% url 'licensee-contacts' %}",
+                data: { "licensee": licensee },
+                success: function (response) {
+                    if (response.length == 0) {
+                        $('#no-contacts-warning').show();
+                    }
+                    response.forEach(function (contact) {
+                        options += '<option value="' + contact.id + '">' + contact.name + '</option>';
+                    });
+                    $('#id_contact').html(options);
+                },
+                error: function (xhr) {
+                    alert("Failed to fetch list of Contacts.\nPlease select another licensee to try again or contact us for assistance.");
+                }
+            });
+        }
+    };
+});
+</script>
+
+{% endblock %}

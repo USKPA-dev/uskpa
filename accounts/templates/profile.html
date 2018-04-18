@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile{% endblock %}
+{% block content %}
+
+
+<form action="" method="POST" class="form">
+        <div class="usa-grid">
+            <legend>User Profile</legend>
+
+            {% if passwordchangeform.non_field_errors %}
+            <div class="usa-alert usa-alert-error">
+                <div class="usa-alert-body">
+                    <h3 class="usa-alert-heading">Password change failed.</h3>
+                    {% for error in passwordchangeform.non_field_errors %}
+                        <p class="usa-alert-text">{{error}}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% csrf_token %}
+            <div class="usa-width-one-half">
+            {% for field in userform %}
+                {% include 'uswds/form-field.html' %}
+            {% endfor %}
+            </div>
+            <div class="usa-width-one-half">
+            {% for field in userprofileform %}
+                {% include 'uswds/form-field.html' %}
+            {% endfor %}
+            </div>
+        </div>
+
+        <div class="usa-grid">
+            {% with passwordchangeform as form %}
+                {% include 'change_password_form.html' %}
+            {% endwith %}
+        </div>
+
+        <div class="usa-grid">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+{% endblock %}
