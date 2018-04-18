@@ -43,19 +43,11 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
 
     def form_valid(self, form):
         """Generate requested Certificates"""
-        method = form.cleaned_data['registration_method']
         cert_kwargs = {'assignor': self.request.user, 'licensee': form.cleaned_data['licensee'],
                        'date_of_issue': form.cleaned_data['date_of_issue']}
-        if method == 'sequential':
-            start = form.cleaned_data['cert_from']
-            end = form.cleaned_data['cert_to']
-            certs = [i for i in range(start, end+1)]
-        if method == 'list':
-            certs = [cert_number.strip()[2:] for cert_number in form.cleaned_data['cert_list'].split(',')]
-
+        certs = form.get_cert_list()
         if certs:
-            Certificate.objects.bulk_create([Certificate(number=i, **cert_kwargs) for i in certs])
-
+            Certificate.objects.bulk_create(Certificate(number=i, **cert_kwargs) for i in certs)
         messages.success(self.request, f'Generated {len(certs)} new certificates.')
         return super().form_valid(form)
 
@@ -73,7 +65,7 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
 
     def filter_queryset(self, qs):
         # Filter by certificate number
-        search = self.request.GET.get(u'search[value]', None)
+        search = self.request.GET.get('search[value]')
         if search:
             qs = qs.filter(number__istartswith=search)
         return qs

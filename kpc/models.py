@@ -33,16 +33,6 @@ class Licensee(models.Model):
         return self.name
 
 
-class CertificateManager(models.Manager):
-
-    def next_available(self):
-        """Starting point for new certificate ID generation"""
-        try:
-            return Certificate.objects.latest().number + 1
-        except Certificate.DoesNotExist:
-            return 1
-
-
 class Certificate(models.Model):
     ASSIGNED = 'assigned'
     PREPARED = 'prepared'
@@ -72,7 +62,7 @@ class Certificate(models.Model):
     )
 
     # Fields on physical certificate
-    number = models.PositiveIntegerField(help_text='USKPA Certificate ID number')
+    number = models.PositiveIntegerField(help_text='USKPA Certificate ID number', unique=True)
     aes = models.CharField(max_length=15,
                            blank=True,
                            help_text='AES Confirmation Number (ITN)',
@@ -109,7 +99,6 @@ class Certificate(models.Model):
     # port_of_export = models.ForeignKey('PortOfExport', blank=True, on_delete=models.PROTECT)
 
     history = HistoricalRecords()
-    objects = CertificateManager()
 
     class Meta:
         get_latest_by = ('number', )
@@ -120,3 +109,11 @@ class Certificate(models.Model):
     @property
     def display_name(self):
         return f"US{self.number}"
+
+    @classmethod
+    def next_available_number(cls):
+        """Starting point for new certificate ID generation"""
+        try:
+            return cls.objects.latest().number + 1
+        except cls.DoesNotExist:
+            return 1

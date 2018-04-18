@@ -63,3 +63,18 @@ class CertificateRegistrationTests(TestCase):
         self.assertIn("Certificate 'To' value must be greater than or equal to 'From' value.",
                       [e.message for e in form.non_field_errors().data])
         self.assertFalse(valid)
+
+    def test_parse_sequential(self):
+        """List of sequential integers generated from provided start/end points"""
+        self.form_kwargs.pop('cert_list')
+        self.form_kwargs.update(
+            {'registration_method': 'sequential', 'cert_from': 1, 'cert_to': 3})
+        form = CertificateRegisterForm(self.form_kwargs)
+        form.is_valid()
+        self.assertEqual(form.get_cert_list(), [1, 2, 3])
+
+    def test_parse_list(self):
+        """List of integers returned from incoming string"""
+        form = CertificateRegisterForm(self.form_kwargs)
+        form.is_valid()
+        self.assertEqual(form.get_cert_list(), [1])

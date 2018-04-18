@@ -47,7 +47,7 @@ class CertificateRegisterForm(forms.Form):
                 self.fields['contact'].initial = contact
         else:
             self.fields['contact'].choices = [('', self.fields['contact'].empty_label)]
-        self.fields['cert_from'].initial = Certificate.objects.next_available()
+        self.fields['cert_from'].initial = Certificate.next_available_number()
 
     def clean(self):
         """Validations requiring cross-field checks"""
@@ -57,7 +57,7 @@ class CertificateRegisterForm(forms.Form):
         cert_from = cleaned_data.get("cert_from")
         cert_to = cleaned_data.get("cert_to")
         cert_list = cleaned_data.get("cert_list")
-        method = cleaned_data.get('registration_method')
+        self.method = cleaned_data.get('registration_method')
 
         if licensee and contact:
             if not contact.profile.licensees.filter(id=licensee.id).exists():
@@ -65,11 +65,11 @@ class CertificateRegisterForm(forms.Form):
                     "Contact is not associated with selected Licensee"
                 )
 
-        if method == self.LIST and not cert_list:
+        if self.method == self.LIST and not cert_list:
             self.add_error('cert_list', 'List of ID values required.')
             raise forms.ValidationError("Certificate List must be provided when List method is selected.")
 
-        if method == self.SEQUENTIAL and (not cert_from or not cert_to):
+        if self.method == self.SEQUENTIAL and (not cert_from or not cert_to):
             raise forms.ValidationError("Certificate To and From must be provided when Sequential method is selected.")
 
         if cert_from and cert_to:
@@ -80,3 +80,15 @@ class CertificateRegisterForm(forms.Form):
 
         # TODO more validation to be done here.
         # Check for requested Cert Number conflicts before attempting creation
+
+    def get_cert_list(self):
+        """return list of certificates to generate"""
+        certs = []
+        if self.method == self.SEQUENTIAL:
+            start = self.cleaned_data['cert_from']
+            end = self.cleaned_data['cert_to']
+            certs = [i for i in range(start, end+1)]
+        elif self.method == self.LIST:
+            cert_list = self.cleaned_data['cert_list'].split(',')
+            certs = [int(cert_number.strip()[2:]) for cert_number in cert_list]
+        return certs

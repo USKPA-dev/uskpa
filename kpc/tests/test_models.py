@@ -26,23 +26,10 @@ class LicenseeTests(SimpleTestCase):
         self.licensee.clean_fields()
 
 
-class CertificateManagerTests(TestCase):
-
-    def test_next_available_when_no_certs(self):
-        """Next available cert number is 1 if no certs exist"""
-        self.assertEquals(Certificate.objects.next_available(), 1)
-
-    def test_next_available_when_certs(self):
-        """Next available cert number is highest existing+1"""
-        mommy.make('Certificate', number=1)
-        mommy.make('Certificate', number=2)
-        self.assertEquals(Certificate.objects.next_available(), 3)
-
-
 class CertificateTests(TestCase):
 
     def setUp(self):
-        self.cert = mommy.make(Certificate)
+        self.cert = mommy.make(Certificate, number=1)
 
     def test_display_name(self):
         """Certificates displays as 'US{number}"""
@@ -60,3 +47,12 @@ class CertificateTests(TestCase):
         """
         self.cert.aes = 'X12345678901234'
         self.cert.clean_fields()
+
+    def test_next_available_when_no_certs(self):
+        """Next available cert number is 1 if no certs exist"""
+        self.cert.delete()
+        self.assertEquals(Certificate.next_available_number(), 1)
+
+    def test_next_available_when_certs(self):
+        """Next available cert number is highest existing+1"""
+        self.assertEquals(Certificate.next_available_number(), 2)
