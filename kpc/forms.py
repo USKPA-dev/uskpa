@@ -25,7 +25,7 @@ class CertificateRegisterForm(forms.Form):
 
     licensee = forms.ModelChoiceField(queryset=Licensee.objects.all())
     contact = UserModelChoiceField(queryset=User.objects.all())
-    date_of_issue = forms.DateTimeField(initial=datetime.date.today)
+    date_of_sale = forms.DateTimeField(initial=datetime.date.today)
     registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS,
                                             widget=USWDSRadioSelect(attrs={'class': 'usa-unstyled-list'}),
                                             initial=SEQUENTIAL)

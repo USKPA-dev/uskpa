@@ -44,7 +44,7 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
     def form_valid(self, form):
         """Generate requested Certificates"""
         cert_kwargs = {'assignor': self.request.user, 'licensee': form.cleaned_data['licensee'],
-                       'date_of_issue': form.cleaned_data['date_of_issue']}
+                       'date_of_sale': form.cleaned_data['date_of_sale']}
         certs = form.get_cert_list()
         if certs:
             Certificate.objects.bulk_create(Certificate(number=i, **cert_kwargs) for i in certs)
@@ -78,7 +78,7 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
                 str(item),
                 str(item.licensee),
                 str(item.status),
-                item.date_of_issue.strftime("%Y-%m-%d %H:%M:%S"),
+                item.date_of_issue.strftime("%Y-%m-%d %H:%M:%S") if item.date_of_issue else None,
                 item.last_modified.strftime("%Y-%m-%d %H:%M:%S")
             ])
         return json_data

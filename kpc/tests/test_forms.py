@@ -12,14 +12,21 @@ class CertificateRegistrationTests(TestCase):
         self.user.profile.licensees.add(self.licensee)
         # Valid input we expect to pass clean methods
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
-                            'date_of_issue': '01/01/2018', 'registration_method': 'list',
+                            'date_of_sale': '01/01/2018', 'registration_method': 'list',
                             'payment_method': 'cash',
                             'payment_amount': 1, 'cert_list': 'US1'
                             }
 
-    def test_valid_form_no_errors(self):
-        """Form validates"""
+    def test_valid_form_no_errors_list(self):
+        """Form validates w/ list data"""
         form = CertificateRegisterForm(self.form_kwargs)
+        valid = form.is_valid()
+        self.assertTrue(valid)
+
+    def test_valid_form_no_errors_sequential(self):
+        """Form validates w/ sequential data"""
+        form = CertificateRegisterForm(self.form_kwargs)
+        self._make_sequential(1, 2)
         valid = form.is_valid()
         self.assertTrue(valid)
 
@@ -56,8 +63,7 @@ class CertificateRegistrationTests(TestCase):
 
     def test_id_ranges_must_be_valid(self):
         """cert_from is less than or equal to cert_to"""
-        self.form_kwargs.pop('cert_list')
-        self.form_kwargs.update({'registration_method': 'sequential', 'cert_from': 25, 'cert_to': 10})
+        self._make_sequential(25, 10)
         form = CertificateRegisterForm(self.form_kwargs)
         valid = form.is_valid()
         self.assertIn("Certificate 'To' value must be greater than or equal to 'From' value.",
@@ -66,9 +72,7 @@ class CertificateRegistrationTests(TestCase):
 
     def test_parse_sequential(self):
         """List of sequential integers generated from provided start/end points"""
-        self.form_kwargs.pop('cert_list')
-        self.form_kwargs.update(
-            {'registration_method': 'sequential', 'cert_from': 1, 'cert_to': 3})
+        self._make_sequential(1, 3)
         form = CertificateRegisterForm(self.form_kwargs)
         form.is_valid()
         self.assertEqual(form.get_cert_list(), [1, 2, 3])
@@ -78,3 +82,7 @@ class CertificateRegistrationTests(TestCase):
         form = CertificateRegisterForm(self.form_kwargs)
         form.is_valid()
         self.assertEqual(form.get_cert_list(), [1])
+
+    def _make_sequential(self, start, end):
+        self.form_kwargs.pop('cert_list')
+        self.form_kwargs.update({'registration_method': 'sequential', 'cert_from': start, 'cert_to': end})
