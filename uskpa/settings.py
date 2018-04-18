@@ -26,12 +26,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '!!NOT-A-SECRET!!')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False) == "TRUE"
-
-if DEBUG:
-    ALLOWED_HOSTS = ['*']
-else:
-    ALLOWED_HOSTS = ['.herokuapp.com']
-
+CI_TESTING = os.environ.get('CI_TESTING', False) == "TRUE"
+IS_DEPLOYED = not DEBUG and not CI_TESTING
 
 # Application definition
 
@@ -83,13 +79,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'uskpa.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
 DATABASES = {}
 DATABASES['default'] = dj_database_url.config(conn_max_age=600)
-
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -102,14 +93,15 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher',
 ]
-# https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
 
-if DEBUG:
+if not IS_DEPLOYED:
     AUTH_PASSWORD_VALIDATORS = []
-else:
+    ALLOWED_HOSTS = ['*']
+elif IS_DEPLOYED:
     # PRODUCTION SETTINGS
     # ------------------------------------------------------------------------------
+    ALLOWED_HOSTS = ['.herokuapp.com']
     AUTH_PASSWORD_VALIDATORS = [
         {
             'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',

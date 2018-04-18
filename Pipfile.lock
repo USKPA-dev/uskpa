@@ -120,7 +120,8 @@
         },
         "django-datatables-view": {
             "hashes": [
-                "sha256:37ec5f0c853969e5171c5c8501defe4826de913075cea92fa788bb33d2dfa242"
+                "sha256:37ec5f0c853969e5171c5c8501defe4826de913075cea92fa788bb33d2dfa242",
+                "sha256:92a0ee3870c4f701a732a76647e44555de6e272fe1fba76cfa2f10cb755a550d"
             ],
             "version": "==1.15.1"
         },
