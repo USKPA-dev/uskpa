@@ -8,6 +8,7 @@ jobs:
           TZ: America/New_York
           PIPENV_VENV_IN_PROJECT: true
           DATABASE_URL: postgres://postgres@localhost/uskpa
+          CI_TESTING: "TRUE"
 
       - image: circleci/postgres:10
         environment:
