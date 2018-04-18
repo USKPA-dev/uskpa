@@ -2,12 +2,12 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views.generic.edit import FormView
+from django.views.generic.base import TemplateView
 
 from .forms import ProfileForm, ProfilePasswordChangeForm, UserForm
 
 
-class UserProfileView(LoginRequiredMixin, FormView):
+class UserProfileView(LoginRequiredMixin, TemplateView):
     """
         Handle three forms for user profile page
         User model form
@@ -29,14 +29,17 @@ class UserProfileView(LoginRequiredMixin, FormView):
         data['passwordchangeform'] = self.get_form(ProfilePasswordChangeForm, 'passwordchangeform')
         return data
 
+    def get(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data())
+
     def post(self, request, *args, **kwargs):
         """Check validity of all our forms"""
-        forms = dict((
-            ('userform', self.get_form(UserForm, 'user')),
-            ('userprofileform', self.get_form(ProfileForm, 'userprofile')),
-            ('passwordchangeform', self.get_form(ProfilePasswordChangeForm, 'passwordchangeform'))
-        ))
-        if all([f.is_valid() for f in forms.values()]):
+        forms = {
+            'userform': self.get_form(UserForm, 'user'),
+            'userprofileform': self.get_form(ProfileForm, 'userprofile'),
+            'passwordchangeform': self.get_form(ProfilePasswordChangeForm, 'passwordchangeform')
+        }
+        if all(f.is_valid() for f in forms.values()):
             return self.form_valid(forms)
         else:
             return self.form_invalid(forms)
@@ -47,7 +50,9 @@ class UserProfileView(LoginRequiredMixin, FormView):
 
     def get_form_kwargs(self, prefix):
         """Add additional kwargs to individual forms"""
-        kwargs = super().get_form_kwargs()
+        kwargs = {}
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({'data': self.request.POST})
         if prefix == 'passwordchangeform':
             kwargs.update({'user': self.request.user})
         else:
@@ -80,4 +85,7 @@ class UserProfileView(LoginRequiredMixin, FormView):
         elif not user_data_changed and not password_changed:
             messages.warning(self.request, self.NO_CHANGES_MESSAGE)
 
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(self.success_url)
+
+    def form_invalid(self, forms):
+        return self.render_to_response(self.get_context_data(form=forms))

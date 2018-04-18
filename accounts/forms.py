@@ -22,14 +22,15 @@ class ProfilePasswordChangeForm(PasswordChangeForm):
         self.fields['new_password2'].required = False
         # auth.forms.PasswordChangeForm.old_password sets autofocus to True,
         # not desired here since this is part of a larger form on the page
-        self.fields['old_password'].widget.attrs = {'autocomplete': 'off'}
+        del self.fields['old_password'].widget.attrs['autofocus']
+        self.fields['old_password'].widget.attrs['autocomplete'] = 'off'
         self.fields['new_password1'].widget.attrs['autocomplete'] = 'off'
         self.fields['new_password2'].widget.attrs['autocomplete'] = 'off'
 
     def _get_field_data(self):
-        old = self.data.get('old_password', None)
-        new = self.data.get('new_password1', None)
-        confirm = self.data.get('new_password2', None)
+        old = self.data.get('old_password')
+        new = self.data.get('new_password1')
+        confirm = self.data.get('new_password2')
         return (old, new, confirm)
 
     def attempted_change(self):

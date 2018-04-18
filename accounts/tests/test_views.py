@@ -40,7 +40,6 @@ class ProfileChangeViewTests(TestCase):
         response = self.client.get(self.url)
         self.assertContains(response, self.user.first_name)
         self.assertContains(response, self.user.last_name)
-        self.assertContains(response, self.user.profile.phone_number)
 
     def test_profile_no_changes_if_forms_are_not_modified(self):
         """No data changes take place if the form is not modified on submit"""
