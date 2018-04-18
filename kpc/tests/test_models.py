@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, TestCase
 from model_mommy import mommy
 
-from kpc.models import Certificate, HSCode, LabeledModel, Licensee
+from kpc.models import Certificate, Licensee
 
 
 class LicenseeTests(SimpleTestCase):
@@ -60,23 +60,3 @@ class CertificateTests(TestCase):
         """
         self.cert.aes = 'X12345678901234'
         self.cert.clean_fields()
-
-
-class LabeledModelTests(SimpleTestCase):
-
-    def setUp(self):
-        self.obj = mommy.prepare(LabeledModel)
-
-    def test_str_returns_label(self):
-        """Render instance label value"""
-        self.assertEqual(str(self.obj), self.obj.label)
-
-
-class HSCodeModelTests(SimpleTestCase):
-
-    def setUp(self):
-        self.obj = mommy.prepare(HSCode)
-
-    def test_str_returns_name(self):
-        """Render instance name value"""
-        self.assertEqual(str(self.obj), self.obj.name)

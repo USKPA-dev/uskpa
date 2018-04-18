@@ -33,49 +33,6 @@ class Licensee(models.Model):
         return self.name
 
 
-class LabeledModel(models.Model):
-    slug = models.SlugField()
-    label = models.CharField(max_length=32)
-    sort_order = models.IntegerField(help_text='Sort order override for select inputs',
-                                     default=0)
-    history = HistoricalRecords()
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return self.label
-
-
-class PaymentMethod(LabeledModel):
-    """Valid certificate payment methods"""
-    pass
-
-
-class DeliveryStatus(LabeledModel):
-    """Certificate delivery/processing statuses"""
-
-    class Meta:
-        verbose_name_plural = 'Delivery statuses'
-
-
-class HSCode(models.Model):
-    """
-    The Harmonized Commodity Description and Coding System
-    generally referred to as "Harmonized System" or simply "HS"
-    is a multipurpose international product nomenclature developed
-    by the World Customs Organization (WCO).
-    """
-    name = models.CharField(max_length=32)
-    history = HistoricalRecords()
-
-    class Meta:
-        verbose_name = 'HS code'
-
-    def __str__(self):
-        return self.name
-
-
 class CertificateManager(models.Manager):
 
     def next_available(self):
@@ -87,6 +44,32 @@ class CertificateManager(models.Manager):
 
 
 class Certificate(models.Model):
+    ASSIGNED = 'assigned'
+    PREPARED = 'prepared'
+    SHIPPED = 'shipped'
+    DELIVERED = 'delivered'
+    VOID = 'void'
+
+    STATUS_CHOICES = (
+        (ASSIGNED, 'Assigned'),
+        (PREPARED, 'Prepared'),
+        (SHIPPED, 'Shipped'),
+        (DELIVERED, 'Delivered'),
+        (VOID, 'Void')
+    )
+
+    PAYMENT_METHOD_CHOICES = (
+        ('cash', 'Cash'),
+        ('check', 'Check'),
+    )
+
+    HS_CODE_CHOICES = (
+        ('7102.10', '7102.10'),
+        ('7102.21', '7102.21'),
+        ('7102.29', '7102.29'),
+        ('7102.31', '7102.31'),
+        ('7102.39', '7102.39'),
+    )
 
     # Fields on physical certificate
     number = models.PositiveIntegerField(help_text='USKPA Certificate ID number')
@@ -110,15 +93,17 @@ class Certificate(models.Model):
     consignee = models.CharField(blank=True, max_length=256, help_text='Ultimate Consignee Name')
     consignee_address = models.TextField(blank=True, help_text='Ultimate Consignee Address')
     carat_weight = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
-    harmonized_code = models.ForeignKey('HSCode', blank=True, null=True, on_delete=models.PROTECT)
+    harmonized_code = models.CharField(choices=HS_CODE_CHOICES, max_length=32,
+                                       blank=True)
 
     # Non certificate fields
     assignor = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
     licensee = models.ForeignKey('Licensee', blank=True, null=True, on_delete=models.PROTECT)
-    status = models.ForeignKey('DeliveryStatus', on_delete=models.PROTECT)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=16, default=ASSIGNED)
     last_modified = models.DateTimeField(auto_now=True)
     date_of_sale = models.DateTimeField(blank=True, null=True, help_text='Date of sale to licensee')
-    payment_method = models.ForeignKey('PaymentMethod', blank=True, null=True, on_delete=models.PROTECT)
+    payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=5,
+                                      blank=True)
     void = models.BooleanField(default=False, help_text="Certificate has been voided?")
     notes = models.TextField(blank=True)
     # port_of_export = models.ForeignKey('PortOfExport', blank=True, on_delete=models.PROTECT)

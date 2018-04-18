@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 from .forms import CertificateRegisterForm
-from .models import Certificate, DeliveryStatus
+from .models import Certificate
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -45,8 +45,7 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
         """Generate requested Certificates"""
         method = form.cleaned_data['registration_method']
         cert_kwargs = {'assignor': self.request.user, 'licensee': form.cleaned_data['licensee'],
-                       'date_of_issue': form.cleaned_data['date_of_issue'],
-                       'status': DeliveryStatus.objects.get(slug='assigned')}
+                       'date_of_issue': form.cleaned_data['date_of_issue']}
         if method == 'sequential':
             start = form.cleaned_data['cert_from']
             end = form.cleaned_data['cert_to']

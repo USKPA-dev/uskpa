@@ -3,7 +3,7 @@ import datetime
 from django import forms
 from django.contrib.auth import get_user_model
 
-from .models import Certificate, Licensee, PaymentMethod
+from .models import Certificate, Licensee
 
 User = get_user_model()
 
@@ -23,7 +23,7 @@ class CertificateRegisterForm(forms.Form):
     cert_from = forms.IntegerField(min_value=0, required=False, label='From')
     cert_to = forms.IntegerField(min_value=1, required=False, label='To')
     cert_list = forms.CharField(required=False, label='Certificate ID list')
-    payment_method = forms.ModelChoiceField(queryset=PaymentMethod.objects.all())
+    payment_method = forms.ChoiceField(choices=Certificate.PAYMENT_METHOD_CHOICES)
     payment_amount = forms.DecimalField(max_digits=10, decimal_places=2)
 
     def __init__(self, *args, **kwargs):

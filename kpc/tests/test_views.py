@@ -69,13 +69,12 @@ class CertificateRegisterViewTests(TestCase):
         self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         self.user.profile.licensees.add(self.licensee)
 
-        payment = mommy.make('PaymentMethod')
         # Valid registration form input
         self.sequential_kwargs = {'registration_method': 'sequential',  'cert_from': 1, 'cert_to': 5}
         self.list_kwargs = {'registration_method': 'list', 'cert_list': 'US201, US123456'}
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_issue': '01/01/2018',
-                            'payment_method': payment.id, 'payment_amount': 1
+                            'payment_method': 'cash', 'payment_amount': 1
                             }
         self.factory = RequestFactory()
 
@@ -107,7 +106,6 @@ class CertificateRegisterViewTests(TestCase):
         """
         client = Client()
         client.force_login(self.admin_user)
-        mommy.make('DeliveryStatus', slug='assigned')
         self.form_kwargs.update(self.sequential_kwargs)
 
         response = client.post(reverse('cert-register'), self.form_kwargs, follow=True)
@@ -123,7 +121,6 @@ class CertificateRegisterViewTests(TestCase):
         """
         client = Client()
         client.force_login(self.admin_user)
-        mommy.make('DeliveryStatus', slug='assigned')
         self.form_kwargs.update(self.list_kwargs)
 
         response = client.post(reverse('cert-register'), self.form_kwargs, follow=True)

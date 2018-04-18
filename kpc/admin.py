@@ -5,8 +5,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from accounts.models import Profile
 
-from .models import (Certificate, DeliveryStatus, HSCode, Licensee,
-                     PaymentMethod)
+from .models import Certificate, Licensee
 
 
 class LabeledAdmin(admin.ModelAdmin):
@@ -47,21 +46,6 @@ class LicenseeAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
         licensee = form.save(commit=False)
         licensee.contacts.set(form.cleaned_data['contacts'])
         super().save_related(request, form, formsets, change)
-
-
-@admin.register(HSCode)
-class HSCode(admin.ModelAdmin):
-    pass
-
-
-@admin.register(DeliveryStatus)
-class DeliveryStatusAdmin(LabeledAdmin):
-    pass
-
-
-@admin.register(PaymentMethod)
-class PaymentMethodAdmin(LabeledAdmin):
-    pass
 
 
 @admin.register(Certificate)

@@ -10,11 +10,11 @@ class CertificateRegistrationTests(TestCase):
         self.licensee = mommy.make('Licensee')
         self.user = mommy.make(settings.AUTH_USER_MODEL)
         self.user.profile.licensees.add(self.licensee)
-        payment = mommy.make('PaymentMethod')
         # Valid input we expect to pass clean methods
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_issue': '01/01/2018', 'registration_method': 'list',
-                            'payment_method': payment.id, 'payment_amount': 1, 'cert_list': 'US1'
+                            'payment_method': 'cash',
+                            'payment_amount': 1, 'cert_list': 'US1'
                             }
 
     def test_valid_form_no_errors(self):
