@@ -8,18 +8,27 @@ from .models import Certificate, Licensee
 User = get_user_model()
 
 
+class USWDSRadioSelect(forms.RadioSelect):
+    option_template_name = 'uswds/radio_options.html'
+
+
 class UserModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_full_name()
 
 
 class CertificateRegisterForm(forms.Form):
-    REGISTRATION_METHODS = (('list', 'list'), ('sequential', 'sequential'))
+    LIST = 'list'
+    SEQUENTIAL = 'sequential'
+
+    REGISTRATION_METHODS = ((SEQUENTIAL, 'Sequential'), (LIST, 'List'))
 
     licensee = forms.ModelChoiceField(queryset=Licensee.objects.all())
-    contact = UserModelChoiceField(queryset=User.objects, empty_label='Select a licensee')
+    contact = UserModelChoiceField(queryset=User.objects.all())
     date_of_issue = forms.DateTimeField(initial=datetime.date.today)
-    registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS)
+    registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS,
+                                            widget=USWDSRadioSelect(attrs={'class': 'usa-unstyled-list'}),
+                                            initial=SEQUENTIAL)
     cert_from = forms.IntegerField(min_value=0, required=False, label='From')
     cert_to = forms.IntegerField(min_value=1, required=False, label='To')
     cert_list = forms.CharField(required=False, label='Certificate ID list')
@@ -37,7 +46,7 @@ class CertificateRegisterForm(forms.Form):
             if contact:
                 self.fields['contact'].initial = contact
         else:
-            self.fields['contact'].choices = [('', 'Select a licensee')]
+            self.fields['contact'].choices = [('', self.fields['contact'].empty_label)]
         self.fields['cert_from'].initial = Certificate.objects.next_available()
 
     def clean(self):
@@ -56,11 +65,11 @@ class CertificateRegisterForm(forms.Form):
                     "Contact is not associated with selected Licensee"
                 )
 
-        if method == 'list' and not cert_list:
+        if method == self.LIST and not cert_list:
             self.add_error('cert_list', 'List of ID values required.')
             raise forms.ValidationError("Certificate List must be provided when List method is selected.")
 
-        if method == 'sequential' and (not cert_from or not cert_to):
+        if method == self.SEQUENTIAL and (not cert_from or not cert_to):
             raise forms.ValidationError("Certificate To and From must be provided when Sequential method is selected.")
 
         if cert_from and cert_to:

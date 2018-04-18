@@ -18,7 +18,7 @@ User = get_user_model()
 def licensee_contacts(request):
     """Return users associated with the provided licensee"""
     if request.method == 'GET':
-        licensee_id = request.GET.get('licensee',)
+        licensee_id = request.GET.get('licensee')
         contacts = User.objects.filter(profile__licensees=licensee_id) if licensee_id else []
         if contacts:
             contacts_json = [{'id': user.id, 'name': user.profile.get_user_display_name()} for user in contacts]

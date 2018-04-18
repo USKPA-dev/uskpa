@@ -1,13 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="usa-grid usa-section">
+<section class="usa-grid">
     <form target='' class="" method="POST">
-            {{ form.media }}
-
             {% csrf_token %}
+            <div id='no-contacts-warning' style="display: none">
+                <div class="usa-alert usa-alert-warning">
+                    <ul class="usa-checklist">
+                        <li>No contacts are currently associated with the selected Licensee.</li>
+                    </ul>
+                </div>
+            </div>
             <fieldset class="usa-fieldset-inputs usa-sans">
                 <legend class="usa-drop_text">Register new Certificates</legend>
+
+                <span class="usa-form-hint">First select a Licensee and then an associated Contact</span>
                 {% if form.non_field_errors %}
                     <div class="usa-alert usa-alert-error">
                         <ul class="usa-checklist">
@@ -19,86 +26,55 @@
                 {% endif %}
                 <div>
                     <div class="usa-input-grid usa-input-grid-medium">
-                        {% with form.licensee as field %}
-                            {% include 'uswds/form-field.html' %}
-                        {% endwith %}
+                        {% include 'uswds/form-field.html' with field=form.licensee %}
                     </div>
                     <div class="usa-input-grid usa-input-grid-small">
-                        {% with form.contact as field %}
-                            {% include 'uswds/form-field.html' %}
-                        {% endwith %}
+                         {% include 'uswds/form-field.html' with field=form.contact %}
                     </div>
                 </div>
+
             </fieldset>
+
             <fieldset>
-                    {% with form.date_of_issue as field %}
-                        {% include 'uswds/form-field.html' %}
-                    {% endwith %}
+                {% include 'uswds/form-field.html' with field=form.date_of_issue %}
             </fieldset>
 
             <fieldset class="usa-fieldset-inputs usa-sans">
-
                 <legend class="usa-sr-only">Registration Method</legend>
                 <p>Registration Method</p>
-                <ul class="usa-unstyled-list">
-                    <li>
-                    <input id="sequentialRegister" type="radio"
-                            {% if form.registration_method.value != 'list' %}
-                                checked
-                            {% endif %}
-                            name="registration_method" value="sequential">
-                    <label for="sequentialRegister">Sequential</label>
-                    </li>
-                    <li>
-                    <input id="listRegister" type="radio"
-                            {% if form.registration_method.value == 'list' %}
-                                checked
-                            {% endif %}
-                            name="registration_method" value="list">
-                    <label for="listRegister">List</label>
-                    </li>
-                </ul>
-
+                 {{form.registration_method}}
             </fieldset>
-            <fieldset class="usa-fieldset-inputs usa-sans"
+
+            <fieldset class="usa-fieldset-inputs usa-sans  cert-generation"
                         id='sequentialInputs'
-                        {% if form.registration_method.value == 'list' %}
+                        {% if form.registration_method.value == form.LIST %}
                             style='display: none'
                         {% endif %}
                 >
                 <div class="usa-input-grid usa-input-grid-small">
-                    {% with form.cert_from as field %}
-                        {% include 'uswds/form-field.html' %}
-                    {% endwith %}
+                    {% include 'uswds/form-field.html' with field=form.cert_from %}
                 </div>
                 <div class="usa-input-grid usa-input-grid-small">
-                    {% with form.cert_to as field %}
-                        {% include 'uswds/form-field.html' %}
-                    {% endwith %}
+                    {% include 'uswds/form-field.html' with field=form.cert_to %}
                 </div>
             </fieldset>
 
-            <fieldset class="usa-fieldset-inputs usa-sans"
+            <fieldset class="usa-fieldset-inputs usa-sans cert-generation"
                         id='listInputs'
-                        {% if form.registration_method.value != 'list' %}
+                        {% if form.registration_method.value != form.LIST %}
                             style='display: none'
                         {% endif %}
                     >
-                {% with form.cert_list as field %}
-                    {% include 'uswds/form-field.html' %}
-                {% endwith %}
+                    {% include 'uswds/form-field.html' with field=form.cert_list %}
                 <span class="usa-input-label-helper">comma delimited</span>
             </fieldset>
+
             <fieldset class="usa-fieldset-inputs usa-sans">
                 <div class="usa-input-grid usa-input-grid-small">
-                    {% with form.payment_method as field %}
-                        {% include 'uswds/form-field.html' %}
-                    {% endwith %}
+                    {% include 'uswds/form-field.html' with field=form.payment_method %}
                 </div>
                 <div class="usa-input-grid usa-input-grid-small">
-                    {% with form.payment_amount as field %}
-                        {% include 'uswds/form-field.html' %}
-                    {% endwith %}
+                    {% include 'uswds/form-field.html' with field=form.payment_amount%}
                 </div>
             </fieldset>
             <input type="submit" value="Issue Certificates">
@@ -106,50 +82,43 @@
 </section>
 
 <script>
-    $( "input[name='registration_method']" ).change( function(input) {
-        toggleRegistration(input);
-    });
-
-    function toggleRegistration(id) {
-        var toggleThese = ['listInputs', 'sequentialInputs']
-        toggleThese.forEach( function(id) {
-            div = document.getElementById(id);
-            div.style.display = div.style.display == "none" ? "block" : "none";
-        });
-    }
-
 
 $( document ).ready(function() {
+
+    $("input[name='registration_method']").change( function(){
+        $(".cert-generation").toggle();
+    });
 
     $('#id_licensee').change(function() {
         var licensee = this.value;
         updateContacts(licensee);
     });
 
+    var initial_option = '<option value="">---------</option>';
+
     function updateContacts(licensee) {
-        var options = '<option value="">------</option>';
-
-        $.getJSON({
-            url: "{% url 'licensee-contacts' %}",
-            data: {"licensee": licensee},
-            success: function(response) {
-                if ( response.length == 0 ) {
-                    if (licensee == '') {
-                        options = '<option value="">Select a licensee</option>';
-                    } else {
-                        options = '<option value="">No contacts available</option>';
+        $('#no-contacts-warning').hide();
+        if (licensee == '') {
+            $('#id_contact').html(initial_option);
+        } else {
+            var options = initial_option;
+            $.getJSON({
+                url: "{% url 'licensee-contacts' %}",
+                data: { "licensee": licensee },
+                success: function (response) {
+                    if (response.length == 0) {
+                        $('#no-contacts-warning').show();
                     }
+                    response.forEach(function (contact) {
+                        options += '<option value="' + contact.id + '">' + contact.name + '</option>';
+                    });
+                    $('#id_contact').html(options);
+                },
+                error: function (xhr) {
+                    alert("Failed to fetch list of Contacts.\nPlease select another licensee to try again or contact us for assistance.");
                 }
-                response.forEach (function(contact) {
-                    options += '<option value="' + contact.id + '">' + contact.name + '</option>';
-                });
-                $('#id_contact').html(options);
-
-            },
-            error: function(xhr) {
-                alert("Failed to fetch list of Contacts.\nPlease select another licensee or contact us for assistance.");
-            }
-        });
+            });
+        }
     };
 });
 </script>
