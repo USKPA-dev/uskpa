@@ -14,6 +14,20 @@
                 <span>About Us</span>
               </a>
             </li>
+            {% if user.is_authenticated %}
+            <li>
+                <a class="usa-nav-link" href="{% url 'certificates' %}">
+                  <span>Certificates</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if user.is_superuser %}
+            <li>
+                <a class="usa-nav-link" href="{% url 'cert-register' %}">
+                  <span>Register Certificates</span>
+                </a>
+            </li>
+            {% endif %}
             {% if user.is_superuser %}
             <li>
                 <a class="usa-nav-link" href="{% url 'admin:index' %}">

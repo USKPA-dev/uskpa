@@ -5,7 +5,11 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from accounts.models import Profile
 
-from .models import Licensee
+from .models import Certificate, Licensee
+
+
+class LabeledAdmin(admin.ModelAdmin):
+    list_display = ('slug', 'label', 'sort_order',)
 
 
 class LicenseeAdminForm(forms.ModelForm):
@@ -42,3 +46,8 @@ class LicenseeAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
         licensee = form.save(commit=False)
         licensee.contacts.set(form.cleaned_data['contacts'])
         super().save_related(request, form, formsets, change)
+
+
+@admin.register(Certificate)
+class CertificateAdmin(admin.ModelAdmin):
+    list_display = ('display_name', 'status', 'last_modified', 'licensee', 'assignor',)

@@ -5,6 +5,9 @@ from simple_history.models import HistoricalRecords
 from simple_history import register
 
 
+from kpc.models import Certificate
+
+
 class HistoryUser(get_user_model()):
     """
         Proxy User model here so we can register it
@@ -29,4 +32,15 @@ class Profile(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return self.user.username
+        return self.get_user_display_name()
+
+    def get_user_display_name(self):
+        """User's fullname or username"""
+        return self.user.get_full_name() or self.user.get_username()
+
+    def certificates(self):
+        """Certificates which this user may access"""
+        if self.user.is_superuser:
+            return Certificate.objects.all()
+        else:
+            return Certificate.objects.filter(licensee__in=self.licensees.all())
