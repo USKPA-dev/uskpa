@@ -54,7 +54,7 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
 
 class CertificateJson(LoginRequiredMixin, BaseDatatableView):
     model = Certificate
-    columns = ['number', 'licensee', 'status', 'date_of_issue', 'last_modified']
+    columns = ['number', 'status', 'consignee', 'last_modified', 'value']
     order_columns = columns
 
     max_display_length = 500
@@ -76,9 +76,9 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
         for item in qs:
             json_data.append([
                 str(item),
-                str(item.licensee),
-                str(item.status),
-                item.date_of_issue.strftime("%Y-%m-%d %H:%M:%S") if item.date_of_issue else None,
-                item.last_modified.strftime("%Y-%m-%d %H:%M:%S")
+                item.get_status_display(),
+                item.consignee,
+                item.last_modified.strftime("%Y-%m-%d %H:%M:%S"),
+                f'${item.shipped_value}' if item.shipped_value else None
             ])
         return json_data

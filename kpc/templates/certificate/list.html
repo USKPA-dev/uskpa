@@ -52,7 +52,10 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
             "dom": "rtip",
             "processing": true,
             "serverSide": true,
-            "ajax": "{% url 'certificate-data' %}"
+            "ajax": "{% url 'certificate-data' %}",
+            "order": [[1, "asc"],
+                      [0, "asc"]]
+
         });
 
 
