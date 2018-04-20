@@ -19,6 +19,7 @@ django-anymail = "*"
 django-simple-history = "*"
 django-countries = "*"
 django-datatables-view = "*"
+django-filter = "*"
 
 
 [dev-packages]

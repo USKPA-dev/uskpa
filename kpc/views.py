@@ -1,4 +1,5 @@
 from django.views.generic.edit import FormView
+from django.views.generic import TemplateView
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from django_datatables_view.base_datatable_view import BaseDatatableView
@@ -9,6 +10,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from .forms import CertificateRegisterForm
 from .models import Certificate
+from .filters import CertificateFilter
+from .utils import _filterable_params
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -52,9 +55,18 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
         return super().form_valid(form)
 
 
+class CertificateListView(TemplateView):
+    template_name = 'certificate/list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filters'] = CertificateFilter(self.request.GET, queryset=self.request.user.profile.certificates())
+        return context
+
+
 class CertificateJson(LoginRequiredMixin, BaseDatatableView):
     model = Certificate
-    columns = ['number', 'status', 'consignee', 'last_modified', 'value']
+    columns = ['number', 'status', 'consignee', 'last_modified', 'shipped_value']
     order_columns = columns
 
     max_display_length = 500
@@ -66,6 +78,8 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
     def filter_queryset(self, qs):
         # Filter by certificate number
         search = self.request.GET.get('search[value]')
+        qs = CertificateFilter(
+            _filterable_params(self.request.GET), queryset=qs).qs
         if search:
             qs = qs.filter(number__istartswith=search)
         return qs

@@ -1,0 +1,36 @@
+
+<div>
+    <div class="usa-width-one-half">
+        <button id='filterApply' class="usa-button">Filter</button>
+    </div>
+    <div class="usa-width-one-half">
+        <button id='resetFilters' class="usa-button">Reset</button>
+    </div>
+
+</div>
+
+<form id='dataTable-filters usa-form'>
+    <label for="certSearch">Search by Certificate number</label>
+    <input id="certSearch" class='table-search' name="search" type="number">
+    <small>Numeric portion only, don't include 'US'.</small>
+
+    {% for field in filters.default_fields %}
+        {% include 'certificate/filter_field.html' %}
+    {% endfor %}
+    <hr>
+
+    <ul class="usa-accordion">
+        <li>
+            <button class="usa-accordion-button" aria-expanded="false" aria-controls="extra-filters">
+                Additional Filters
+            </button>
+            <div id="extra-filters" class="usa-accordion-content">
+                {% for field in filters.extra_fields %}
+                    {% include 'certificate/filter_field.html' %}
+                {% endfor %}
+            </div>
+        </li>
+    </ul>
+
+</form>
+

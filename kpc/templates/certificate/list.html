@@ -6,34 +6,26 @@
 <script type="text/javascript" charset="utf8"
 src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
+<style>
+    #id_status label {
+        margin-top: 0em;
+    }
+
+    input[type=date] {
+        padding: 0;
+    }
+</style>
+
 {% endblock "header" %}
 
 {% block content %}
+
 <section class="usa-grid">
-    <legend class="usa-drop_text">Certificates</legend>
-    <div>
-    <div class="usa-width-one-half">
-        <div role="search">
-            <form class="usa-search usa-search-big">
-                <label for="certSearch">Search by Certificate number</label>
-                <input id="certSearch" name="search">
-                <small>Numeric portion only, don't include 'US'.</small>
-            </form>
-        </div>
+    <div class='usa-width-one-third filters'>
+        {% include 'certificate/filters.html' %}
     </div>
-    <div class="usa-width-one-half">
-            <div class="dataTables_length" id="certDataTable_length">
-                <label for="certDataTable_length">Certificates to Show</label>
-                <select id="certsShown" name="certDataTable_length" aria-controls="certDataTable">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-    </div>
-</div>
-    <table id='certDataTable'>
+    <div class="usa-width-two-thirds">
+    <table id='certDataTable' class='table dataTable'>
         <thead>
             <th>Number</th>
             <th>Status</th>
@@ -44,27 +36,66 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
         <tbody>
         </tbody>
     </table>
+    </div>
 </section>
 
 <script>
     $(document).ready(function() {
         var oTable = $('#certDataTable').DataTable({
-            "dom": "rtip",
+            "dom": "irtlp",
             "processing": true,
             "serverSide": true,
-            "ajax": "{% url 'certificate-data' %}",
+            "ajax": {
+                url: "{% url 'certificate-data' %}",
+                data: function (d) {
+                        // attach filter input data to outbound query
+                        $('input:not([type="checkbox"])').not('#certSearch').each(function (){
+                            var value = $(this).val();
+                            if (value) {
+                                d[$(this).attr('name')] = value;
+                            }
+                        });
+                        // attach status checkbox data to outbound query
+                        var status_values = [];
+                        $("input[name='status']:checked").each(function () {
+                            var value = $(this).val();
+                            if (value) {
+                                status_values.push(value);
+                            }
+                        });
+                        if (status_values){
+                            d.status = status_values;
+                        }
+                }
+            },
             "order": [[1, "asc"],
-                      [0, "asc"]]
+                      [0, "asc"]],
+            language: {
+                "info": "Showing _START_ to _END_ of _TOTAL_ certificates",
+                "infoEmpty": "Showing 0 to 0 of 0 certificates",
+                "infoFiltered": "(filtered from _MAX_ total)",
+                "zeroRecords": "No certificates found",
 
+            }
         });
 
+        // Run our filtered search!
+        $('#filterApply').click(function (event) {
+            oTable.search($('#certSearch').val()).draw();
+            event.preventDefault();
+        });
 
-        $('#certSearch').keyup(function(){
-            oTable.search($(this).val()).draw() ;
+        // clear all search filters and refresh data
+        $('#resetFilters').click(function (event) {
+            $(':input').not(':checkbox').not('[name=certDataTable_length]').val('');
+            $('input:checked').prop('checked', false);
+            oTable.search($('#certSearch').val()).draw();
         });
-        $('#certsShown').change(function(){
-            oTable.page.len( $(this).val() ).draw();
+
+        $('[name=certDataTable_length]').change(function(){
+            oTable.page.len($(this).val()).draw();
         });
+
     });
 </script>
 {% endblock content %}
