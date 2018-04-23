@@ -1,7 +1,7 @@
 <fieldset>
 {% for widget in widget.subwidgets %}
     <div class="usa-width-one-half">
-        <label>
+        <label for="{{widget.attrs.id}}">
             {% if forloop.first %}From{% else %}To{% endif %}
         </label>
     {% include widget.template_name %}

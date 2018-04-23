@@ -12,13 +12,15 @@ class RangeWidget(RangeWidget):
 
 class CheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     option_template_name = 'uswds/radio_options.html'
+    template_name = 'uswds/checkbox_input.html'
 
 
 class CertificateFilter(FilterSet):
     DATE_ATTR = {'type': 'date'}
 
     status = MultipleChoiceFilter(
-        choices=Certificate.STATUS_CHOICES, widget=CheckboxSelectMultiple(attrs={'class': 'usa-unstyled-list'}))
+        choices=Certificate.STATUS_CHOICES,
+        widget=CheckboxSelectMultiple(attrs={'class': 'usa-unstyled-list', 'legend': 'Certificate Status'}))
     last_modified = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     date_of_sale = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     shipped_value = RangeFilter(widget=RangeWidget())
