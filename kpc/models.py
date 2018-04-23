@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
+from django.http import QueryDict
 from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
@@ -34,16 +35,18 @@ class Licensee(models.Model):
 
 
 class Certificate(models.Model):
-    ASSIGNED = 'assigned'
-    PREPARED = 'prepared'
-    SHIPPED = 'shipped'
-    DELIVERED = 'delivered'
-    VOID = 'void'
+    ASSIGNED = 0
+    PREPARED = 1
+    INTRANSIT = 2
+    DELIVERED = 3
+    VOID = 4
+
+    DEFAULT_SEARCH = [ASSIGNED, PREPARED, INTRANSIT]
 
     STATUS_CHOICES = (
         (ASSIGNED, 'Assigned'),
         (PREPARED, 'Prepared'),
-        (SHIPPED, 'Shipped'),
+        (INTRANSIT, 'In-transit'),
         (DELIVERED, 'Delivered'),
         (VOID, 'Void')
     )
@@ -89,7 +92,7 @@ class Certificate(models.Model):
     # Non certificate fields
     assignor = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
     licensee = models.ForeignKey('Licensee', blank=True, null=True, on_delete=models.PROTECT)
-    status = models.CharField(choices=STATUS_CHOICES, max_length=16, default=ASSIGNED)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=ASSIGNED)
     last_modified = models.DateTimeField(auto_now=True)
     date_of_sale = models.DateTimeField(blank=True, null=True, help_text='Date of sale to licensee')
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=5,
@@ -117,3 +120,10 @@ class Certificate(models.Model):
             return cls.objects.latest().number + 1
         except cls.DoesNotExist:
             return 1
+
+    @classmethod
+    def default_search_filters(cls):
+        """Return default search as URL parameters"""
+        q = QueryDict(mutable=True)
+        q.setlist('status', cls.DEFAULT_SEARCH)
+        return q.urlencode()

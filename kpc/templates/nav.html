@@ -1,3 +1,4 @@
+{% load default_search %}
 <nav role="navigation" class="usa-nav">
         <div class="usa-nav-inner">
           <button class="usa-nav-close">
@@ -16,7 +17,7 @@
             </li>
             {% if user.is_authenticated %}
             <li>
-                <a class="usa-nav-link" href="{% url 'certificates' %}">
+                <a class="usa-nav-link" href="{% url 'certificates' %}{% default_search %}">
                   <span>Certificates</span>
                 </a>
             </li>
