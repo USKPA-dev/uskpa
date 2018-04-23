@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
+from django.http import QueryDict
 from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
@@ -39,6 +40,8 @@ class Certificate(models.Model):
     INTRANSIT = 2
     DELIVERED = 3
     VOID = 4
+
+    DEFAULT_SEARCH = [ASSIGNED, PREPARED, INTRANSIT]
 
     STATUS_CHOICES = (
         (ASSIGNED, 'Assigned'),
@@ -117,3 +120,10 @@ class Certificate(models.Model):
             return cls.objects.latest().number + 1
         except cls.DoesNotExist:
             return 1
+
+    @classmethod
+    def default_search_filters(cls):
+        """Return default search as URL parameters"""
+        q = QueryDict(mutable=True)
+        q.setlist('status', cls.DEFAULT_SEARCH)
+        return q.urlencode()

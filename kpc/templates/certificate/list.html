@@ -49,10 +49,13 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
                 url: "{% url 'certificate-data' %}",
                 data: function (d) {
                         // attach filter input data to outbound query
+                        var filters = [];
+
                         $('input:not([type="checkbox"])').not('#certSearch').each(function (){
                             var value = $(this).val();
                             if (value) {
                                 d[$(this).attr('name')] = value;
+                                filters.push($(this).serialize());
                             }
                         });
                         // attach status checkbox data to outbound query
@@ -61,11 +64,17 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
                             var value = $(this).val();
                             if (value) {
                                 status_values.push(value);
+                                filters.push($(this).serialize());
                             }
                         });
                         if (status_values){
                             d.status = status_values;
                         }
+                        // add our filter parameters to window
+                        if (filters.lengths != 0) {
+                            window.history.pushState({}, null, '?' + filters.join('&'));
+                        }
+
                 }
             },
             "order": [[1, "asc"],
@@ -89,6 +98,7 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
         $('#resetFilters').click(function (event) {
             $(':input').not(':checkbox').not('[name=certDataTable_length]').val('');
             $('input:checked').prop('checked', false);
+            window.history.pushState({}, null, '.');
             oTable.search($('#certSearch').val()).draw();
         });
 

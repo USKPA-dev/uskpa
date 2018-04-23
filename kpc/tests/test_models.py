@@ -56,3 +56,8 @@ class CertificateTests(TestCase):
     def test_next_available_when_certs(self):
         """Next available cert number is highest existing+1"""
         self.assertEquals(Certificate.next_available_number(), 2)
+
+    def test_default_search_filters_returns_query_params(self):
+        """Query parameters for default cert search are generated"""
+        expected = 'status=0&status=1&status=2'
+        self.assertEqual(Certificate.default_search_filters(), expected)
