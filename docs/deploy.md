@@ -63,6 +63,18 @@ Additional data will be included as development continues.
 $ heroku run python manage.py loaddata groups.json
 ```
 
+### Environment Variables
+
+We leverage Heroku Config variables for instance configuration.
+
+The following variables can be set in Heroku to alter the site's behavior.
+
+Var | Value | Destination
+--- | --- | ---
+ADMINS | Comma delimited list of email addresses | ``settings.ADMINS``
+DEBUG | TRUE | ``settings.DEBUG``
+
+
 ### Email - One time Setup
 
 Additional steps are required to enable outgoing email functionality from a new Heroku instance.

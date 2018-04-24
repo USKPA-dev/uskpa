@@ -95,6 +95,13 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptPasswordHasher',
 ]
 
+# Set admin list
+admins = os.environ.get('ADMINS', '')
+if admins:
+    ADMINS = [('', email) for email in admins.split(',')]
+else:
+    ADMINS = []
+MANAGERS = ADMINS
 
 if not IS_DEPLOYED:
     AUTH_PASSWORD_VALIDATORS = []
@@ -134,7 +141,6 @@ elif IS_DEPLOYED:
     SECURE_HSTS_SECONDS = 60
     SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', True)
     SECURE_HSTS_PRELOAD = os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', True)
-
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

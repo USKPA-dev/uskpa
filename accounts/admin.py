@@ -42,7 +42,7 @@ class ProfileUserAdmin(SimpleHistoryAdmin, UserAdmin):
         else:
             reset_password = False
 
-        super(UserAdmin, self).save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
         # Generate reset password key and send email to new user
         if reset_password:
