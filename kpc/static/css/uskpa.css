@@ -1,0 +1,27 @@
+.cert-body,
+.cert-body-top {
+    margin-top: 1em;
+}
+.cert-header {
+    overflow-y: hidden;
+}
+.attr-label {
+    font-weight: bold;
+}
+
+
+#certificate-fields *> input,
+#certificate-fields *> select,
+#certificate-fields *> textarea {
+    max-width: 70%;
+    display: inline-block;
+}
+
+#certificate-fields *> label
+ {
+    font-weight: bold;
+    width: 25%;
+    display: inline-block;
+    margin-top: 1rem;
+    vertical-align: top;
+}

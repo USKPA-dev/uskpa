@@ -1,12 +1,12 @@
 {% if field.errors %}
     <div class="usa-input-error">
         <label class="usa-input-error-label" for="{{ field.id_for_label }}">{{field.label}}</label>
+        {{ field }}
         {% for error in field.errors %}
             <span class="usa-input-error-message" role="alert">
                 {{error}}
             </span>
         {% endfor %}
-        {{ field }}
     </div>
 {% else %}
     <label for="{{ field.id_for_label }}">{{field.label}}</label>

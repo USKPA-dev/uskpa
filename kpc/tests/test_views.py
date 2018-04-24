@@ -10,6 +10,7 @@ from model_mommy import mommy
 
 from kpc.models import Certificate
 from kpc.views import CertificateRegisterView, licensee_contacts
+from kpc.forms import LicenseeCertificateForm
 
 
 class LicenseeContactsTests(TestCase):
@@ -17,8 +18,10 @@ class LicenseeContactsTests(TestCase):
     def setUp(self):
         self.user = mommy.make(settings.AUTH_USER_MODEL)
         self.factory = RequestFactory()
-        user_ct = ContentType.objects.get(app_label='accounts', model='profile')
-        self.p, _ = Permission.objects.get_or_create(content_type=user_ct, codename='can_get_licensee_contacts', name="can_get_licensee_contacts")
+        user_ct = ContentType.objects.get(
+            app_label='accounts', model='profile')
+        self.p, _ = Permission.objects.get_or_create(
+            content_type=user_ct, codename='can_get_licensee_contacts', name="can_get_licensee_contacts")
         self.request = self.factory.get('')
         self.request.user = self.user
 
@@ -65,13 +68,16 @@ class CertificateRegisterViewTests(TestCase):
 
     def setUp(self):
         self.licensee = mommy.make('Licensee')
-        self.admin_user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
+        self.admin_user = mommy.make(
+            settings.AUTH_USER_MODEL, is_superuser=True)
         self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         self.user.profile.licensees.add(self.licensee)
 
         # Valid registration form input
-        self.sequential_kwargs = {'registration_method': 'sequential',  'cert_from': 1, 'cert_to': 5}
-        self.list_kwargs = {'registration_method': 'list', 'cert_list': 'US201, US123456'}
+        self.sequential_kwargs = {
+            'registration_method': 'sequential',  'cert_from': 1, 'cert_to': 5}
+        self.list_kwargs = {'registration_method': 'list',
+                            'cert_list': 'US201, US123456'}
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_sale': '01/01/2018',
                             'payment_method': 'cash', 'payment_amount': 1
@@ -108,7 +114,8 @@ class CertificateRegisterViewTests(TestCase):
         client.force_login(self.admin_user)
         self.form_kwargs.update(self.sequential_kwargs)
 
-        response = client.post(reverse('cert-register'), self.form_kwargs, follow=True)
+        response = client.post(reverse('cert-register'),
+                               self.form_kwargs, follow=True)
         self.assertEqual(Certificate.objects.count(), 5)
 
         message = list(response.context['messages']).pop()
@@ -123,9 +130,62 @@ class CertificateRegisterViewTests(TestCase):
         client.force_login(self.admin_user)
         self.form_kwargs.update(self.list_kwargs)
 
-        response = client.post(reverse('cert-register'), self.form_kwargs, follow=True)
+        response = client.post(reverse('cert-register'),
+                               self.form_kwargs, follow=True)
 
         self.assertEqual(Certificate.objects.count(), 2)
 
         message = list(response.context['messages']).pop()
         self.assertEqual(message.message, 'Generated 2 new certificates.')
+
+
+class CertificateViewTests(TestCase):
+
+    def setUp(self):
+        self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
+        self.cert = mommy.make(Certificate, status=Certificate.INTRANSIT)
+        self.url = reverse('cert-details', args=[str(self.cert.id)])
+        self.form_kwargs = {"country_of_origin": "AQ", 'aes': 'X22222222222222',
+                            'number_of_parcels': 1, 'date_of_issue': '01/31/2018',
+                            'date_of_expiry': '01/31/2019', 'carat_weight': 1,
+                            'harmonized_code': '7102.31', 'exporter': 'test',
+                            'exporter_address': '123', 'consignee': 'test',
+                            'consignee_address': 'test', 'shipped_value': 10}
+        self.c = Client()
+        self.c.force_login(self.user)
+
+    def test_editable_form_rendered_if_assigned(self):
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        """User gets an editable form if certificate is editable"""
+        response = self.c.get(reverse('cert-details', args=[str(cert.id)]))
+        self.assertTemplateUsed(response, 'certificate/details-edit.html')
+
+    def test_non_editable_form_rendered_if_assigned(self):
+        """User gets a non-editable form if certificate is editable"""
+        response = self.c.get(self.url)
+        self.assertTemplateUsed(response, 'certificate/details.html')
+
+    def test_form_invalid_if_cert_is_not_assigned(self):
+        """Users can't use this form if certificate is not ASSIGNED"""
+        response = self.c.post(self.url, self.form_kwargs, follow=True)
+        self.assertContains(response, LicenseeCertificateForm.UNEDITABLE_MSG)
+
+    def test_form_valid_if_cert_is_assigned(self):
+        """Cert status updates w/ valid form"""
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        response = self.c.post(
+            reverse('cert-details', args=[str(cert.id)]), self.form_kwargs, follow=True)
+        cert.refresh_from_db()
+        self.assertEqual(cert.status, Certificate.PREPARED)
+        self.assertTemplateUsed(response, 'certificate/details.html')
+
+    def test_form_invalid_if_not_all_fields_provided(self):
+        """Form invalid without all fields"""
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        self.form_kwargs.pop('consignee')
+        response = self.c.post(
+            reverse('cert-details', args=[str(cert.id)]), self.form_kwargs, follow=True)
+        cert.refresh_from_db()
+        self.assertEqual(cert.status, Certificate.ASSIGNED)
+        self.assertTemplateUsed(response, 'certificate/details-edit.html')
+        self.assertContains(response, 'required')

@@ -1,0 +1,59 @@
+{% extends 'certificate/base.html' %}
+
+{% block certificate-body-fields %}
+    <div id="certificate-fields">
+        <div class="cert-header">
+            <div class="usa-width-one-half">
+                <div class="">
+                    <span class="attr-label">Country of origin:</span> {{object.country_of_origin}}
+                </div>
+                <div class="">
+                    <span class="attr-label">AES Number (ITN):</span> {{object.aes}}
+                </div>
+                <div class="">
+                    <span class="attr-label">Issued:</span> {{object.date_of_issue}}
+                </div>
+                <div class="">
+                    <span class="attr-label">Expiry:</span> {{object.date_of_expiry}}
+                </div>
+            </div>
+            <div class="usa-width-one-half">
+                <div>
+                    <span class="attr-label">Parcels:</span> {{object.number_of_parcels}}
+                </div>
+                <div>
+                    <span class="attr-label">Value (USD):</span> {{object.shipped_value}}
+                </div>
+                <div>
+                    <span class="attr-label">Carat Weight/Mass:</span> {{object.carat_weight}}
+                </div>
+                <div>
+                    <span class="attr-label">Harmonized Commodity Code:</span> {{object.harmonized_code}}
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="cert-body">
+            <div>
+                <div class="usa-width-one-half">
+                    <span class="attr-label">Exporter:</span> {{object.exporter}}
+                </div>
+                <div class="usa-width-one-half">
+                        <p><span class="attr-label">Address:</span></p>
+                        {{object.exporter_address}}
+                </div>
+            </div>
+            <div>
+                <div class="usa-width-one-half">
+                    <span class="attr-label">Consignee:</span> {{object.consignee}}
+                </div>
+                <div class="usa-width-one-half">
+                    <p>
+                        <span class="attr-label">Address:</span>
+                    </p>
+                    {{object.consignee_address}}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

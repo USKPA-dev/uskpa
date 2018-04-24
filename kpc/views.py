@@ -1,18 +1,17 @@
-from django.views.generic.edit import FormView
-from django.views.generic import TemplateView
-from django.http import JsonResponse, HttpResponse
-from django.contrib.auth.decorators import permission_required
-from django_datatables_view.base_datatable_view import BaseDatatableView
 from django.contrib import messages
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
-
-from .forms import CertificateRegisterForm
-from .models import Certificate
-from .filters import CertificateFilter
-from .utils import _filterable_params
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import HttpResponse, JsonResponse
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView
+from django.views.generic.edit import FormView, UpdateView
+from django_datatables_view.base_datatable_view import BaseDatatableView
+
+from .filters import CertificateFilter
+from .forms import CertificateRegisterForm, LicenseeCertificateForm
+from .models import Certificate
+from .utils import _filterable_params
 
 User = get_user_model()
 
@@ -89,10 +88,40 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
         json_data = []
         for item in qs:
             json_data.append([
-                str(item),
+                item.get_anchor_tag(),
                 item.get_status_display(),
                 item.consignee,
                 item.last_modified.strftime("%Y-%m-%d %H:%M:%S"),
                 f'${item.shipped_value}' if item.shipped_value else None
             ])
         return json_data
+
+
+class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Certificate
+    form_class = LicenseeCertificateForm
+    template_name = 'certificate/details-edit.html'
+
+    CERT_ISSUED = "Thank you! Your certificate has been successfully issued."
+    UNMODIFIABLE = "Certificates may only be modified when their status is `Assigned`"
+
+    def test_func(self):
+        obj = self.get_object()
+        return obj.user_can_access(self.request.user)
+
+    def get_template_names(self):
+        if self.object.licensee_editable:
+            return ['certificate/details-edit.html']
+        return ['certificate/details.html']
+
+    def form_valid(self, form):
+        """Move certificate to Prepared"""
+        self.object.set_prepared()
+        messages.success(self.request, self.CERT_ISSUED)
+        return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        """Only expected if status is ASSIGNED"""
+        if self.get_object().licensee_editable:
+            messages.error(self.request, self.UNMODIFIABLE)
+        return super().post(request, *args, **kwargs)
