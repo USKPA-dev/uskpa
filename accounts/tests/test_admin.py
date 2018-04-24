@@ -1,9 +1,10 @@
-from django.test import TestCase, RequestFactory
-from django.core import mail
 from django.contrib.auth import get_user_model
+from django.core import mail
+from django.test import RequestFactory, TestCase
+from model_mommy import mommy
 
-from accounts.forms import UserCreationForm
 from accounts.admin import ProfileUserAdmin
+from accounts.forms import UserCreationForm
 
 User = get_user_model()
 
@@ -16,6 +17,7 @@ class ProfileAdminTests(TestCase):
         self.user = self.form.save(commit=False)
         # We don't need to target the real URL here, just making an HttpRequest()
         self.request = RequestFactory().get('/')
+        self.request.user = mommy.make(User, is_superuser=True)
         self.site = 'SITE'
 
     def test_email_on_user_add(self):
