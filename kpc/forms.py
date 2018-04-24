@@ -19,17 +19,25 @@ class UserModelChoiceField(forms.ModelChoiceField):
 
 class LicenseeCertificateForm(forms.ModelForm):
 
+    UNEDITABLE_MSG = "Certificate may only be edited when status is ASSIGNED"
+
     def __init__(self, *args, **kwargs):
         """All fields are required for Licensee to complete certificate"""
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].widget.attrs["required"] = "required"
+            self.fields[field].required = True
 
     class Meta:
         model = Certificate
         fields = ('aes', 'country_of_origin', 'shipped_value', 'exporter', 'exporter_address',
                   'number_of_parcels', 'consignee', 'consignee_address', 'carat_weight', 'harmonized_code',
                   'date_of_issue', 'date_of_expiry')
+
+    def clean(self):
+        """Form cannot be used unless Certificate.ASSIGNED"""
+        super().clean()
+        if not self.instance.licensee_editable:
+            raise forms.ValidationError(self.UNEDITABLE_MSG)
 
 
 class CertificateRegisterForm(forms.Form):
@@ -40,7 +48,7 @@ class CertificateRegisterForm(forms.Form):
 
     licensee = forms.ModelChoiceField(queryset=Licensee.objects.all())
     contact = UserModelChoiceField(queryset=User.objects.all())
-    date_of_sale = forms.DateField(initial=datetime.date.today)
+    date_of_sale = forms.DateTimeField(initial=datetime.date.today)
     registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS,
                                             widget=USWDSRadioSelect(attrs={'class': 'usa-unstyled-list'}),
                                             initial=SEQUENTIAL)
