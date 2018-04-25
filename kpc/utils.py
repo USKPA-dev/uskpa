@@ -10,3 +10,7 @@ def _filterable_params(qd):
         if key.endswith('[]'):
             qd_out.setlist(key[:-2], qd_out.pop(key))
     return qd_out
+
+
+def _to_mdy(dt):
+    return dt.strftime("%m/%d/%Y")

@@ -20,6 +20,7 @@ django-simple-history = "*"
 django-countries = "*"
 django-datatables-view = "*"
 django-filter = "*"
+django-queryset-csv = "*"
 
 
 [dev-packages]
