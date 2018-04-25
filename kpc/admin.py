@@ -8,10 +8,6 @@ from accounts.models import Profile
 from .models import Certificate, Licensee
 
 
-class LabeledAdmin(admin.ModelAdmin):
-    list_display = ('slug', 'label', 'sort_order',)
-
-
 class LicenseeAdminForm(forms.ModelForm):
     contacts = forms.ModelMultipleChoiceField(
             queryset=Profile.objects.all(),
@@ -35,7 +31,7 @@ class LicenseeAdminForm(forms.ModelForm):
 
 
 @admin.register(Licensee)
-class LicenseeAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
+class LicenseeAdmin(SimpleHistoryAdmin):
     form = LicenseeAdminForm
     list_display = ('name', 'address', 'city', 'state', 'zip_code', 'tax_id', )
 
@@ -49,5 +45,5 @@ class LicenseeAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
 
 
 @admin.register(Certificate)
-class CertificateAdmin(admin.ModelAdmin):
+class CertificateAdmin(SimpleHistoryAdmin):
     list_display = ('display_name', 'status', 'last_modified', 'licensee', 'assignor',)
