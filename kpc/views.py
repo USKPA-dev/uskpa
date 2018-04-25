@@ -115,6 +115,6 @@ class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         """Move certificate to Prepared"""
-        self.object.set_prepared()
+        form.instance.status = Certificate.PREPARED
         messages.success(self.request, self.CERT_ISSUED)
         return super().form_valid(form)
