@@ -103,7 +103,6 @@ class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'certificate/details-edit.html'
 
     CERT_ISSUED = "Thank you! Your certificate has been successfully issued."
-    UNMODIFIABLE = "Certificates may only be modified when their status is `Assigned`"
 
     def test_func(self):
         obj = self.get_object()
@@ -119,9 +118,3 @@ class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         self.object.set_prepared()
         messages.success(self.request, self.CERT_ISSUED)
         return super().form_valid(form)
-
-    def post(self, request, *args, **kwargs):
-        """Only expected if status is ASSIGNED"""
-        if self.get_object().licensee_editable:
-            messages.error(self.request, self.UNMODIFIABLE)
-        return super().post(request, *args, **kwargs)

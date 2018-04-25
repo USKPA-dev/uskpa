@@ -69,13 +69,14 @@ class Certificate(models.Model):
     aes = models.CharField(max_length=15,
                            blank=True,
                            help_text='AES Confirmation Number (ITN)',
+                           verbose_name='AES',
                            validators=[
                                 RegexValidator(regex='X\d{14}',
-                                               message='AES Confirmation (ITN) format: X##############'
+                                               message='AES Confirmation (ITN) format is 14 digits prepended by X: X##############'
                                                )
                                     ]
                            )
-    country_of_origin = CountryField(blank=True)
+    country_of_origin = CountryField(blank=True, verbose_name='Country of Origin')
     date_of_issue = models.DateTimeField(blank=True, null=True, help_text='Date of Issue')
     date_of_expiry = models.DateTimeField(blank=True, null=True, help_text='Date of Expiry')
     shipped_value = models.DecimalField(max_digits=20, decimal_places=2,

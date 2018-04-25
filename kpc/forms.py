@@ -7,6 +7,8 @@ from .models import Certificate, Licensee
 
 User = get_user_model()
 
+DATE_ATTRS = {'type': 'date', 'placeholder': 'mm/dd/yyyy'}
+
 
 class USWDSRadioSelect(forms.RadioSelect):
     option_template_name = 'uswds/radio_options.html'
@@ -18,8 +20,12 @@ class UserModelChoiceField(forms.ModelChoiceField):
 
 
 class LicenseeCertificateForm(forms.ModelForm):
+    date_of_issue = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs=DATE_ATTRS))
+    date_of_expiry = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs=DATE_ATTRS))
 
-    UNEDITABLE_MSG = "Certificate may only be edited when status is ASSIGNED"
+    UNEDITABLE_MSG = "Certificates may only be modified when their status is `Assigned`"
 
     def __init__(self, *args, **kwargs):
         """All fields are required for Licensee to complete certificate"""
@@ -48,7 +54,8 @@ class CertificateRegisterForm(forms.Form):
 
     licensee = forms.ModelChoiceField(queryset=Licensee.objects.all())
     contact = UserModelChoiceField(queryset=User.objects.all())
-    date_of_sale = forms.DateTimeField(initial=datetime.date.today)
+    date_of_sale = forms.DateField(
+        initial=datetime.date.today, widget=forms.DateInput(attrs=DATE_ATTRS))
     registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS,
                                             widget=USWDSRadioSelect(attrs={'class': 'usa-unstyled-list'}),
                                             initial=SEQUENTIAL)
