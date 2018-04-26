@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, TestCase
 from model_mommy import mommy
@@ -61,3 +63,56 @@ class CertificateTests(TestCase):
         """Query parameters for default cert search are generated"""
         expected = 'status=0&status=1&status=2'
         self.assertEqual(Certificate.default_search_filters(), expected)
+
+    def test_status_not_modifiable(self):
+        """
+           Certificate status is NOT user moddable status it
+           not PREPARED or INTRANSIT
+        """
+        self.cert.status = Certificate.ASSIGNED
+        self.assertFalse(self.cert.status_can_be_updated)
+        self.cert.status = Certificate.DELIVERED
+        self.assertFalse(self.cert.status_can_be_updated)
+        self.cert.status = Certificate.VOID
+        self.assertFalse(self.cert.status_can_be_updated)
+
+    def test_status_modifiable(self):
+        """certificate status is user moddable if its PREPARED or INTRANSIT"""
+        self.cert.status = Certificate.PREPARED
+        self.assertTrue(self.cert.status_can_be_updated)
+        self.cert.status = Certificate.INTRANSIT
+        self.assertTrue(self.cert.status_can_be_updated)
+
+    def test_next_status_label_returns_none(self):
+        """No next status label if not user moddable"""
+        self.assertIsNone(self.cert.next_status_label)
+        self.cert.status = Certificate.VOID
+        self.assertIsNone(self.cert.next_status_label)
+
+    def test_next_status_label(self):
+        """Return display value next status value"""
+        self.cert.status = Certificate.PREPARED
+        self.assertEqual(self.cert.next_status_label, 'In-transit')
+
+    def test_next_status_no_effect_if_not_moddable(self):
+        """No change if status is not moddable"""
+        orig_status = self.cert.status
+        self.cert.next_status()
+        self.cert.refresh_from_db()
+        self.assertEqual(orig_status, self.cert.status)
+
+    def test_next_status_moves_to_intransit(self):
+        """Status is set to INTRANSIT and date_of_shipment set to TODAY"""
+        self.cert.status = Certificate.PREPARED
+        self.cert.next_status()
+        self.cert.refresh_from_db()
+        self.assertEqual(self.cert.status, Certificate.INTRANSIT)
+        self.assertEqual(self.cert.date_of_shipment, datetime.date.today())
+
+    def test_next_status_moves_to_delivered(self):
+        """Status is set to DELIVERED and date_of_delivery set to TODAY"""
+        self.cert.status = Certificate.INTRANSIT
+        self.cert.next_status()
+        self.cert.refresh_from_db()
+        self.assertEqual(self.cert.status, Certificate.DELIVERED)
+        self.assertEqual(self.cert.date_of_delivery, datetime.date.today())

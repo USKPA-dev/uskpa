@@ -8,9 +8,10 @@ from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from model_mommy import mommy
 
+from kpc.forms import StatusUpdateForm, LicenseeCertificateForm
 from kpc.models import Certificate
-from kpc.views import CertificateRegisterView, licensee_contacts
-from kpc.forms import LicenseeCertificateForm
+from kpc.views import (CertificateRegisterView, CertificateView,
+                       licensee_contacts)
 
 
 class LicenseeContactsTests(TestCase):
@@ -143,8 +144,6 @@ class CertificateViewTests(TestCase):
 
     def setUp(self):
         self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
-        self.cert = mommy.make(Certificate, status=Certificate.INTRANSIT)
-        self.url = reverse('cert-details', args=[str(self.cert.id)])
         self.form_kwargs = {"country_of_origin": "AQ", 'aes': 'X22222222222222',
                             'number_of_parcels': 1, 'date_of_issue': '01/31/2018',
                             'date_of_expiry': '01/31/2019', 'carat_weight': 1,
@@ -155,27 +154,43 @@ class CertificateViewTests(TestCase):
         self.c = Client()
         self.c.force_login(self.user)
 
+    def test_status_form_when_not_editable(self):
+        """
+        status form is used when certificate is not editable
+        by licensees
+        """
+        cert = mommy.make(Certificate, status=Certificate.INTRANSIT)
+        form = CertificateView(object=cert).get_form_class()
+        self.assertIs(form, StatusUpdateForm)
+
+    def test_cert_form_when_editable(self):
+        """Licensee form is used when certificate is  editable"""
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        form = CertificateView(object=cert).get_form_class()
+        self.assertIs(form, LicenseeCertificateForm)
+
     def test_editable_form_rendered_if_assigned(self):
         cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
         """User gets an editable form if certificate is editable"""
-        response = self.c.get(reverse('cert-details', args=[str(cert.id)]))
+        response = self.c.get(cert.get_absolute_url())
         self.assertTemplateUsed(response, 'certificate/details-edit.html')
 
     def test_non_editable_form_rendered_if_assigned(self):
         """User gets a non-editable form if certificate is editable"""
-        response = self.c.get(self.url)
+        cert = mommy.make(Certificate, status=Certificate.VOID)
+        response = self.c.get(cert.get_absolute_url())
         self.assertTemplateUsed(response, 'certificate/details.html')
 
     def test_form_invalid_if_cert_is_not_assigned(self):
         """Users can't use this form if certificate is not ASSIGNED"""
-        response = self.c.post(self.url, self.form_kwargs, follow=True)
-        self.assertContains(response, LicenseeCertificateForm.UNEDITABLE_MSG)
+        cert = mommy.make(Certificate, status=Certificate.VOID)
+        response = self.c.post(cert.get_absolute_url(), self.form_kwargs, follow=True)
+        self.assertContains(response, StatusUpdateForm.NOT_AVAILABLE)
 
     def test_form_valid_if_cert_is_assigned(self):
         """Cert status updates w/ valid form"""
         cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
-        response = self.c.post(
-            reverse('cert-details', args=[str(cert.id)]), self.form_kwargs, follow=True)
+        response = self.c.post(cert.get_absolute_url(), self.form_kwargs, follow=True)
         cert.refresh_from_db()
         self.assertEqual(cert.status, Certificate.PREPARED)
         self.assertTemplateUsed(response, 'certificate/details.html')
@@ -184,9 +199,20 @@ class CertificateViewTests(TestCase):
         """Form invalid without all fields"""
         cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
         self.form_kwargs.pop('consignee')
-        response = self.c.post(
-            reverse('cert-details', args=[str(cert.id)]), self.form_kwargs, follow=True)
+        response = self.c.post(cert.get_absolute_url(), self.form_kwargs, follow=True)
         cert.refresh_from_db()
         self.assertEqual(cert.status, Certificate.ASSIGNED)
         self.assertTemplateUsed(response, 'certificate/details-edit.html')
         self.assertContains(response, 'required')
+
+    def test_next_status_input_rendered_when_moddable(self):
+        """Button to advance status is rendered if status can be changed"""
+        cert = mommy.make(Certificate, status=Certificate.INTRANSIT)
+        response = self.c.get(cert.get_absolute_url())
+        self.assertContains(response, f'Set status to: {cert.next_status_label}')
+
+    def test_next_status_input_not_rendered_when_unmoddable(self):
+        """Button to advance status is NOT rendered if status cannot be changed"""
+        cert = mommy.make(Certificate, status=Certificate.VOID)
+        response = self.c.get(cert.get_absolute_url())
+        self.assertNotContains(response, 'Set status')

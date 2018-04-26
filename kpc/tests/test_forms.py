@@ -1,7 +1,79 @@
+import datetime
+
+from django import forms
 from django.conf import settings
 from django.test import TestCase
 from model_mommy import mommy
-from kpc.forms import CertificateRegisterForm
+
+from kpc.forms import CertificateRegisterForm, StatusUpdateForm
+from kpc.models import Certificate
+
+
+class StatusUpdateFormTests(TestCase):
+
+    def setUp(self):
+        self.cert = mommy.prepare(Certificate)
+        self.form = StatusUpdateForm
+        self.form_kwargs = {'next_status': Certificate.INTRANSIT, 'date': '2018-01-01'}
+
+    def test_invalid_if_licensee_form_field_submitted(self):
+        """Form fields from licensee cert form submitted, invalid"""
+        self.form_kwargs['attested'] = True
+        form = self.form(self.form_kwargs, instance=self.cert)
+        self.assertFalse(form.is_valid())
+        with self.assertRaisesRegex(forms.ValidationError, self.form.NOT_AVAILABLE):
+            form.clean()
+
+    def test_invalid_if_shipped_is_before_issued(self):
+        """Shipped date must be on or after issued date"""
+        self.cert.status = Certificate.PREPARED
+        self.cert.date_of_issue = datetime.date.today()
+        form = self.form(self.form_kwargs, instance=self.cert)
+        self.assertFalse(form.is_valid())
+        with self.assertRaises(forms.ValidationError):
+            form.clean()
+
+    def test_invalid_if_delivered_is_before_shipped(self):
+        """Delivered date must be on or after shipped date"""
+        self.cert.status = Certificate.INTRANSIT
+        self.cert.date_of_shipment = datetime.date.today()
+        form = self.form(self.form_kwargs, instance=self.cert)
+        self.assertFalse(form.is_valid())
+        with self.assertRaises(forms.ValidationError):
+            form.clean()
+
+    def test_new_status_must_be_expected(self):
+        """Incoming status must match expected value from cert instance"""
+        self.cert.status = Certificate.PREPARED
+        self.form_kwargs['next_status'] = Certificate.DELIVERED
+        form = self.form(self.form_kwargs, instance=self.cert)
+        self.assertFalse(form.is_valid())
+        with self.assertRaisesRegex(forms.ValidationError, form.UNEXPECTED_STATUS):
+            form.clean()
+
+    def test_intransit_and_date_set_if_valid(self):
+        cert = mommy.make(Certificate, status=Certificate.PREPARED,
+                          date_of_issue=datetime.date.today())
+        self.form_kwargs['date'] = datetime.date.today()
+        form = self.form(self.form_kwargs, instance=cert)
+        self.assertTrue(form.is_valid())
+
+        form.save()
+        cert.refresh_from_db()
+        self.assertEqual(cert.status, self.form_kwargs['next_status'])
+        self.assertEqual(cert.date_of_shipment, datetime.date.today())
+
+    def test_delivered_and_date_set_if_valid(self):
+        cert = mommy.make(Certificate, status=Certificate.INTRANSIT,
+                          date_of_shipment=datetime.date.today())
+        form_kwargs = {'date': datetime.date.today(), 'next_status': Certificate.DELIVERED}
+        form = self.form(form_kwargs, instance=cert)
+        self.assertTrue(form.is_valid())
+
+        form.save()
+        cert.refresh_from_db()
+        self.assertEqual(cert.status, form_kwargs['next_status'])
+        self.assertEqual(cert.date_of_delivery, datetime.date.today())
 
 
 class CertificateRegistrationTests(TestCase):

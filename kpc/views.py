@@ -9,7 +9,8 @@ from django.views.generic.edit import FormView, UpdateView
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from .filters import CertificateFilter
-from .forms import CertificateRegisterForm, LicenseeCertificateForm
+from .forms import (CertificateRegisterForm, LicenseeCertificateForm,
+                    StatusUpdateForm)
 from .models import Certificate
 from .utils import _filterable_params
 
@@ -99,14 +100,15 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
 
 class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Certificate
-    form_class = LicenseeCertificateForm
-    template_name = 'certificate/details-edit.html'
-
-    CERT_ISSUED = "Thank you! Your certificate has been successfully issued."
 
     def test_func(self):
         obj = self.get_object()
         return obj.user_can_access(self.request.user)
+
+    def get_form_class(self):
+        if self.object.licensee_editable:
+            return LicenseeCertificateForm
+        return StatusUpdateForm
 
     def get_template_names(self):
         if self.object.licensee_editable:
@@ -114,8 +116,6 @@ class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return ['certificate/details.html']
 
     def form_valid(self, form):
-        """Move certificate to Prepared"""
-        form.instance.status = Certificate.PREPARED
         response = super().form_valid(form)
-        messages.success(self.request, self.CERT_ISSUED)
+        messages.success(self.request, form.SUCCESS_MSG)
         return response

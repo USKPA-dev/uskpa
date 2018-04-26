@@ -20,12 +20,12 @@ class UserModelChoiceField(forms.ModelChoiceField):
 
 
 class LicenseeCertificateForm(forms.ModelForm):
-    date_of_issue = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs=DATE_ATTRS))
-    date_of_expiry = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs=DATE_ATTRS))
+    date_of_issue = forms.DateField(
+        widget=forms.DateInput(attrs=DATE_ATTRS))
+    date_of_expiry = forms.DateField(
+        widget=forms.DateInput(attrs=DATE_ATTRS))
 
-    UNEDITABLE_MSG = "Certificates may only be modified when their status is `Assigned`"
+    SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
 
     def __init__(self, *args, **kwargs):
         """All fields are required for Licensee to complete certificate"""
@@ -39,11 +39,11 @@ class LicenseeCertificateForm(forms.ModelForm):
                   'number_of_parcels', 'consignee', 'consignee_address', 'carat_weight', 'harmonized_code',
                   'date_of_issue', 'date_of_expiry', 'attested')
 
-    def clean(self):
-        """Form cannot be used unless Certificate.ASSIGNED"""
-        super().clean()
-        if not self.instance.licensee_editable:
-            raise forms.ValidationError(self.UNEDITABLE_MSG)
+    def save(self):
+        """Set status to PREPARED"""
+        self.instance.status = Certificate.PREPARED
+        self.instance.save()
+        return self.instance
 
 
 class CertificateRegisterForm(forms.Form):
@@ -122,3 +122,57 @@ class CertificateRegisterForm(forms.Form):
             cert_list = self.cleaned_data['cert_list'].split(',')
             certs = [int(cert_number.strip()[2:]) for cert_number in cert_list]
         return certs
+
+
+class StatusUpdateForm(forms.ModelForm):
+    date = forms.DateField(required=True)
+    next_status = forms.IntegerField(required=True)
+
+    UNEXPECTED_STATUS = 'Unable to update status, please reload the page and try again.'
+    INTRANSIT_DATE = "The In-Transit date must be on or after the certificate's date of issue (%s)."
+    DELIVERY_DATE = "The Delivered date must be on or after the certificate's date of shipment (%s)."
+    NOT_AVAILABLE = "This certificate has already been issued."
+    SUCCESS_MSG = 'Certificate status has been succesfully updated.'
+
+    class Meta:
+        model = Certificate
+        fields = ("date", 'next_status')
+
+    def clean(self):
+        """Dates must be ordered"""
+        if 'attested' in self.data.keys():
+            # Certificate issue form was submitted
+            # We're expecting only status changes
+            # Likely certificate was issued while form was being completed.
+            raise forms.ValidationError(self.NOT_AVAILABLE)
+
+        cleaned_data = super().clean()
+        date = cleaned_data.get('date')
+        new_status = cleaned_data.get('next_status')
+
+        if new_status != self.instance.next_status_value:
+            raise forms.ValidationError(self.UNEXPECTED_STATUS)
+
+        if new_status == Certificate.INTRANSIT:
+            if date < self.instance.date_of_issue:
+                raise forms.ValidationError(
+                    self.INTRANSIT_DATE % self.instance.date_of_issue)
+
+        if new_status == Certificate.DELIVERED:
+            if date < self.instance.date_of_shipment:
+                raise forms.ValidationError(
+                    self.DELIVERY_DATE % self.instance.date_of_shipment)
+
+    def save(self):
+        """Set our new status and associated date"""
+        date = self.cleaned_data['date']
+        new_status = self.cleaned_data['next_status']
+        self.instance.status = new_status
+
+        if new_status == Certificate.INTRANSIT:
+            self.instance.date_of_shipment = date
+        if new_status == Certificate.DELIVERED:
+            self.instance.date_of_delivery = date
+
+        self.instance.save()
+        return self.instance
