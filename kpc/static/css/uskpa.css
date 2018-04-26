@@ -10,18 +10,23 @@
 }
 
 
-#certificate-fields *> input,
-#certificate-fields *> select,
-#certificate-fields *> textarea {
+#certificate-body-fields *> input,
+#certificate-body-fields *> select,
+#certificate-body-fields *> textarea {
     max-width: 70%;
     display: inline-block;
 }
 
-#certificate-fields *> label
+#certificate-body-fields *> label
  {
     font-weight: bold;
     width: 25%;
     display: inline-block;
     margin-top: 1rem;
     vertical-align: top;
+}
+
+#attestation *> label {
+    max-width: 100%;
+    margin-top: 1rem;
 }

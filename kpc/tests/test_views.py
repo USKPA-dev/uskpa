@@ -150,7 +150,8 @@ class CertificateViewTests(TestCase):
                             'date_of_expiry': '01/31/2019', 'carat_weight': 1,
                             'harmonized_code': '7102.31', 'exporter': 'test',
                             'exporter_address': '123', 'consignee': 'test',
-                            'consignee_address': 'test', 'shipped_value': 10}
+                            'consignee_address': 'test', 'shipped_value': 10,
+                            'attested': True}
         self.c = Client()
         self.c.force_login(self.user)
 

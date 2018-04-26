@@ -100,6 +100,11 @@ class Certificate(models.Model):
                                       blank=True)
     void = models.BooleanField(default=False, help_text="Certificate has been voided?")
     notes = models.TextField(blank=True)
+
+    attested = models.BooleanField(default=False, help_text="""I have completed the necessary
+                                                                application pertaining to this shipment,
+                                                                including the warranty that the diamonds
+                                                                being shipped were not traded to fund conflict.""")
     # port_of_export = models.ForeignKey('PortOfExport', blank=True, on_delete=models.PROTECT)
 
     history = HistoricalRecords()
