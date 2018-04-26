@@ -77,8 +77,8 @@ class Certificate(models.Model):
                                     ]
                            )
     country_of_origin = CountryField(blank=True, verbose_name='Country of Origin')
-    date_of_issue = models.DateTimeField(blank=True, null=True, help_text='Date of Issue')
-    date_of_expiry = models.DateTimeField(blank=True, null=True, help_text='Date of Expiry')
+    date_of_issue = models.DateField(blank=True, null=True, help_text='Date of Issue')
+    date_of_expiry = models.DateField(blank=True, null=True, help_text='Date of Expiry')
     shipped_value = models.DecimalField(max_digits=20, decimal_places=2,
                                         blank=True, null=True, help_text="Value in USD")
     exporter = models.CharField(blank=True, max_length=256)
@@ -95,7 +95,7 @@ class Certificate(models.Model):
     licensee = models.ForeignKey('Licensee', blank=True, null=True, on_delete=models.PROTECT)
     status = models.IntegerField(choices=STATUS_CHOICES, default=ASSIGNED)
     last_modified = models.DateTimeField(auto_now=True)
-    date_of_sale = models.DateTimeField(blank=True, null=True, help_text='Date of sale to licensee')
+    date_of_sale = models.DateField(blank=True, null=True, help_text='Date of sale to licensee')
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=5,
                                       blank=True)
     void = models.BooleanField(default=False, help_text="Certificate has been voided?")
@@ -144,7 +144,3 @@ class Certificate(models.Model):
     def user_can_access(self, user):
         """True if user can access this certificate"""
         return user.profile.certificates().filter(id=self.id).exists()
-
-    def set_prepared(self):
-        self.status = self.PREPARED
-        self.save()
