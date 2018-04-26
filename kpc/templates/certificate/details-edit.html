@@ -54,6 +54,33 @@
             </div>
         </div>
     </div>
+
+    {% with form.attested as field %}
+    <div id="attestation">
+        <fieldset class="usa-fieldset-inputs usa-sans">
+            <legend class="usa-sr-only">Attestation</legend>
+            <ul class="usa-unstyled-list">
+                {% if field.errors %}
+                <li class="usa-input-error">
+                    <input id="id_attested" type="checkbox" name="attested" value="attested">
+                    <label class="usa-input-error-label" for="id_attested">{{form.attested.help_text}}</label>
+                    <span class="usa-input-error-message" role="alert">
+                        {% for err in field.errors %}
+                            {{err}}
+                        {% endfor %}
+                    </span>
+                </li>
+                {% else %}
+                <li>
+                    <input id="id_attested" type="checkbox" name="attested" value="attested">
+                    <label for="id_attested">{{form.attested.help_text}}</label>
+                </li>
+                {% endif %}
+            </ul>
+        </fieldset>
+    </div>
+    {% endwith %}
+
     <input type="submit" value="Complete Certificate">
 </form>
 {% endblock %}
