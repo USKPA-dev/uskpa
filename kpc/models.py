@@ -1,5 +1,3 @@
-import datetime
-
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
@@ -166,18 +164,6 @@ class Certificate(models.Model):
         """Return value of next status"""
         if self.status in self.MODIFIABLE_STATUSES:
             return self.status+1
-
-    def next_status(self):
-        """Move certificate to next status and set associated date"""
-        if self.status_can_be_updated:
-            today = datetime.date.today()
-            if self.status is self.PREPARED:
-                self.status = self.INTRANSIT
-                self.date_of_shipment = today
-            elif self.status is self.INTRANSIT:
-                self.status = self.DELIVERED
-                self.date_of_delivery = today
-            self.save()
 
     def user_can_access(self, user):
         """True if user can access this certificate"""

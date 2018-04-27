@@ -1,5 +1,3 @@
-import datetime
-
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, TestCase
 from model_mommy import mommy
@@ -94,25 +92,7 @@ class CertificateTests(TestCase):
         self.cert.status = Certificate.PREPARED
         self.assertEqual(self.cert.next_status_label, 'In-transit')
 
-    def test_next_status_no_effect_if_not_moddable(self):
-        """No change if status is not moddable"""
-        orig_status = self.cert.status
-        self.cert.next_status()
-        self.cert.refresh_from_db()
-        self.assertEqual(orig_status, self.cert.status)
-
-    def test_next_status_moves_to_intransit(self):
-        """Status is set to INTRANSIT and date_of_shipment set to TODAY"""
+    def test_next_status_value(self):
+        """Return integer of next status"""
         self.cert.status = Certificate.PREPARED
-        self.cert.next_status()
-        self.cert.refresh_from_db()
-        self.assertEqual(self.cert.status, Certificate.INTRANSIT)
-        self.assertEqual(self.cert.date_of_shipment, datetime.date.today())
-
-    def test_next_status_moves_to_delivered(self):
-        """Status is set to DELIVERED and date_of_delivery set to TODAY"""
-        self.cert.status = Certificate.INTRANSIT
-        self.cert.next_status()
-        self.cert.refresh_from_db()
-        self.assertEqual(self.cert.status, Certificate.DELIVERED)
-        self.assertEqual(self.cert.date_of_delivery, datetime.date.today())
+        self.assertEqual(self.cert.next_status_value, Certificate.INTRANSIT)
