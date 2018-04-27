@@ -47,3 +47,5 @@ class LicenseeAdmin(SimpleHistoryAdmin):
 @admin.register(Certificate)
 class CertificateAdmin(SimpleHistoryAdmin):
     list_display = ('display_name', 'status', 'last_modified', 'licensee', 'assignor',)
+    list_filter = ('status', 'licensee',)
+    search_fields = ('number',)
