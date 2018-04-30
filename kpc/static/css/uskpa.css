@@ -31,11 +31,17 @@
     margin-top: 1rem;
 }
 
-#status-update {
-    max-width: 25%;
-}
 #status-update *> input {
     padding-left: 1em;
     padding-right: 1em;
     margin-top: 0.5em;
+}
+
+#void {
+    float:right;
+}
+
+.cert-number {
+    font-size: 3rem;
+    font-weight: 700;
 }
