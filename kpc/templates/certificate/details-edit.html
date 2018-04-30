@@ -4,7 +4,8 @@
 <form target='' method="POST">
     {% csrf_token %}
     <div id="certificate-body-fields">
-        <div class="cert-header">
+        <div class="cert-header usa-grid">
+            <hr>
             <div class="usa-width-one-half">
                 <div>
                      {% include 'uswds/form-field.html' with field=form.country_of_origin %}
@@ -34,9 +35,10 @@
                 </div>
             </div>
         </div>
-        <hr>
+
         <div class="cert-body">
-            <div>
+            <div class="usa-grid">
+                <hr>
                 <div class="usa-width-one-half">
                      {% include 'uswds/form-field.html' with field=form.exporter %}
                 </div>
@@ -44,7 +46,7 @@
                      {% include 'uswds/form-field.html' with field=form.exporter_address %}
                 </div>
             </div>
-            <div>
+            <div class="usa-grid">
                 <div class="usa-width-one-half">
                      {% include 'uswds/form-field.html' with field=form.consignee %}
                 </div>
@@ -56,7 +58,7 @@
     </div>
 
     {% with form.attested as field %}
-    <div id="attestation">
+    <div id="attestation" class="usa-grid">
         <fieldset class="usa-fieldset-inputs usa-sans">
             <legend class="usa-sr-only">Attestation</legend>
             <ul class="usa-unstyled-list">
@@ -77,10 +79,10 @@
                 </li>
                 {% endif %}
             </ul>
+        <input type="submit" value="Complete Certificate">
         </fieldset>
     </div>
     {% endwith %}
 
-    <input type="submit" value="Complete Certificate">
 </form>
 {% endblock %}
