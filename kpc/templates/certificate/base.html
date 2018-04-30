@@ -4,29 +4,47 @@
 
 {% block content %}
 {% if form.non_field_errors %}
-<div class="usa-alert usa-alert-error usa-grid">
+<div class="usa-grid">
+<div class="usa-alert usa-alert-error">
     <ul class="usa-checklist">
         {% for error in form.non_field_errors %}
         <li>{{error}}</li>
         {% endfor %}
     </ul>
 </div>
+</div>
 {% endif %}
+
+{% if object.void %}
+<div class="usa-grid">
+    <div class="usa-alert usa-alert-warning">
+        <div class="usa-alert-body">
+        <h3 class="usa-alert-heading">Voided on: {{object.date_voided}}</h3>
+        <p class="usa-alert-text">
+            Reason: {{object.notes}}
+        </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <div class='cert-header'>
     <div class="usa-grid">
         <div class="usa-width-one-half">
-            <span class="cert-number">{{object}}
-            {% if user.is_superuser %}
-            <a title='Edit certificate' href="{% url 'admin:kpc_certificate_change' object.id %}">
-                <i class="far fa-edit"></i>
-            </a>
-            {% endif %}
-            </span>
+            <h1>{{object}}
+                {% if user.is_superuser %}
+                <a title='Edit certificate' href="{% url 'admin:kpc_certificate_change' object.id %}">
+                    <i class="far fa-edit"></i>
+                </a>
+                {% endif %}
+            </h1>
         </div>
         <div class="usa-width-one-half">
-            <a href='void' id='void' type='button'>
-                Void this Certificate
-            </a>
+            {% if not object.void %}
+                <a href='{% url "void" object.id %}' id='void' type='button' class="usa-button">
+                    Void this Certificate
+                </a>
+            {% endif %}
         </div>
     </div>
     <div class="usa-grid">

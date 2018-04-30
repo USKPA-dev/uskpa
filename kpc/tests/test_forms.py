@@ -5,8 +5,34 @@ from django.conf import settings
 from django.test import TestCase
 from model_mommy import mommy
 
-from kpc.forms import CertificateRegisterForm, StatusUpdateForm
+from kpc.forms import CertificateRegisterForm, StatusUpdateForm, VoidForm
 from kpc.models import Certificate
+
+
+class VoidFormTests(TestCase):
+
+    def setUp(self):
+        self.form = VoidForm
+        self.form_kwargs = {'reason': self.form.OTHER_CHOICE, 'void': True}
+
+    def test_clean_notes_required_if_other(self):
+        """Other, specify field must be populated if OTHER_CHOICE selected"""
+        form = self.form(self.form_kwargs)
+        self.assertFalse(form.is_valid())
+        with self.assertRaisesRegex(forms.ValidationError, self.form.REASON_REQUIRED):
+            form.clean()
+
+    def test_save_sets_void_w_fields(self):
+        """Set Certificate.void and all associated fields"""
+        cert = mommy.make(Certificate)
+        self.form_kwargs['reason'] = Certificate.VOID_REASONS[0]
+        form = self.form(self.form_kwargs, instance=cert)
+        self.assertTrue(form.is_valid())
+        form.save()
+        cert.refresh_from_db()
+        self.assertTrue(cert.void)
+        self.assertEqual(cert.notes, self.form_kwargs['reason'])
+        self.assertEqual(cert.date_voided, datetime.date.today())
 
 
 class StatusUpdateFormTests(TestCase):
@@ -14,7 +40,8 @@ class StatusUpdateFormTests(TestCase):
     def setUp(self):
         self.cert = mommy.prepare(Certificate)
         self.form = StatusUpdateForm
-        self.form_kwargs = {'next_status': Certificate.INTRANSIT, 'date': '2018-01-01'}
+        self.form_kwargs = {
+            'next_status': Certificate.INTRANSIT, 'date': '2018-01-01'}
 
     def test_invalid_if_licensee_form_field_submitted(self):
         """Form fields from licensee cert form submitted, invalid"""
@@ -66,7 +93,8 @@ class StatusUpdateFormTests(TestCase):
     def test_delivered_and_date_set_if_valid(self):
         cert = mommy.make(Certificate, status=Certificate.INTRANSIT,
                           date_of_shipment=datetime.date.today())
-        form_kwargs = {'date': datetime.date.today(), 'next_status': Certificate.DELIVERED}
+        form_kwargs = {'date': datetime.date.today(
+        ), 'next_status': Certificate.DELIVERED}
         form = self.form(form_kwargs, instance=cert)
         self.assertTrue(form.is_valid())
 
@@ -157,4 +185,5 @@ class CertificateRegistrationTests(TestCase):
 
     def _make_sequential(self, start, end):
         self.form_kwargs.pop('cert_list')
-        self.form_kwargs.update({'registration_method': 'sequential', 'cert_from': start, 'cert_to': end})
+        self.form_kwargs.update(
+            {'registration_method': 'sequential', 'cert_from': start, 'cert_to': end})

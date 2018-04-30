@@ -11,7 +11,7 @@ from model_mommy import mommy
 from kpc.forms import StatusUpdateForm, LicenseeCertificateForm
 from kpc.models import Certificate
 from kpc.views import (CertificateRegisterView, CertificateView,
-                       licensee_contacts)
+                       licensee_contacts, CertificateVoidView)
 
 
 class LicenseeContactsTests(TestCase):
@@ -216,3 +216,30 @@ class CertificateViewTests(TestCase):
         cert = mommy.make(Certificate, status=Certificate.VOID)
         response = self.c.get(cert.get_absolute_url())
         self.assertNotContains(response, 'Set status')
+
+
+class CertificateVoidTests(TestCase):
+
+    def setUp(self):
+        self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
+        self.c = Client()
+        self.c.force_login(self.user)
+
+    def test_redirect_to_details_if_void(self):
+        """
+        Redirect w/ message to details if certificate is already voided
+        """
+        cert = mommy.make(Certificate, void=True)
+        response = self.c.get(reverse('void', args=[cert.id]), follow=True)
+        self.assertRedirects(response, cert.get_absolute_url())
+        message = list(response.context['messages']).pop()
+        self.assertEqual(message.message, CertificateVoidView.ALREADY_VOID)
+
+    def test_render_void_form_w_choices(self):
+        """
+        Void form is rendered with choices defined by Certificate model
+        """
+        cert = mommy.make(Certificate, void=False)
+        response = self.c.get(reverse('void', args=[cert.id]), follow=True)
+        for choice in Certificate.VOID_REASONS:
+            self.assertContains(response, choice)

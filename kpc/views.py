@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView, UpdateView
@@ -10,7 +11,7 @@ from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from .filters import CertificateFilter
 from .forms import (CertificateRegisterForm, LicenseeCertificateForm,
-                    StatusUpdateForm)
+                    StatusUpdateForm, VoidForm)
 from .models import Certificate
 from .utils import _filterable_params
 
@@ -98,12 +99,15 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
         return json_data
 
 
-class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class BaseCertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Certificate
 
     def test_func(self):
         obj = self.get_object()
         return obj.user_can_access(self.request.user)
+
+
+class CertificateView(BaseCertificateView):
 
     def get_form_class(self):
         if self.object.licensee_editable:
@@ -114,6 +118,26 @@ class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if self.object.licensee_editable:
             return ['certificate/details-edit.html']
         return ['certificate/details.html']
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, form.SUCCESS_MSG)
+        return response
+
+
+class CertificateVoidView(BaseCertificateView):
+    form_class = VoidForm
+    template_name = 'certificate/void.html'
+
+    ALREADY_VOID = "This certificate has already been voided."
+
+    def dispatch(self, request, *args, **kwargs):
+        """Unexpected access if certificate is already voided"""
+        obj = self.get_object()
+        if obj.void:
+            messages.warning(self.request, self.ALREADY_VOID)
+            return redirect(obj.get_absolute_url())
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)

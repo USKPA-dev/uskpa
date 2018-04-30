@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{form.errors}}
+{% if form.non_field_errors %}
+<div class="usa-alert usa-alert-error usa-grid">
+  <ul class="usa-checklist">
+    {% for error in form.non_field_errors %}
+    <li>{{error}}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="usa-grid">
+  <h1>Voiding Certificate: {{object}}</h1>
+  <p>This action cannot be reversed, please confirm and provide a reason.</p>
+  <form action="" method="POST" class="usa-form">
+    {% csrf_token %}
+    <fieldset>
+        <fieldset class="usa-fieldset-inputs usa-sans">
+          <legend class="usa-sr-only">Confirmation</legend>
+          <ul class="usa-unstyled-list">
+            {% if form.void.errors %}
+            <li class="usa-input-error">
+              <input id="id_void" type="checkbox" name="void" value="void">
+              <label class="usa-input-error-label" for="id_void">{{form.void.help_text}}</label>
+              <span class="usa-input-error-message" role="alert">
+                {% for err in form.void.errors %} {{err}} {% endfor %}
+              </span>
+            </li>
+            {% else %}
+            <li>
+              <input id="id_void" type="checkbox" name="void" value="void">
+              <label for="id_void">{{form.void.help_text}}</label>
+            </li>
+            {% endif %}
+          </ul>
+    </fieldset>
+    <fieldset>
+      <label for="id_reason">Reason:</label>
+      <select name="reason" id="id_reason">
+        {% for choice in form.reason %}
+          {{choice}}
+        {% endfor %}
+      </select>
+    </fieldset>
+
+    <fieldset id="notes_fieldset"
+        {% if form.reason.value != form.OTHER_CHOICE %}class="hidden"{% endif %}>
+      <label for="id_notes">Other, specify:</label>
+      <textarea name="notes" col="40" rows="10" id="id_notes"></textarea>
+    </fieldset>
+    <fieldset>
+      <input type="submit" value="Void Certificate">
+      <a href="{% url 'cert-details' object.id  %}" class="usa-button">Cancel</a>
+    </fieldset>
+    </form>
+</div>
+
+<script>
+
+  $(document).ready(function () {
+    $('#id_reason').change(function () {
+      if ($(this).val() === 'Other') {
+        $('#notes_fieldset').show();
+      } else {
+        $('#notes_fieldset').hide();
+        $('#id_notes').val('');
+      }
+    });
+  });
+
+</script>
+
+{% endblock content %}
