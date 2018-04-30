@@ -176,3 +176,35 @@ class StatusUpdateForm(forms.ModelForm):
 
         self.instance.save()
         return self.instance
+
+
+class VoidForm(forms.ModelForm):
+    OTHER_CHOICE = 'Other'
+    REASON_CHOICES = [(reason, reason) for reason in Certificate.VOID_REASONS]
+    void = forms.BooleanField(help_text="I wish to void this certificate.")
+    reason = forms.ChoiceField(choices=REASON_CHOICES)
+    notes = forms.CharField(widget=forms.Textarea(), required=False)
+
+    SUCCESS_MSG = "Certificate has been successfully voided."
+    REASON_REQUIRED = "Please provide a reason for this action."
+
+    class Meta:
+        model = Certificate
+        fields = ("void", "notes")
+
+    def clean(self):
+        reason = self.cleaned_data.get('reason')
+        notes = self.cleaned_data.get('notes')
+
+        if reason == self.OTHER_CHOICE and not notes:
+            raise forms.ValidationError(self.REASON_REQUIRED)
+
+    def save(self):
+        """Set status to void"""
+        cert = self.instance
+        cert.status = Certificate.VOID
+        cert.void = True
+        cert.notes = self.cleaned_data['notes'] or self.cleaned_data['reason']
+        cert.date_voided = datetime.date.today()
+        cert.save()
+        return cert
