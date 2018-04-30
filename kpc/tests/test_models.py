@@ -1,11 +1,11 @@
 from django.core.exceptions import ValidationError
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 from model_mommy import mommy
-
+from django.conf import settings
 from kpc.models import Certificate, Licensee
 
 
-class LicenseeTests(SimpleTestCase):
+class LicenseeTests(TestCase):
 
     def setUp(self):
         self.licensee = mommy.prepare(Licensee)
@@ -24,6 +24,23 @@ class LicenseeTests(SimpleTestCase):
         """Properly formatted tax identifiers do not raise ValidationErrors"""
         self.licensee.tax_id = '12-1234567'
         self.licensee.clean_fields()
+
+    def test_superuser_can_access(self):
+        """Can access details if admin"""
+        superuser = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
+        self.assertTrue(self.licensee.user_can_access(superuser))
+
+    def test_contact_can_access(self):
+        """Can access details if contact of licensee"""
+        contact = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        self.licensee.save()
+        contact.profile.licensees.add(self.licensee)
+        self.assertTrue(self.licensee.user_can_access(contact))
+
+    def test_unaffiliated_user_cannot_access(self):
+        """Cannot access details as un-affliated user"""
+        other_user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        self.assertFalse(self.licensee.user_can_access(other_user))
 
 
 class CertificateTests(TestCase):

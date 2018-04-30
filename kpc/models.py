@@ -5,6 +5,7 @@ from django.http import QueryDict
 from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
+from django.urls import reverse
 
 
 class Licensee(models.Model):
@@ -32,6 +33,12 @@ class Licensee(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('licensee', args=[self.id])
+
+    def user_can_access(self, user):
+        return user.is_superuser or user.profile.licensees.filter(id=self.id).exists()
 
 
 class Certificate(models.Model):

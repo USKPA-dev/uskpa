@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Licensee: {{object.name}}{% endblock %}
+
+{% block content %}
+<div class="usa-grid">
+  <div class='usa-width-one-third address-block'>
+    <h1>{{object.name}}</h1>
+    <p>{{object.address}}</p>
+    {% if objects.address2 %}
+    <p>{{object.address2}}</p>
+    {% endif %}
+    <p>{{object.city}}, {{object.state}} {{object.zip_code}}</p>
+    <p><span class="attr-label">Tax ID:</span> {{object.tax_id}}</p>
+    {% if user.is_superuser %}
+      <a title='Edit licensee' href="{% url 'admin:kpc_licensee_change' object.id %}">
+        <i class="far fa-edit"></i>
+      </a>
+    {% endif %}
+  </div>
+  <div class="usa-width-two-thirds contacts">
+    <h2>Contacts</h2>
+    <table id='contacts-table' >
+      <thead>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone</th>
+      </thead>
+      <tbody>
+        {% for profile in object.contacts.all %}
+        <tr>
+          <td>{{profile}}</td>
+          <td>{{profile.user.email}}</td>
+          <td>{{profile.phone_number}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock content %}

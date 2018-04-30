@@ -52,7 +52,9 @@
             <span class="attr-label">Status: </span>{{object.get_status_display}}
         </div>
         <div class="usa-width-one-third">
-            <span class="attr-label">Licensee:</span> {{object.licensee}}
+            <span class="attr-label">Licensee:
+            <a href="{{object.licensee.get_absolute_url}}">{{object.licensee}}</a>
+            </span>
         </div>
         <div class="usa-width-one-third">
             <span class="attr-label">Assignor:</span> {{object.assignor}}

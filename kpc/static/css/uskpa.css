@@ -68,3 +68,16 @@ input[type=date] {
 .cert-listing {
     overflow-x: auto;
 }
+
+.address-block p {
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+.contacts table {
+    margin: auto;
+}
+
+.contacts h2 {
+    text-align: center;
+}

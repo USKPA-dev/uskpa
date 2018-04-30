@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView
 from django.views.generic.edit import FormView, UpdateView
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from djqscsv import render_to_csv_response
@@ -14,7 +14,7 @@ from djqscsv import render_to_csv_response
 from .filters import CertificateFilter
 from .forms import (CertificateRegisterForm, LicenseeCertificateForm,
                     StatusUpdateForm, VoidForm)
-from .models import Certificate
+from .models import Certificate, Licensee
 from .utils import _filterable_params, _to_mdy
 
 User = get_user_model()
@@ -55,6 +55,14 @@ def licensee_contacts(request):
     else:
         return HttpResponse(status=405)
     return JsonResponse(contacts_json, safe=False)
+
+
+class LicenseeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Licensee
+    template_name = 'licensee.html'
+
+    def test_func(self):
+        return self.get_object().user_can_access(self.request.user)
 
 
 class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView):
