@@ -34,6 +34,9 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
             <th>Carats</th>
             <th>HSC</th>
             <th>Exporter</th>
+            <th>Date Shipped</th>
+            <th>Date Delivered</th>
+            <th>Date Voided</th>
         </thead>
         <tbody>
         </tbody>
@@ -108,6 +111,30 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
                 { data: "carat_weight", name: "carat_weight", visible: false },
                 { data: "harmonized_code", name: "harmonized_code", visible: false },
                 { data: "exporter", name: "exporter", visible: false },
+                {
+                    data: "date_of_shipment",
+                    name: "date_of_shipment",
+                    visible: false,
+                    render: function (data, type, row) {
+                        return dateToMoment(data);
+                    }
+                },
+                {
+                    data: "date_of_delivery",
+                    name: "date_of_delivery",
+                    visible: false,
+                    render: function (data, type, row) {
+                        return dateToMoment(data);
+                    }
+                },
+                {
+                    data: "date_voided",
+                    name: "date_voided",
+                    visible: false,
+                    render: function (data, type, row) {
+                        return dateToMoment(data);
+                    }
+                }
             ],
             "ajax": {
                 url: "{% url 'certificate-data' %}",

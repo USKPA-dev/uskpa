@@ -96,7 +96,8 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
     columns = ["number", "status", "consignee", "last_modified",
                "shipped_value", "licensee__name", "aes", "date_of_issue",
                "date_of_sale", "date_of_expiry", "number_of_parcels",
-               "carat_weight", "harmonized_code", "exporter"]
+               "carat_weight", "harmonized_code", "exporter", "date_of_shipment",
+               "date_of_delivery", "date_voided"]
     order_columns = columns
 
     max_display_length = 500
