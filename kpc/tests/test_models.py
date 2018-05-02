@@ -61,3 +61,38 @@ class CertificateTests(TestCase):
         """Query parameters for default cert search are generated"""
         expected = 'status=0&status=1&status=2'
         self.assertEqual(Certificate.default_search_filters(), expected)
+
+    def test_status_not_modifiable(self):
+        """
+           Certificate status is NOT user moddable status it
+           not PREPARED or INTRANSIT
+        """
+        self.cert.status = Certificate.ASSIGNED
+        self.assertFalse(self.cert.status_can_be_updated)
+        self.cert.status = Certificate.DELIVERED
+        self.assertFalse(self.cert.status_can_be_updated)
+        self.cert.status = Certificate.VOID
+        self.assertFalse(self.cert.status_can_be_updated)
+
+    def test_status_modifiable(self):
+        """certificate status is user moddable if its PREPARED or INTRANSIT"""
+        self.cert.status = Certificate.PREPARED
+        self.assertTrue(self.cert.status_can_be_updated)
+        self.cert.status = Certificate.INTRANSIT
+        self.assertTrue(self.cert.status_can_be_updated)
+
+    def test_next_status_label_returns_none(self):
+        """No next status label if not user moddable"""
+        self.assertIsNone(self.cert.next_status_label)
+        self.cert.status = Certificate.VOID
+        self.assertIsNone(self.cert.next_status_label)
+
+    def test_next_status_label(self):
+        """Return display value next status value"""
+        self.cert.status = Certificate.PREPARED
+        self.assertEqual(self.cert.next_status_label, 'In-transit')
+
+    def test_next_status_value(self):
+        """Return integer of next status"""
+        self.cert.status = Certificate.PREPARED
+        self.assertEqual(self.cert.next_status_value, Certificate.INTRANSIT)

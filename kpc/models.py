@@ -42,6 +42,7 @@ class Certificate(models.Model):
     VOID = 4
 
     DEFAULT_SEARCH = [ASSIGNED, PREPARED, INTRANSIT]
+    MODIFIABLE_STATUSES = [PREPARED, INTRANSIT]
 
     STATUS_CHOICES = (
         (ASSIGNED, 'Assigned'),
@@ -105,7 +106,8 @@ class Certificate(models.Model):
                                                                 application pertaining to this shipment,
                                                                 including the warranty that the diamonds
                                                                 being shipped were not traded to fund conflict.""")
-    # port_of_export = models.ForeignKey('PortOfExport', blank=True, on_delete=models.PROTECT)
+    date_of_shipment = models.DateField(blank=True, null=True, help_text='Date certificate was marked IN TRANSIT')
+    date_of_delivery = models.DateField(blank=True, null=True, help_text='Date certificate was marked DELIVERED')
 
     history = HistoricalRecords()
 
@@ -117,7 +119,7 @@ class Certificate(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('cert-details', args=[str(self.id)])
+        return reverse('cert-details', args=[self.id])
 
     def get_anchor_tag(self):
         """Link to this object"""
@@ -145,6 +147,23 @@ class Certificate(models.Model):
     @property
     def licensee_editable(self):
         return self.status == self.ASSIGNED
+
+    @property
+    def status_can_be_updated(self):
+        """Certificate may be modified by users?"""
+        return self.status in self.MODIFIABLE_STATUSES
+
+    @property
+    def next_status_label(self):
+        """Return label of next status"""
+        if self.status in self.MODIFIABLE_STATUSES:
+            return dict(self.STATUS_CHOICES)[self.status+1]
+
+    @property
+    def next_status_value(self):
+        """Return value of next status"""
+        if self.status in self.MODIFIABLE_STATUSES:
+            return self.status+1
 
     def user_can_access(self, user):
         """True if user can access this certificate"""

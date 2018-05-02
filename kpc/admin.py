@@ -10,12 +10,12 @@ from .models import Certificate, Licensee
 
 class LicenseeAdminForm(forms.ModelForm):
     contacts = forms.ModelMultipleChoiceField(
-            queryset=Profile.objects.all(),
-            required=False,
-            widget=FilteredSelectMultiple(
-                verbose_name='Contacts',
-                is_stacked=False
-            )
+        queryset=Profile.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple(
+            verbose_name='Contacts',
+            is_stacked=False
+        )
     )
 
     class Meta:
@@ -44,8 +44,44 @@ class LicenseeAdmin(SimpleHistoryAdmin):
         super().save_related(request, form, formsets, change)
 
 
+class CertificateAdminForm(forms.ModelForm):
+    """Enforce date consistency"""
+    class Meta:
+        model = Certificate
+        fields = ("__all__")
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        sold = cleaned_data.get('date_of_sale')
+        issued = cleaned_data.get('date_of_issue')
+        shipped = cleaned_data.get('date_of_shipment')
+        delivered = cleaned_data.get('date_of_delivery')
+
+        if issued and not sold:
+            raise forms.ValidationError("Date Issued cannot be set without Date Sold")
+        if shipped and not issued:
+            raise forms.ValidationError("Date Shipped cannot be set without Date Issued")
+        if delivered and not shipped:
+            raise forms.ValidationError("Date Delivered cannot be set without Date Shipped")
+
+        if sold and issued:
+            if issued < sold:
+                raise forms.ValidationError(
+                    'Date issued can not pre-date Date Sold')
+            if shipped:
+                if shipped < issued:
+                    raise forms.ValidationError(
+                        'Date shipped can not pre-date Date Issued')
+                if delivered and delivered < shipped:
+                        raise forms.ValidationError(
+                            'Date delivered can not pre-date Date Shipped')
+
+
 @admin.register(Certificate)
 class CertificateAdmin(SimpleHistoryAdmin):
-    list_display = ('display_name', 'status', 'last_modified', 'licensee', 'assignor',)
+    form = CertificateAdminForm
+    list_display = ('display_name', 'status',
+                    'last_modified', 'licensee', 'assignor',)
     list_filter = ('status', 'licensee',)
     search_fields = ('number',)

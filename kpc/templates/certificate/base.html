@@ -44,6 +44,23 @@
                 <span class="attr-label">Date Sold:</span> {{object.date_of_sale}}
             </div>
         </div>
+        <div>
+            <div class="usa-width-one-third">
+                {% if object.date_of_issue %}
+                <span class="attr-label">Date Issued:</span> {{object.date_of_issue}}
+                {% endif %}
+            </div>
+            <div class="usa-width-one-third">
+                {% if object.date_of_shipment %}
+                <span class="attr-label">Date Shipped:</span> {{object.date_of_shipment}}
+                {% endif %}
+            </div>
+            <div class="usa-width-one-third">
+                {% if object.date_of_delivery %}
+                <span class="attr-label">Date Delivered:</span> {{object.date_of_delivery}}
+                {% endif %}
+            </div>
+        </div>
         {% if object.notes %}
         <div>
             <span class="attr-label">Notes:</span> {{object.notes}}
@@ -56,6 +73,23 @@
     <div id="certificate-fields">
         {% block certificate-body-fields %}
         {% endblock %}
+
+        {% if object.status_can_be_updated %}
+        <hr>
+        <div id="status-update">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <fieldset>
+                    <label for="id_date">{{object.next_status_label}} as of:</label>
+                    <input type="date" name="date" placeholder="mm/dd/yyyy"  id="id_date">
+                </fieldset>
+                <input type="hidden" name="next_status" value="{{object.next_status_value}}" id="id_next_status">
+                <input type="submit" value="Set status to: {{object.next_status_label}}">
+            </form>
+        </div>
+        {% endif %}
     </div>
+
 </div>
+
 {% endblock %}
