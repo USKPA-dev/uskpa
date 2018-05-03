@@ -55,7 +55,7 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
         return super().form_valid(form)
 
 
-class CertificateListView(TemplateView):
+class CertificateListView(LoginRequiredMixin, TemplateView):
     template_name = 'certificate/list.html'
 
     def get_context_data(self, **kwargs):
