@@ -187,3 +187,7 @@ elif EMAIL_BACKEND.startswith("anymail"):
     }
     if not ANYMAIL["SENDGRID_API_KEY"]:
         raise ImproperlyConfigured(f'SENDGRID_API_KEY must be set when EMAIL_BACKEND={EMAIL_BACKEND}')
+
+
+SHOW_CERT_PDF_ADDRESS_BOUNDARY = False
+KPC_BASE = os.path.join(BASE_DIR, 'kpc', 'resources', 'kpc_base.pdf')

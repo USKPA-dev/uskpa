@@ -1,12 +1,15 @@
+import urllib
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
+from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, DetailView
+from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import FormView, UpdateView
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from djqscsv import render_to_csv_response
@@ -15,7 +18,7 @@ from .filters import CertificateFilter
 from .forms import (CertificateRegisterForm, LicenseeCertificateForm,
                     StatusUpdateForm, VoidForm)
 from .models import Certificate, Licensee
-from .utils import _filterable_params, _to_mdy
+from .utils import CertificatePreview, _filterable_params, _to_mdy
 
 User = get_user_model()
 
@@ -138,11 +141,23 @@ class BaseCertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 
 class CertificateView(BaseCertificateView):
+    REVIEW_MSG = "Please review the certificate data below."
 
     def get_form_class(self):
         if self.object.licensee_editable:
             return LicenseeCertificateForm
         return StatusUpdateForm
+
+    def get_form(self):
+        """
+        Check for incoming GET params
+        If present, populate form with values
+        """
+        form = super().get_form()
+        if self.request.GET and isinstance(form, LicenseeCertificateForm):
+            messages.info(self.request, self.REVIEW_MSG)
+            return LicenseeCertificateForm(self.request.GET)
+        return form
 
     def get_template_names(self):
         if self.object.licensee_editable:
@@ -150,9 +165,16 @@ class CertificateView(BaseCertificateView):
         return ['certificate/details.html']
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, form.SUCCESS_MSG)
-        return response
+        """Render confirmation page if certificate submitted"""
+        if isinstance(form, LicenseeCertificateForm):
+            cert = form.save(commit=False)
+            context = self.get_context_data()
+            context['b64_pdf'] = CertificatePreview(cert).make_preview()
+            return TemplateResponse(self.request, 'certificate/preview.html', context=context)
+        else:
+            response = super().form_valid(form)
+            messages.success(self.request, form.SUCCESS_MSG)
+            return response
 
 
 class CertificateVoidView(BaseCertificateView):
@@ -173,3 +195,20 @@ class CertificateVoidView(BaseCertificateView):
         response = super().form_valid(form)
         messages.success(self.request, form.SUCCESS_MSG)
         return response
+
+
+class CertificateConfirmView(BaseCertificateView):
+    form_class = LicenseeCertificateForm
+
+    def form_invalid(self, form):
+        """
+        Unexpectedly modified form data on confirmation page
+        Redirect to edit page w/ errors
+        """
+        form_data = urllib.parse.urlencode(self.request.POST)
+        return redirect(self.object.get_absolute_url() + '?' + form_data)
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, form.SUCCESS_MSG)
+        return redirect(form.instance.get_absolute_url())

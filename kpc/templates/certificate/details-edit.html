@@ -1,61 +1,10 @@
 {% extends 'certificate/base.html' %}
 
 {% block certificate-body-fields %}
-<form target='' method="POST">
+<form action="{% url 'cert-details' object.id %}" method="POST">
     {% csrf_token %}
-    <div id="certificate-body-fields">
-        <div class="cert-header usa-grid">
-            <hr>
-            <div class="usa-width-one-half">
-                <div>
-                     {% include 'uswds/form-field.html' with field=form.country_of_origin %}
-                </div>
-                <div>
-                     {% include 'uswds/form-field.html' with field=form.aes %}
-                </div>
-                <div>
-                     {% include 'uswds/form-field.html' with field=form.date_of_issue %}
-                </div>
-                <div>
-                     {% include 'uswds/form-field.html' with field=form.date_of_expiry %}
-                </div>
-            </div>
-            <div class="usa-width-one-half">
-                <div>
-                     {% include 'uswds/form-field.html' with field=form.number_of_parcels %}
-                </div>
-                <div>
-                     {% include 'uswds/form-field.html' with field=form.shipped_value %}
-                </div>
-                <div>
-                     {% include 'uswds/form-field.html' with field=form.carat_weight %}
-                </div>
-                <div>
-                     {% include 'uswds/form-field.html' with field=form.harmonized_code %}
-                </div>
-            </div>
-        </div>
 
-        <div class="cert-body">
-            <div class="usa-grid">
-                <hr>
-                <div class="usa-width-one-half">
-                     {% include 'uswds/form-field.html' with field=form.exporter %}
-                </div>
-                <div class="usa-width-one-half">
-                     {% include 'uswds/form-field.html' with field=form.exporter_address %}
-                </div>
-            </div>
-            <div class="usa-grid">
-                <div class="usa-width-one-half">
-                     {% include 'uswds/form-field.html' with field=form.consignee %}
-                </div>
-                <div class="usa-width-one-half">
-                     {% include 'uswds/form-field.html' with field=form.consignee_address %}
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'certificate/fields_form.html' %}
 
     {% with form.attested as field %}
     <div id="attestation" class="usa-grid">
@@ -79,7 +28,7 @@
                 </li>
                 {% endif %}
             </ul>
-        <input type="submit" value="Complete Certificate">
+        <input type="submit" value="Submit">
         </fieldset>
     </div>
     {% endwith %}

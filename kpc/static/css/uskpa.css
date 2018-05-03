@@ -1,5 +1,5 @@
 h1 {
-    font-size: 2.5rem;
+    font-size: 2.0rem;
     margin-top: 0.5em !important;
 }
 
@@ -80,4 +80,15 @@ input[type=date] {
 
 .contacts h2 {
     text-align: center;
+}
+
+.pdf-preview {
+    overflow-x: auto;
+}
+.pdf-preview canvas {
+    border: black solid thin;
+}
+
+.preview-confirm input {
+    display:inline;
 }

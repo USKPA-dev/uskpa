@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Certificate US{{object.number}}{% endblock %}
+
+{% block content %}
+
+<div class="usa-grid">
+<form method="POST">
+{% csrf_token %}
+
+  <div class="usa-grid">
+    <h1>Preparing {{object}}</h1>
+    <p>Please review and confirm the data below to complete this certificate.</p>
+  </div>
+
+  <div class="usa-grid preview-confirm">
+    {% comment %}Disabled while PDF renders or until user requests plaintext preview{% endcomment %}
+    <input disabled type="submit" class="usa-button" value="Cancel" formaction="{% url 'cert-details' object.id %}" formmethod="GET">
+    <input disabled type="submit" class="usa-button" value="Confirm" formaction="{% url 'confirm' object.id %}">
+  </div>
+
+  <div class="usa-grid">
+      <div class='pdf-preview'><small>Trouble viewing the preview below? <a class="alt-preview">Click here to view as plain text</a></small></div>
+      <div class="text-preview hidden"><small><a class="alt-preview">Click here to view draft certificate</a></small></div>
+      <div class="hidden text-preview">
+        {% include 'certificate/fields_form.html' %}
+        <div class="hidden">
+          {% comment %}
+            Hidden inputs to store form values for confirm submission
+          {% endcomment %}
+          <input name="country_of_origin" value="{{form.country_of_origin.value}}">
+          <input name="harmonized_code" value="{{form.harmonized_code.value}}">
+          <input name="attested" value="attested">
+        </div>
+      </div>
+      <div class="pdf-preview">
+        <canvas class='hidden' id="the-canvas"></canvas>
+      </div>
+  </div>
+<form>
+</div>
+
+<script>
+      $(document).ready(function () {
+
+        // disable form inputs -- only reviewing here
+        $('input, textarea').attr('readonly', 'readonly');
+        $('select option').attr('disabled', 'disabled');
+
+        $('.alt-preview').click( function() {
+          $('.preview-confirm input').removeAttr('disabled');
+          $('.pdf-preview').toggle();
+          $('.text-preview').toggle();
+        });
+
+        var pdfData = atob("{{b64_pdf|safe}}");
+
+        // Render PDF
+        var loadingTask = pdfjsLib.getDocument({data: pdfData});
+        loadingTask.promise.then(function (pdf) {
+
+          // Fetch our only page
+          var pageNumber = 1;
+          pdf.getPage(pageNumber).then(function (page) {
+            var scale = 1;
+            var viewport = page.getViewport(scale);
+
+            // Prepare canvas using PDF dimensions
+            var canvas = document.getElementById('the-canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            var renderContext = {
+              canvasContext: context,
+              viewport: viewport
+            };
+            var renderTask = page.render(renderContext);
+            renderTask.then(function () {
+              $('canvas').show();
+              $('.preview-confirm input').removeAttr('disabled');
+            });
+          });
+        }, function (reason) {
+          // PDF loading error
+          console.error(reason);
+        });
+
+      });
+</script>
+
+{% endblock content %}
