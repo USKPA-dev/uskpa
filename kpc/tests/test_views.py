@@ -216,3 +216,16 @@ class CertificateViewTests(TestCase):
         cert = mommy.make(Certificate, status=Certificate.VOID)
         response = self.c.get(cert.get_absolute_url())
         self.assertNotContains(response, 'Set status')
+
+
+class CertificateListViewTests(TestCase):
+
+    def setUp(self):
+        self.c = Client()
+        self.url = reverse('certificates')
+
+    def test_login_required(self):
+        """redirect to login if anonymoususer"""
+        response = self.c.get(self.url)
+        target_url = settings.LOGIN_URL + '?next=' + self.url
+        self.assertRedirects(response, target_url, fetch_redirect_response=False)
