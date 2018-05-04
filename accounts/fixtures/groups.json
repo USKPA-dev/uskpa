@@ -1,16 +1,16 @@
 [
-{
+  {
     "model": "auth.group",
     "fields": {
-        "name": "Licensee",
-        "permissions": []
+      "name": "Auditor",
+      "permissions": [["can_review_certificates", "accounts", "profile"]]
     }
-},
-{
+  },
+  {
     "model": "auth.group",
     "fields": {
-        "name": "Auditor",
-        "permissions": []
+      "name": "Licensee",
+      "permissions": []
     }
-}
+  }
 ]

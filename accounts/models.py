@@ -31,6 +31,11 @@ class Profile(models.Model):
 
     history = HistoricalRecords()
 
+    class Meta:
+        permissions = (
+            ('can_review_certificates', "Can Review all Certificates"),
+        )
+
     def __str__(self):
         return self.get_user_display_name()
 
