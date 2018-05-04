@@ -67,9 +67,7 @@ class Certificate(models.Model):
     HS_CODE_CHOICES = (
         ('7102.10', '7102.10'),
         ('7102.21', '7102.21'),
-        ('7102.29', '7102.29'),
         ('7102.31', '7102.31'),
-        ('7102.39', '7102.39'),
     )
 
     VOID_REASONS = ['Printing Error', 'Typographical error', 'No longer needed', 'Other']
