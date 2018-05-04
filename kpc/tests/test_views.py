@@ -256,3 +256,28 @@ class CertificateVoidTests(TestCase):
         response = self.c.get(reverse('void', args=[cert.id]), follow=True)
         for choice in Certificate.VOID_REASONS:
             self.assertContains(response, choice)
+
+
+class ExportViewTests(TestCase):
+
+    def setUp(self):
+        self.super_user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
+        self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        self.cert = mommy.make(Certificate)
+        self.c = Client()
+        self.c.force_login(self.user)
+        self.url = reverse('export')
+
+    def test_yields_rows_for_each_certificate_none(self):
+        """Only BOM and headers yielded if no certs visible"""
+        response = self.c.get(self.url)
+        results = [row for row in response.streaming_content]
+        self.assertEqual(len(results), 2)
+
+    def test_yields_rows_for_all_certificates_visible(self):
+        """One row per certificates to which a user has access"""
+        self.c.force_login(self.super_user)
+        mommy.make(Certificate)
+        response = self.c.get(self.url)
+        results = [row for row in response.streaming_content]
+        self.assertEqual(len(results), 2 + Certificate.objects.count())

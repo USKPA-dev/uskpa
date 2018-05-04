@@ -2,30 +2,22 @@
 
 {% block title %}Certificate Search{% endblock title %}
 {% block "header" %}
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
 
 <script type="text/javascript" charset="utf8"
+src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
+<script type="text/javascript" charset="utf8"
 src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
-
-<style>
-    #id_status label {
-        margin-top: 0em;
-    }
-
-    input[type=date] {
-        padding: 0;
-    }
-</style>
 
 {% endblock "header" %}
 
 {% block content %}
 
 <section class="usa-grid">
+
     <div class='usa-width-one-third filters'>
         {% include 'certificate/filters.html' %}
     </div>
-    <div class="usa-width-two-thirds">
+    <div class="usa-width-two-thirds cert-listing">
     <table id='certDataTable' class='table dataTable'>
         <thead>
             <th>Number</th>
@@ -33,6 +25,18 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
             <th>Consignee</th>
             <th>Last Modified</th>
             <th>Value</th>
+            <th>Licensee</th>
+            <th>AES</th>
+            <th>Date Issued</th>
+            <th>Date Sold</th>
+            <th>Expiry</th>
+            <th>Parcels</th>
+            <th>Carats</th>
+            <th>HSC</th>
+            <th>Exporter</th>
+            <th>Date Shipped</th>
+            <th>Date Delivered</th>
+            <th>Date Voided</th>
         </thead>
         <tbody>
         </tbody>
@@ -41,11 +45,97 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 </section>
 
 <script>
+    var statusMap = new Map({{statuses|safe}});
+
+    function dateToMoment(data) {
+        if (data) {
+            var dt = moment(data);
+            return dt.format('M/D/YYYY');
+        }
+        return data;
+    }
+
     $(document).ready(function() {
         var oTable = $('#certDataTable').DataTable({
             "dom": "irtlp",
             "processing": true,
             "serverSide": true,
+            columns: [
+                { data: "number",
+                  render: function(data, type, row) {
+                      var display_value = 'US' + data;
+                      return "<a href='" + data + "'>" + display_value + "</a>";
+                  }
+                },
+                { data: "status" ,
+                  name: "status",
+                  render: function(data, type, row) {
+                      return statusMap.get(data);
+                  }
+                },
+                { data: "consignee",
+                  name: "consignee"
+                },
+                { data: "last_modified",
+                  name: "last_modified",
+                  render: function(data, type, row) {
+                      return dateToMoment(data);
+                  }},
+                { data: "shipped_value",
+                  name: "shipped_value"
+                },
+                { data: "licensee__name", name: "licensee__name", visible: false },
+                { data: "aes", name: "aes", visible: false },
+                { data: "date_of_issue",
+                  name: "date_of_issue",
+                  visible: false,
+                  render: function (data, type, row) {
+                    return dateToMoment(data);
+                  }
+                },
+                { data: "date_of_sale",
+                  name: "date_of_sale",
+                  visible: false,
+                  render: function (data, type, row) {
+                    return dateToMoment(data);
+                  }
+                },
+                { data: "date_of_expiry",
+                  name: "date_of_expiry",
+                  visible: false,
+                  render: function (data, type, row) {
+                    return dateToMoment(data);
+                    }
+                },
+                { data: "number_of_parcels", name: "number_of_parcels", visible: false },
+                { data: "carat_weight", name: "carat_weight", visible: false },
+                { data: "harmonized_code", name: "harmonized_code", visible: false },
+                { data: "exporter", name: "exporter", visible: false },
+                {
+                    data: "date_of_shipment",
+                    name: "date_of_shipment",
+                    visible: false,
+                    render: function (data, type, row) {
+                        return dateToMoment(data);
+                    }
+                },
+                {
+                    data: "date_of_delivery",
+                    name: "date_of_delivery",
+                    visible: false,
+                    render: function (data, type, row) {
+                        return dateToMoment(data);
+                    }
+                },
+                {
+                    data: "date_voided",
+                    name: "date_voided",
+                    visible: false,
+                    render: function (data, type, row) {
+                        return dateToMoment(data);
+                    }
+                }
+            ],
             "ajax": {
                 url: "{% url 'certificate-data' %}",
                 data: function (d) {
@@ -107,6 +197,14 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
             oTable.page.len($(this).val()).draw();
         });
 
+        $('#export').click(function (){
+            var filters = oTable.ajax.params();
+            var params = jQuery.param(filters);
+            var export_url = 'export?' + params;
+            window.open(export_url, '_blank');
+        });
+
     });
+
 </script>
 {% endblock content %}

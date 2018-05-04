@@ -13,6 +13,7 @@ urlpatterns = [
     path('certificates/<int:pk>/void', kpc_views.CertificateVoidView.as_view(), name='void'),
     path('certificates/<int:pk>', kpc_views.CertificateView.as_view(), name='cert-details'),
     path('certificates/', kpc_views.CertificateListView.as_view(), name='certificates'),
+    path('certificates/export', kpc_views.ExportView.as_view(), name='export'),
     path('certificates-data/', kpc_views.CertificateJson.as_view(), name='certificate-data'),
     path('licensee-contacts/', kpc_views.licensee_contacts, name='licensee-contacts'),
     path('admin/', admin.site.urls),

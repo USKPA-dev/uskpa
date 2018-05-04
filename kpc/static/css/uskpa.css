@@ -57,3 +57,14 @@ h1 {
 .hidden {
     display: none;
 }
+
+#id_status label {
+    margin-top: 0em;
+}
+
+input[type=date] {
+    padding: 0;
+}
+.cert-listing {
+    overflow-x: auto;
+}

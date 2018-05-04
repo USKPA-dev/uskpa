@@ -170,3 +170,7 @@ class Certificate(models.Model):
     def user_can_access(self, user):
         """True if user can access this certificate"""
         return user.profile.certificates().filter(id=self.id).exists()
+
+    @classmethod
+    def get_label_for_status(cls, status):
+        return dict(cls.STATUS_CHOICES).get(status)
