@@ -43,9 +43,13 @@ class Profile(models.Model):
         """User's fullname or username"""
         return self.user.get_full_name() or self.user.get_username()
 
+    @property
+    def is_auditor(self):
+        return self.user.has_perm('accounts.can_review_certificates')
+
     def certificates(self):
         """Certificates which this user may access"""
-        if self.user.is_superuser:
+        if self.user.is_superuser or self.is_auditor:
             return Certificate.objects.all()
         else:
             return Certificate.objects.filter(licensee__in=self.licensees.all())
