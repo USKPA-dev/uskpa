@@ -28,10 +28,16 @@ class LicenseeCertificateForm(forms.ModelForm):
     SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
 
     def __init__(self, *args, **kwargs):
-        """All fields are required for Licensee to complete certificate"""
+        """
+        All fields are required for Licensee to complete certificate
+        """
+        self.editable = kwargs.pop('editable', True)
         super().__init__(*args, **kwargs)
+
         for field in self.fields:
             self.fields[field].required = True
+            if not self.editable:
+                self.fields[field].disabled = True
 
     class Meta:
         model = Certificate
@@ -134,6 +140,10 @@ class StatusUpdateForm(forms.ModelForm):
     DELIVERY_DATE = "The Delivered date must be on or after the certificate's date of shipment (%s)."
     NOT_AVAILABLE = "This certificate has already been issued."
     SUCCESS_MSG = 'Certificate status has been succesfully updated.'
+
+    def __init__(self, *args, **kwargs):
+        self.editable = kwargs.pop('editable', False)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Certificate

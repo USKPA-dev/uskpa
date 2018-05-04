@@ -40,7 +40,7 @@
             </h1>
         </div>
         <div class="usa-width-one-half">
-            {% if not object.void %}
+            {% if not object.void and form.editable %}
                 <a href='{% url "void" object.id %}' id='void' type='button' class="usa-button">
                     Void this Certificate
                 </a>
@@ -100,7 +100,7 @@
 <div id="certificate-fields ">
     {% block certificate-body-fields %}
     {% endblock %}
-    {% if object.status_can_be_updated %}
+    {% if object.status_can_be_updated and form.editable %}
     <div id="status-update" class="usa-grid">
         <hr>
         <form action="" method="POST" class="usa-form">

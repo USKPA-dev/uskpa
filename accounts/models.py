@@ -5,7 +5,7 @@ from simple_history.models import HistoricalRecords
 from simple_history import register
 
 
-from kpc.models import Certificate
+from kpc.models import Certificate, Licensee
 
 
 class HistoryUser(get_user_model()):
@@ -25,9 +25,11 @@ register(HistoryUser)
 
 class Profile(models.Model):
     """Store additional user information"""
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=32, blank=True)
-    licensees = models.ManyToManyField('kpc.Licensee', blank=True, related_name='contacts')
+    licensees = models.ManyToManyField(
+        'kpc.Licensee', blank=True, related_name='contacts')
 
     history = HistoricalRecords()
 
@@ -43,9 +45,16 @@ class Profile(models.Model):
         """User's fullname or username"""
         return self.user.get_full_name() or self.user.get_username()
 
+    def get_licensees(self):
+        """List of licensees to which this user has access"""
+        if self.user.is_superuser or self.is_auditor:
+            return Licensee.objects.all()
+        return self.licensees.all()
+
     @property
     def is_auditor(self):
-        return self.user.has_perm('accounts.can_review_certificates')
+        return self.user.has_perm('accounts.can_review_certificates') \
+               and not self.user.is_superuser
 
     def certificates(self):
         """Certificates which this user may access"""
