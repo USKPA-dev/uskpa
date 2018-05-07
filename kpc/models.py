@@ -65,6 +65,8 @@ class Certificate(models.Model):
         ('7102.39', '7102.39'),
     )
 
+    VOID_REASONS = ['Printing Error', 'Typographical error', 'No longer needed', 'Other']
+
     # Fields on physical certificate
     number = models.PositiveIntegerField(help_text='USKPA Certificate ID number', unique=True)
     aes = models.CharField(max_length=15,
@@ -108,7 +110,7 @@ class Certificate(models.Model):
                                                                 being shipped were not traded to fund conflict.""")
     date_of_shipment = models.DateField(blank=True, null=True, help_text='Date certificate was marked IN TRANSIT')
     date_of_delivery = models.DateField(blank=True, null=True, help_text='Date certificate was marked DELIVERED')
-
+    date_voided = models.DateField(blank=True, null=True, help_text="Date on which this certificate was voided")
     history = HistoricalRecords()
 
     class Meta:
@@ -168,3 +170,7 @@ class Certificate(models.Model):
     def user_can_access(self, user):
         """True if user can access this certificate"""
         return user.profile.certificates().filter(id=self.id).exists()
+
+    @classmethod
+    def get_label_for_status(cls, status):
+        return dict(cls.STATUS_CHOICES).get(status)

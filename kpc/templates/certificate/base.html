@@ -3,93 +3,117 @@
 {% block title %}Certificate US{{object.number}}{% endblock %}
 
 {% block content %}
+{% if form.non_field_errors %}
 <div class="usa-grid">
-    {% if form.non_field_errors %}
-    <div class="usa-alert usa-alert-error">
-        <ul class="usa-checklist">
-            {% for error in form.non_field_errors %}
-            <li>{{error}}</li>
-            {% endfor %}
-        </ul>
+<div class="usa-alert usa-alert-error">
+    <ul class="usa-checklist">
+        {% for error in form.non_field_errors %}
+        <li>{{error}}</li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
+{% endif %}
+
+{% if object.void %}
+<div class="usa-grid">
+    <div class="usa-alert usa-alert-warning">
+        <div class="usa-alert-body">
+        <h3 class="usa-alert-heading">Voided on: {{object.date_voided}}</h3>
+        <p class="usa-alert-text">
+            Reason: {{object.notes}}
+        </p>
+        </div>
     </div>
-    {% endif %}
-    <div class='cert-header'>
-        <div>
-            <legend>{{object}} {% if user.is_superuser %}
+</div>
+{% endif %}
+
+<div class='cert-header'>
+    <div class="usa-grid">
+        <div class="usa-width-one-half">
+            <h1>{{object}}
+                {% if user.is_superuser %}
                 <a title='Edit certificate' href="{% url 'admin:kpc_certificate_change' object.id %}">
                     <i class="far fa-edit"></i>
                 </a>
                 {% endif %}
-            </legend>
+            </h1>
         </div>
-        <div>
-            <div class="usa-width-one-third">
-                <span class="attr-label">Status: </span>{{object.get_status_display}}
-            </div>
-            <div class="usa-width-one-third">
-                <span class="attr-label">Licensee:</span> {{object.licensee}}
-            </div>
-            <div class="usa-width-one-third">
-                <span class="attr-label">Assignor:</span> {{object.assignor}}
-            </div>
+        <div class="usa-width-one-half">
+            {% if not object.void %}
+                <a href='{% url "void" object.id %}' id='void' type='button' class="usa-button">
+                    Void this Certificate
+                </a>
+            {% endif %}
         </div>
-        <div>
-            <div class="usa-width-one-third">
-                <span class="attr-label">Modified:</span> {{object.last_modified}}
-            </div>
-            <div class="usa-width-one-third">
-                <span class="attr-label">Contact:</span> {{object.contact}}
-            </div>
-            <div class="usa-width-one-third">
-                <span class="attr-label">Date Sold:</span> {{object.date_of_sale}}
-            </div>
-        </div>
-        <div>
-            <div class="usa-width-one-third">
-                {% if object.date_of_issue %}
-                <span class="attr-label">Date Issued:</span> {{object.date_of_issue}}
-                {% endif %}
-            </div>
-            <div class="usa-width-one-third">
-                {% if object.date_of_shipment %}
-                <span class="attr-label">Date Shipped:</span> {{object.date_of_shipment}}
-                {% endif %}
-            </div>
-            <div class="usa-width-one-third">
-                {% if object.date_of_delivery %}
-                <span class="attr-label">Date Delivered:</span> {{object.date_of_delivery}}
-                {% endif %}
-            </div>
-        </div>
-        {% if object.notes %}
-        <div>
-            <span class="attr-label">Notes:</span> {{object.notes}}
-        </div>
-        {% endif %}
     </div>
+    <div class="usa-grid">
+        <div class="usa-width-one-third">
+            <span class="attr-label">Status: </span>{{object.get_status_display}}
+        </div>
+        <div class="usa-width-one-third">
+            <span class="attr-label">Licensee:</span> {{object.licensee}}
+        </div>
+        <div class="usa-width-one-third">
+            <span class="attr-label">Assignor:</span> {{object.assignor}}
+        </div>
+    </div>
+    <div class="usa-grid">
+        <div class="usa-width-one-third">
+            <span class="attr-label">Modified:</span> {{object.last_modified}}
+        </div>
+        <div class="usa-width-one-third">
+            <span class="attr-label">Contact:</span> {{object.contact}}
+        </div>
+        <div class="usa-width-one-third">
+            <span class="attr-label">Date Sold:</span> {{object.date_of_sale}}
+        </div>
+    </div>
+    <div>
+        <div class="usa-width-one-third">
+            {% if object.date_of_issue %}
+            <span class="attr-label">Date Issued:</span> {{object.date_of_issue}}
+            {% endif %}
+        </div>
+        <div class="usa-width-one-third">
+            {% if object.date_of_shipment %}
+            <span class="attr-label">Date Shipped:</span> {{object.date_of_shipment}}
+            {% endif %}
+        </div>
+        <div class="usa-width-one-third">
+            {% if object.date_of_delivery %}
+            <span class="attr-label">Date Delivered:</span> {{object.date_of_delivery}}
+            {% endif %}
+        </div>
+    </div>
+    {% if object.notes %}
+    <div class="usa-grid">
+        <span class="attr-label">Notes:</span> {{object.notes}}
+    </div>
+    {% endif %}
 
-    <hr>
+</div>
 
-    <div id="certificate-fields">
-        {% block certificate-body-fields %}
-        {% endblock %}
 
-        {% if object.status_can_be_updated %}
+<div id="certificate-fields ">
+    {% block certificate-body-fields %}
+    {% endblock %}
+    {% if object.status_can_be_updated %}
+    <div id="status-update" class="usa-grid">
         <hr>
-        <div id="status-update">
-            <form action="" method="POST">
-                {% csrf_token %}
-                <fieldset>
-                    <label for="id_date">{{object.next_status_label}} as of:</label>
-                    <input type="date" name="date" placeholder="mm/dd/yyyy"  id="id_date">
-                </fieldset>
+        <form action="" method="POST" class="usa-form">
+            {% csrf_token %}
+            <fieldset>
+                <label for="id_date">{{object.next_status_label}} as of:</label>
+                <input type="date" name="date" placeholder="mm/dd/yyyy"  id="id_date">
+            </fieldset>
+            <fieldset>
                 <input type="hidden" name="next_status" value="{{object.next_status_value}}" id="id_next_status">
-                <input type="submit" value="Set status to: {{object.next_status_label}}">
-            </form>
-        </div>
-        {% endif %}
+                <input type="submit" class="usa-button" value="Set status to: {{object.next_status_label}}">
+            </fieldset>
+        </form>
     </div>
-
+    {% endif %}
 </div>
 
 {% endblock %}

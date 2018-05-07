@@ -3,18 +3,43 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView, UpdateView
 from django_datatables_view.base_datatable_view import BaseDatatableView
+from djqscsv import render_to_csv_response
 
 from .filters import CertificateFilter
 from .forms import (CertificateRegisterForm, LicenseeCertificateForm,
-                    StatusUpdateForm)
+                    StatusUpdateForm, VoidForm)
 from .models import Certificate
-from .utils import _filterable_params
+from .utils import _filterable_params, _to_mdy
 
 User = get_user_model()
+
+
+class ExportView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        """Return CSV of filtered certificates"""
+        qs = request.user.profile.certificates()
+        qs = CertificateFilter(_filterable_params(request.GET), queryset=qs).qs
+        qs = qs.values(*CertificateJson.columns)
+
+        export_kwargs = {'field_serializer_map': {
+            'number': (lambda number: 'US' + str(number)),
+            'status': Certificate.get_label_for_status,
+            'last_modified': (lambda dt: dt.strftime("%m/%d/%Y %X %Z")),
+            'date_of_issue': _to_mdy,
+            'date_of_sale': _to_mdy,
+            'date_of_expiry': _to_mdy,
+            'date_of_shipment': _to_mdy,
+            'date_of_delivery': _to_mdy,
+            'date_voided': _to_mdy
+        }}
+        return render_to_csv_response(qs, **export_kwargs)
 
 
 @permission_required('accounts.can_get_licensee_contacts', raise_exception=True)
@@ -61,12 +86,18 @@ class CertificateListView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filters'] = CertificateFilter(self.request.GET, queryset=self.request.user.profile.certificates())
+        context['statuses'] = [[status[0], status[1]] for status in Certificate.STATUS_CHOICES]
+        context['dt_columns'] = CertificateJson.columns
         return context
 
 
 class CertificateJson(LoginRequiredMixin, BaseDatatableView):
     model = Certificate
-    columns = ['number', 'status', 'consignee', 'last_modified', 'shipped_value']
+    columns = ["number", "status", "consignee", "last_modified",
+               "shipped_value", "licensee__name", "aes", "date_of_issue",
+               "date_of_sale", "date_of_expiry", "number_of_parcels",
+               "carat_weight", "harmonized_code", "exporter", "date_of_shipment",
+               "date_of_delivery", "date_voided"]
     order_columns = columns
 
     max_display_length = 500
@@ -86,24 +117,19 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
 
     def prepare_results(self, qs):
         """format our dates and Cert number"""
-        json_data = []
-        for item in qs:
-            json_data.append([
-                item.get_anchor_tag(),
-                item.get_status_display(),
-                item.consignee,
-                item.last_modified.strftime("%Y-%m-%d %H:%M:%S"),
-                f'${item.shipped_value}' if item.shipped_value else None
-            ])
-        return json_data
+        qs = qs.values(*self.columns)
+        return list(qs)
 
 
-class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class BaseCertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Certificate
 
     def test_func(self):
         obj = self.get_object()
         return obj.user_can_access(self.request.user)
+
+
+class CertificateView(BaseCertificateView):
 
     def get_form_class(self):
         if self.object.licensee_editable:
@@ -114,6 +140,26 @@ class CertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if self.object.licensee_editable:
             return ['certificate/details-edit.html']
         return ['certificate/details.html']
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, form.SUCCESS_MSG)
+        return response
+
+
+class CertificateVoidView(BaseCertificateView):
+    form_class = VoidForm
+    template_name = 'certificate/void.html'
+
+    ALREADY_VOID = "This certificate has already been voided."
+
+    def dispatch(self, request, *args, **kwargs):
+        """Unexpected access if certificate is already voided"""
+        obj = self.get_object()
+        if obj.void:
+            messages.warning(self.request, self.ALREADY_VOID)
+            return redirect(obj.get_absolute_url())
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)

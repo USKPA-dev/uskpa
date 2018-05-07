@@ -4,7 +4,8 @@
 <form target='' method="POST">
     {% csrf_token %}
     <div id="certificate-body-fields">
-        <div class="cert-header">
+        <div class="cert-header usa-grid">
+            <hr>
             <div class="usa-width-one-half">
                 <div>
                      {% include 'uswds/form-field.html' with field=form.country_of_origin %}
@@ -34,9 +35,10 @@
                 </div>
             </div>
         </div>
-        <hr>
+
         <div class="cert-body">
-            <div>
+            <div class="usa-grid">
+                <hr>
                 <div class="usa-width-one-half">
                      {% include 'uswds/form-field.html' with field=form.exporter %}
                 </div>
@@ -44,7 +46,7 @@
                      {% include 'uswds/form-field.html' with field=form.exporter_address %}
                 </div>
             </div>
-            <div>
+            <div class="usa-grid">
                 <div class="usa-width-one-half">
                      {% include 'uswds/form-field.html' with field=form.consignee %}
                 </div>
@@ -56,14 +58,14 @@
     </div>
 
     {% with form.attested as field %}
-    <div id="attestation">
+    <div id="attestation" class="usa-grid">
         <fieldset class="usa-fieldset-inputs usa-sans">
             <legend class="usa-sr-only">Attestation</legend>
             <ul class="usa-unstyled-list">
                 {% if field.errors %}
                 <li class="usa-input-error">
                     <input id="id_attested" type="checkbox" name="attested" value="attested">
-                    <label class="usa-input-error-label" for="id_attested">{{form.attested.help_text}}</label>
+                    <label class="usa-input-error-label" for="id_attested">{{field.help_text}}</label>
                     <span class="usa-input-error-message" role="alert">
                         {% for err in field.errors %}
                             {{err}}
@@ -73,14 +75,14 @@
                 {% else %}
                 <li>
                     <input id="id_attested" type="checkbox" name="attested" value="attested">
-                    <label for="id_attested">{{form.attested.help_text}}</label>
+                    <label for="id_attested">{{field.help_text}}</label>
                 </li>
                 {% endif %}
             </ul>
+        <input type="submit" value="Complete Certificate">
         </fieldset>
     </div>
     {% endwith %}
 
-    <input type="submit" value="Complete Certificate">
 </form>
 {% endblock %}

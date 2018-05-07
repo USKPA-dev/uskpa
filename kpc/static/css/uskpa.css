@@ -1,3 +1,8 @@
+h1 {
+    font-size: 2.5rem;
+    margin-top: 0.5em !important;
+}
+
 .cert-body,
 .cert-body-top {
     margin-top: 1em;
@@ -8,7 +13,6 @@
 .attr-label {
     font-weight: bold;
 }
-
 
 #certificate-body-fields *> input,
 #certificate-body-fields *> select,
@@ -31,11 +35,36 @@
     margin-top: 1rem;
 }
 
-#status-update {
-    max-width: 25%;
-}
 #status-update *> input {
     padding-left: 1em;
     padding-right: 1em;
     margin-top: 0.5em;
+}
+
+#void {
+    float:right;
+}
+
+.cert-number {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.usa-alert {
+    margin-top: 0em;
+}
+
+.hidden {
+    display: none;
+}
+
+#id_status label {
+    margin-top: 0em;
+}
+
+input[type=date] {
+    padding: 0;
+}
+.cert-listing {
+    overflow-x: auto;
 }
