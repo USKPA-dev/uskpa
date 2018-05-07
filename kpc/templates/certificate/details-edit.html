@@ -34,4 +34,25 @@
     {% endwith %}
 
 </form>
+
+<script>
+    var EXPIRY_DAYS = {{form.EXPIRY_DAYS}};
+
+    $(document).ready(function () {
+
+        // Calculate and set Date of Expiry
+        $('#id_date_of_issue').change(function(){
+            var dtIssued = moment(this.value, ['YYYY-MM-DD', 'MM/DD/YYYY']);
+            if (dtIssued.isValid()){
+                var expectedExpiry = dtIssued.add(EXPIRY_DAYS, 'days').format('MM/DD/YYYY');
+                $('#id_date_of_expiry').val(expectedExpiry);
+            } else {
+                $('#id_date_of_expiry').attr('placeholder', 'Unable to calculate from entered Date of Issue');
+            }
+        })
+    });
+
+
+</script>
+
 {% endblock %}

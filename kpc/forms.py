@@ -20,12 +20,15 @@ class UserModelChoiceField(forms.ModelChoiceField):
 
 
 class LicenseeCertificateForm(forms.ModelForm):
+    EXPIRY_DAYS = Certificate.EXPIRY_DAYS
+
     date_of_issue = forms.DateField(
         widget=forms.DateInput(attrs=DATE_ATTRS))
-    date_of_expiry = forms.DateField(
-        widget=forms.DateInput(attrs=DATE_ATTRS))
-
+    date_of_expiry = forms.DateField(label=f"Date of Expiry ({EXPIRY_DAYS} days from date issued)",
+                                     widget=forms.DateInput(attrs={'readonly': 'readonly',
+                                                                   'placeholder': 'Auto-filled from Date of Issue'}))
     SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
+    DATE_EXPIRY_INVALID = f'Date of Expiry must be {Certificate.EXPIRY_DAYS} days after Date of Issue'
 
     def __init__(self, *args, **kwargs):
         """
@@ -44,6 +47,16 @@ class LicenseeCertificateForm(forms.ModelForm):
         fields = ('aes', 'country_of_origin', 'shipped_value', 'exporter', 'exporter_address',
                   'number_of_parcels', 'consignee', 'consignee_address', 'carat_weight', 'harmonized_code',
                   'date_of_issue', 'date_of_expiry', 'attested')
+
+    def clean(self):
+        date_of_issue = self.cleaned_data.get('date_of_issue')
+        date_of_expiry = self.cleaned_data.get('date_of_expiry')
+
+        # Date of expiry must be Certificate.EXPIRY_DAYS days after date of issue
+        if date_of_issue and date_of_expiry:
+            delta = date_of_expiry - date_of_issue
+            if delta.days != Certificate.EXPIRY_DAYS:
+                self.add_error('date_of_expiry', self.DATE_EXPIRY_INVALID)
 
     def save(self, commit=True):
         """Set status to PREPARED"""

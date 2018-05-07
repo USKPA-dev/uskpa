@@ -14,20 +14,10 @@ h1 {
     font-weight: bold;
 }
 
-#certificate-body-fields *> input,
-#certificate-body-fields *> select,
-#certificate-body-fields *> textarea {
-    max-width: 70%;
-    display: inline-block;
-}
-
 #certificate-body-fields *> label
  {
     font-weight: bold;
-    width: 25%;
-    display: inline-block;
     margin-top: 1rem;
-    vertical-align: top;
 }
 
 #attestation *> label {

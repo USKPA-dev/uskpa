@@ -5,8 +5,10 @@ from django.conf import settings
 from django.test import TestCase
 from model_mommy import mommy
 
-from kpc.forms import CertificateRegisterForm, StatusUpdateForm, VoidForm
+from kpc.forms import (CertificateRegisterForm, LicenseeCertificateForm,
+                       StatusUpdateForm, VoidForm)
 from kpc.models import Certificate
+from kpc.tests import CERT_FORM_KWARGS
 
 
 class VoidFormTests(TestCase):
@@ -194,3 +196,19 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs.pop('cert_list')
         self.form_kwargs.update(
             {'registration_method': 'sequential', 'cert_from': start, 'cert_to': end})
+
+
+class LicenseeCertificateFormTests(TestCase):
+
+    def setUp(self):
+        self.form_class = LicenseeCertificateForm
+
+    def test_date_expiry_validated_against_date_issued(self):
+        """
+        Date of expiry must be Certificate.EXPIRY_DAYS from date of issue
+        """
+        kwargs = CERT_FORM_KWARGS.copy()
+        kwargs['date_of_expiry'] = '12/12/9999'
+        form = LicenseeCertificateForm(kwargs)
+        self.assertFalse(form.is_valid())
+        self.assertIn(LicenseeCertificateForm.DATE_EXPIRY_INVALID, form.errors['date_of_expiry'])
