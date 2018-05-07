@@ -72,6 +72,9 @@ class Certificate(models.Model):
 
     VOID_REASONS = ['Printing Error', 'Typographical error', 'No longer needed', 'Other']
 
+    # Price in USD of a certificate
+    PRICE = 20
+
     # Fields on physical certificate
     number = models.PositiveIntegerField(help_text='USKPA Certificate ID number', unique=True)
     aes = models.CharField(max_length=15,

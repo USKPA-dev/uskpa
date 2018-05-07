@@ -75,6 +75,11 @@ class LicenseeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     raise_exception = True
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['price'] = Certificate.PRICE
+        return context
+
     def test_func(self):
         """only for superusers"""
         if not self.request.user.is_superuser:

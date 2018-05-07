@@ -114,21 +114,28 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_sale': '01/01/2018', 'registration_method': 'list',
                             'payment_method': 'cash',
-                            'payment_amount': 1, 'cert_list': 'US1'
+                            'payment_amount': 20, 'cert_list': 'US1'
                             }
+
+    def test_payment_not_expected_amount(self):
+        """Payment must be # of certs * Certificate.PRICE"""
+        self.form_kwargs['payment_amount'] = 1
+        form = CertificateRegisterForm(self.form_kwargs)
+        self.assertFalse(form.is_valid())
+        self.assertIn("A payment of $20 is required. (1 requested certificates @ $20 per certificate.)",
+                      [e.message for e in form.non_field_errors().data])
 
     def test_valid_form_no_errors_list(self):
         """Form validates w/ list data"""
         form = CertificateRegisterForm(self.form_kwargs)
-        valid = form.is_valid()
-        self.assertTrue(valid)
+        self.assertTrue(form.is_valid())
 
     def test_valid_form_no_errors_sequential(self):
         """Form validates w/ sequential data"""
+        self.form_kwargs['payment_amount'] = 40
         form = CertificateRegisterForm(self.form_kwargs)
         self._make_sequential(1, 2)
-        valid = form.is_valid()
-        self.assertTrue(valid)
+        self.assertTrue(form.is_valid())
 
     def test_validation_fails_if_licensee_and_contact_dont_match(self):
         """Fail validation and provide msg if provided user is not associated with licensee"""

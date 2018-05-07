@@ -64,13 +64,17 @@ class CertificateRegisterForm(forms.Form):
     date_of_sale = forms.DateField(
         initial=datetime.date.today, widget=forms.DateInput(attrs=DATE_ATTRS))
     registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS,
-                                            widget=USWDSRadioSelect(attrs={'class': 'usa-unstyled-list'}),
+                                            widget=USWDSRadioSelect(
+                                                attrs={'class': 'usa-unstyled-list'}),
                                             initial=SEQUENTIAL)
     cert_from = forms.IntegerField(min_value=0, required=False, label='From')
     cert_to = forms.IntegerField(min_value=1, required=False, label='To')
     cert_list = forms.CharField(required=False, label='Certificate ID list')
-    payment_method = forms.ChoiceField(choices=Certificate.PAYMENT_METHOD_CHOICES)
-    payment_amount = forms.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = forms.ChoiceField(
+        choices=Certificate.PAYMENT_METHOD_CHOICES)
+    payment_amount = forms.DecimalField(max_digits=10,
+                                        label='Payment amount (Certificate price: $%s)' % Certificate.PRICE,
+                                        decimal_places=2)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -79,11 +83,13 @@ class CertificateRegisterForm(forms.Form):
             licensee = data.get('licensee', None)
             contact = data.get('contact', None)
             if licensee:
-                self.fields['contact'].queryset = User.objects.filter(profile__licensees__in=[licensee])
+                self.fields['contact'].queryset = User.objects.filter(
+                    profile__licensees__in=[licensee])
             if contact:
                 self.fields['contact'].initial = contact
         else:
-            self.fields['contact'].choices = [('', self.fields['contact'].empty_label)]
+            self.fields['contact'].choices = [
+                ('', self.fields['contact'].empty_label)]
         self.fields['cert_from'].initial = Certificate.next_available_number()
 
     def clean(self):
@@ -94,6 +100,7 @@ class CertificateRegisterForm(forms.Form):
         cert_from = cleaned_data.get("cert_from")
         cert_to = cleaned_data.get("cert_to")
         cert_list = cleaned_data.get("cert_list")
+        payment_aount = cleaned_data.get("payment_amount")
         self.method = cleaned_data.get('registration_method')
 
         if licensee and contact:
@@ -104,16 +111,27 @@ class CertificateRegisterForm(forms.Form):
 
         if self.method == self.LIST and not cert_list:
             self.add_error('cert_list', 'List of ID values required.')
-            raise forms.ValidationError("Certificate List must be provided when List method is selected.")
+            raise forms.ValidationError(
+                "Certificate List must be provided when List method is selected.")
 
         if self.method == self.SEQUENTIAL and (not cert_from or not cert_to):
-            raise forms.ValidationError("Certificate To and From must be provided when Sequential method is selected.")
+            raise forms.ValidationError(
+                "Certificate To and From must be provided when Sequential method is selected.")
 
         if cert_from and cert_to:
             if cert_from > cert_to:
                 self.add_error('cert_from', 'Value must be less than "To"')
-                self.add_error('cert_to', 'Value must be greater than or equal to "From"')
-                raise forms.ValidationError("Certificate 'To' value must be greater than or equal to 'From' value.")
+                self.add_error(
+                    'cert_to', 'Value must be greater than or equal to "From"')
+                raise forms.ValidationError(
+                    "Certificate 'To' value must be greater than or equal to 'From' value.")
+
+        """payment amount matches expected value"""
+        requested_certs = len(self.get_cert_list())
+        expected_payment = requested_certs * Certificate.PRICE
+        if payment_aount != expected_payment:
+            raise forms.ValidationError(
+                f"A payment of ${expected_payment} is required. ({requested_certs} requested certificates @ ${Certificate.PRICE} per certificate.)")
 
         # TODO more validation to be done here.
         # Check for requested Cert Number conflicts before attempting creation

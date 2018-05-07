@@ -97,11 +97,11 @@ class CertificateRegisterViewTests(TestCase):
         # Valid registration form input
         self.sequential_kwargs = {
             'registration_method': 'sequential',  'cert_from': 1, 'cert_to': 5}
-        self.list_kwargs = {'registration_method': 'list',
+        self.list_kwargs = {'registration_method': 'list', 'payment_amount': 40,
                             'cert_list': 'US201, US123456'}
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_sale': '01/01/2018',
-                            'payment_method': 'cash', 'payment_amount': 1
+                            'payment_method': 'cash', 'payment_amount': 100
                             }
         self.factory = RequestFactory()
 
