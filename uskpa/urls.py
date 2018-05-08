@@ -15,6 +15,7 @@ urlpatterns = [
     path('certificates/', kpc_views.CertificateListView.as_view(), name='certificates'),
     path('certificates/export', kpc_views.ExportView.as_view(), name='export'),
     path('certificates-data/', kpc_views.CertificateJson.as_view(), name='certificate-data'),
+    path('licensee/<int:pk>', kpc_views.LicenseeDetailView.as_view(), name='licensee'),
     path('licensee-contacts/', kpc_views.licensee_contacts, name='licensee-contacts'),
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),

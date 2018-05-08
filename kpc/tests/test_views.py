@@ -281,3 +281,22 @@ class ExportViewTests(TestCase):
         response = self.c.get(self.url)
         results = [row for row in response.streaming_content]
         self.assertEqual(len(results), 2 + Certificate.objects.count())
+
+
+class LicenseeDetailsViewTests(TestCase):
+
+    def setUp(self):
+        self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
+        self.licensee = mommy.make('Licensee')
+        self.user.profile.licensees.add(self.licensee)
+        self.url = reverse('licensee', args=[self.licensee.id])
+        self.c = Client()
+        self.c.force_login(self.user)
+
+    def test_contacts_list_on_licensee_page(self):
+        """Contact information is displayed on licensee page"""
+        self.user.profile.phone_number = '555'
+        self.user.save()
+        response = self.c.get(self.url)
+        self.assertContains(response, self.user.email)
+        self.assertContains(response, self.user.profile.phone_number)
