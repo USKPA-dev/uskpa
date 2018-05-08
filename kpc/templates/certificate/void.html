@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 
+{% block title %}Voiding Certificate: {{object}}{% endblock %}
+
 {% block content %}
-{{form.errors}}
-{% if form.non_field_errors %}
-<div class="usa-alert usa-alert-error usa-grid">
-  <ul class="usa-checklist">
-    {% for error in form.non_field_errors %}
-    <li>{{error}}</li>
-    {% endfor %}
-  </ul>
-</div>
+{% if form.non_form_errors %}
+<section class="alert-section">
+  <div class="usa-alert usa-alert-error usa-grid">
+    <ul class="usa-checklist">
+      {% for error in form.non_form_errors %}
+      <li>{{error.content}}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
 {% endif %}
 
 <div class="usa-grid">

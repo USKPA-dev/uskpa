@@ -3,33 +3,42 @@
 {% block title %}Certificate US{{object.number}}{% endblock %}
 
 {% block content %}
+
+{% if form.non_field_errors or object.void %}
+<section class='alert-section'>
+{% endif %}
 {% if form.non_field_errors %}
 <div class="usa-grid">
-<div class="usa-alert usa-alert-error">
-    <ul class="usa-checklist">
-        {% for error in form.non_field_errors %}
-        <li>{{error}}</li>
-        {% endfor %}
-    </ul>
-</div>
+    <div class="usa-alert usa-alert-error">
+        <ul class="usa-checklist">
+            {% for error in form.non_field_errors %}
+            <li>{{error}}</li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 {% endif %}
-
 {% if object.void %}
 <div class="usa-grid">
     <div class="usa-alert usa-alert-warning">
         <div class="usa-alert-body">
-        <h3 class="usa-alert-heading">Voided on: {{object.date_voided}}</h3>
-        <p class="usa-alert-text">
-            Reason: {{object.notes}}
-        </p>
+            <h3 class="usa-alert-heading">Voided on: {{object.date_voided}}</h3>
+            <p class="usa-alert-text">
+                Reason: {{object.notes}}
+            </p>
         </div>
     </div>
 </div>
 {% endif %}
+{% if form.non_field_errors or object.void %}
+</section>
+{% endif %}
 
 <div class='cert-header'>
-    <div class="usa-grid">
+
+
+
+    <div class="usa-grid cert-row-one">
         <div class="usa-width-one-half">
             <h1>{{object}}
                 {% if user.is_superuser %}
@@ -96,8 +105,7 @@
 
 </div>
 
-
-<div id="certificate-fields ">
+<div id="certificate-fields">
     {% block certificate-body-fields %}
     {% endblock %}
     {% if object.status_can_be_updated and form.editable %}

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}Certificate Search{% endblock title %}
+{% block page-title %} Certificate Search {% endblock %}
 {% block "header" %}
 
 <script type="text/javascript" charset="utf8"
@@ -11,8 +12,8 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 {% endblock "header" %}
 
 {% block content %}
-
-<section class="usa-grid">
+<section class="usa-grid usa-section">
+<h1>Certificate Search</h1>
 
     <div class='usa-width-one-third filters'>
         {% include 'certificate/filters.html' %}

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="usa-grid">
-    <form target='' class="" method="POST">
+<section class="usa-grid usa-section">
+    <form target='' method="POST">
             {% csrf_token %}
             <div id='no-contacts-warning' style="display: none">
                 <div class="usa-alert usa-alert-warning">
