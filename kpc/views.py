@@ -148,6 +148,8 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
 
 class BaseCertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Certificate
+    slug_field = 'number'
+    slug_url_kwarg = 'number'
 
 
 class CertificateView(BaseCertificateView):

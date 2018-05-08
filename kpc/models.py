@@ -133,7 +133,7 @@ class Certificate(models.Model):
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('cert-details', args=[self.id])
+        return reverse('cert-details', args=[self.number])
 
     def get_anchor_tag(self):
         """Link to this object"""

@@ -318,7 +318,7 @@ class CertificateVoidTests(TestCase):
         self.user.is_superuser = False
         self.user.save()
         self.user.groups.add(Group.objects.get(name='Auditor'))
-        response = self.c.get(reverse('void', args=[cert.id]), follow=True)
+        response = self.c.get(reverse('void', args=[cert.number]), follow=True)
         self.assertTemplateUsed(response, '403.html')
 
     def test_redirect_to_details_if_void(self):
@@ -326,7 +326,7 @@ class CertificateVoidTests(TestCase):
         Redirect w/ message to details if certificate is already voided
         """
         cert = mommy.make(Certificate, void=True)
-        response = self.c.get(reverse('void', args=[cert.id]), follow=True)
+        response = self.c.get(reverse('void', args=[cert.number]), follow=True)
         self.assertRedirects(response, cert.get_absolute_url())
         message = list(response.context['messages']).pop()
         self.assertEqual(message.message, CertificateVoidView.ALREADY_VOID)
@@ -336,7 +336,7 @@ class CertificateVoidTests(TestCase):
         Void form is rendered with choices defined by Certificate model
         """
         cert = mommy.make(Certificate, void=False)
-        response = self.c.get(reverse('void', args=[cert.id]), follow=True)
+        response = self.c.get(reverse('void', args=[cert.number]), follow=True)
         for choice in Certificate.VOID_REASONS:
             self.assertContains(response, choice)
 
@@ -391,7 +391,7 @@ class CertificateConfirmViewTest(CertTestCase):
     def setUp(self):
         super().setUp()
         self.cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
-        self.url = reverse('confirm', args=[self.cert.id])
+        self.url = reverse('confirm', args=[self.cert.number])
 
     def test_auditor_denied(self):
         """Auditors cannot access"""
