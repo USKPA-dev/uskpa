@@ -1,5 +1,75 @@
+/* USWDS OVERRIDES */
+
+.usa-footer-contact_info a {
+    color: white;
+}
+
+.usa-footer-primary-section {
+    background-color: #212121;
+}
+
+.usa-alert {
+    margin-top: 0em;
+}
+
+.usa-header-extended .usa-logo {
+    margin-bottom: 0;
+}
+
+#logo {
+    max-height: 3rem;
+    margin-top: 0.5rem;
+}
+
+.usa-banner {
+    background-color: #212121;
+    color: white;
+}
+
+.usa-header-extended .usa-nav {
+    border-top: none;
+    float: right;
+}
+
+.usa-hero .usa-hero-callout {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: black;
+    max-width: 45rem;
+}
+
+.usa-hero .usa-hero-callout .usa-hero-callout-alt {
+    color: #292a2b;
+}
+
+.usa-section-dark {
+    background-color: black;
+}
+
+.usa-section-dark h1,
+.usa-section-dark h2,
+.usa-section-dark h3,
+.usa-section-dark h4,
+.usa-section-dark h5,
+.usa-section-dark h6 {
+    color: white;
+}
+
+.usa-section-dark p {
+    color: #aeb0b5;
+}
+
+.usa-banner-inner a:visited {
+    color: white;
+}
+
+.usa-hero {
+    background-image: url("/static/assets/diamond.jpg");
+}
+
+/* USKPA */
+
 h1 {
-    font-size: 2.0rem;
+    font-size: 2rem;
     margin-top: 0.5em !important;
 }
 
@@ -7,41 +77,43 @@ h1 {
 .cert-body-top {
     margin-top: 1em;
 }
-.cert-header {
-    overflow-y: hidden;
+
+.cert-row-one {
+    margin-bottom: 1rem;
 }
+
 .attr-label {
     font-weight: bold;
 }
 
-#certificate-body-fields *> label
- {
+.alert-section {
+    padding-top: 6rem;
+}
+
+#certificate-body-fields *>label {
     font-weight: bold;
     margin-top: 1rem;
 }
 
-#attestation *> label {
+#attestation *>label {
     max-width: 100%;
     margin-top: 1rem;
 }
 
-#status-update *> input {
+#status-update *>input {
     padding-left: 1em;
     padding-right: 1em;
     margin-top: 0.5em;
 }
 
 #void {
-    float:right;
+    float: right;
+    width: 100%;
 }
 
 .cert-number {
     font-size: 3rem;
     font-weight: 700;
-}
-
-.usa-alert {
-    margin-top: 0em;
 }
 
 .hidden {
@@ -52,9 +124,10 @@ h1 {
     margin-top: 0em;
 }
 
-input[type=date] {
+input[type="date"] {
     padding: 0;
 }
+
 .cert-listing {
     overflow-x: auto;
 }
@@ -75,10 +148,11 @@ input[type=date] {
 .pdf-preview {
     overflow-x: auto;
 }
+
 .pdf-preview canvas {
     border: black solid thin;
 }
 
 .preview-confirm input {
-    display:inline;
+    display: inline;
 }
