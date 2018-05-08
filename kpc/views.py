@@ -141,7 +141,6 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
         return qs
 
     def prepare_results(self, qs):
-        """format our dates and Cert number"""
         qs = qs.values(*self.columns)
         return list(qs)
 
