@@ -68,6 +68,10 @@
     margin-top: 0.5rem;
 }
 
+.usa-hero h1 {
+    font-size: 3rem;
+}
+
 h1 {
     font-size: 2rem;
     margin-top: 0.5em !important;
