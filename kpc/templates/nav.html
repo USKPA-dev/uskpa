@@ -6,25 +6,28 @@
           </button>
           <ul class="usa-nav-primary usa-accordion">
             <li>
-              <a class="usa-nav-link" href="{% url 'join' %}">
+              <a class="usa-nav-link {% if request.resolver_match.url_name == 'join' %}usa-current{% endif %}"
+                 href="{% url 'join' %}">
                 <span>Become A Licensee</span>
               </a>
             </li>
             <li>
-              <a class="usa-nav-link" href="{% url 'about' %}">
+              <a class="usa-nav-link" href="{% url 'home' %}#about">
                 <span>About Us</span>
               </a>
             </li>
             {% if user.is_authenticated %}
             <li>
-                <a class="usa-nav-link" href="{% url 'certificates' %}{% default_search %}">
+                <a class="usa-nav-link {% if request.resolver_match.url_name == 'certificates' %}usa-current{% endif %}"
+                  href="{% url 'certificates' %}{% default_search %}">
                   <span>Certificates</span>
                 </a>
             </li>
             {% endif %}
             {% if user.is_superuser %}
             <li>
-                <a class="usa-nav-link" href="{% url 'cert-register' %}">
+                <a class="usa-nav-link {% if request.resolver_match.url_name == 'cert-register' %}usa-current{% endif %}"
+                href="{% url 'cert-register' %}">
                   <span>Register Certificates</span>
                 </a>
             </li>
