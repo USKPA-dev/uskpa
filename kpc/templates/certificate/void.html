@@ -56,7 +56,7 @@
     </fieldset>
     <fieldset>
       <input type="submit" value="Void Certificate">
-      <a href="{% url 'cert-details' object.id  %}" class="usa-button">Cancel</a>
+      <a href="{{object.get_absolute_url}}" class="usa-button">Cancel</a>
     </fieldset>
     </form>
 </div>
