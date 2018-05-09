@@ -81,6 +81,10 @@ class Certificate(models.Model):
     EXPIRY_DAYS = 60
 
     # Fields on physical certificate
+    PHYSICAL_FIELDS = ('number', 'country_of_origin', 'aes', 'date_of_issue', 'date_of_expiry',
+                       'shipped_value', 'exporter', 'exporter_address', 'number_of_parcels',
+                       'consignee', 'consignee_address', 'carat_weight', 'harmonized_code')
+
     number = models.PositiveIntegerField(
         help_text='USKPA Certificate ID number', unique=True)
     aes = models.CharField(max_length=15,
