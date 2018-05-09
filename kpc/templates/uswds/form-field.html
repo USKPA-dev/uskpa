@@ -10,6 +10,8 @@
     </div>
 {% else %}
     <label for="{{ field.id_for_label }}">{{field.label}}</label>
-    <span class="usa-form-hint">{{field.help_text}}</span>
+    {% block helptext %}
+        <span class="usa-form-hint">{{field.help_text}}</span>
+    {% endblock %}
     {{ field }}
 {% endif %}
