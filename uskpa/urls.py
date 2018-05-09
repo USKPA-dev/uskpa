@@ -10,6 +10,7 @@ urlpatterns = [
     path('about-us/', TemplateView.as_view(template_name='about.html'), name='about'),
     path('become-a-licensee/', TemplateView.as_view(template_name='join.html'), name='join'),
     path('register-certificate/', kpc_views.CertificateRegisterView.as_view(), name='cert-register'),
+    path('certificates/<int:pk>/confirm', kpc_views.CertificateConfirmView.as_view(), name='confirm'),
     path('certificates/<int:pk>/void', kpc_views.CertificateVoidView.as_view(), name='void'),
     path('certificates/<int:pk>', kpc_views.CertificateView.as_view(), name='cert-details'),
     path('certificates/', kpc_views.CertificateListView.as_view(), name='certificates'),

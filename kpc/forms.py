@@ -39,10 +39,11 @@ class LicenseeCertificateForm(forms.ModelForm):
                   'number_of_parcels', 'consignee', 'consignee_address', 'carat_weight', 'harmonized_code',
                   'date_of_issue', 'date_of_expiry', 'attested')
 
-    def save(self):
+    def save(self, commit=True):
         """Set status to PREPARED"""
-        self.instance.status = Certificate.PREPARED
-        self.instance.save()
+        if commit:
+            self.instance.status = Certificate.PREPARED
+            self.instance.save()
         return self.instance
 
 

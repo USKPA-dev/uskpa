@@ -14,6 +14,20 @@ from kpc.views import (CertificateRegisterView, CertificateView,
                        licensee_contacts, CertificateVoidView)
 
 
+class CertTestCase(TestCase):
+    def setUp(self):
+        self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
+        self.form_kwargs = {"country_of_origin": "AQ", 'aes': 'X22222222222222',
+                            'number_of_parcels': 1, 'date_of_issue': '01/31/2018',
+                            'date_of_expiry': '01/31/2019', 'carat_weight': 1,
+                            'harmonized_code': '7102.31', 'exporter': 'test',
+                            'exporter_address': '123', 'consignee': 'test',
+                            'consignee_address': 'test', 'shipped_value': 10,
+                            'attested': True}
+        self.c = Client()
+        self.c.force_login(self.user)
+
+
 class LicenseeContactsTests(TestCase):
 
     def setUp(self):
@@ -140,19 +154,7 @@ class CertificateRegisterViewTests(TestCase):
         self.assertEqual(message.message, 'Generated 2 new certificates.')
 
 
-class CertificateViewTests(TestCase):
-
-    def setUp(self):
-        self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
-        self.form_kwargs = {"country_of_origin": "AQ", 'aes': 'X22222222222222',
-                            'number_of_parcels': 1, 'date_of_issue': '01/31/2018',
-                            'date_of_expiry': '01/31/2019', 'carat_weight': 1,
-                            'harmonized_code': '7102.31', 'exporter': 'test',
-                            'exporter_address': '123', 'consignee': 'test',
-                            'consignee_address': 'test', 'shipped_value': 10,
-                            'attested': True}
-        self.c = Client()
-        self.c.force_login(self.user)
+class CertificateViewTests(CertTestCase):
 
     def test_status_form_when_not_editable(self):
         """
@@ -184,22 +186,16 @@ class CertificateViewTests(TestCase):
     def test_form_invalid_if_cert_is_not_assigned(self):
         """Users can't use this form if certificate is not ASSIGNED"""
         cert = mommy.make(Certificate, status=Certificate.VOID)
-        response = self.c.post(cert.get_absolute_url(), self.form_kwargs, follow=True)
+        response = self.c.post(cert.get_absolute_url(),
+                               self.form_kwargs, follow=True)
         self.assertContains(response, StatusUpdateForm.NOT_AVAILABLE)
-
-    def test_form_valid_if_cert_is_assigned(self):
-        """Cert status updates w/ valid form"""
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
-        response = self.c.post(cert.get_absolute_url(), self.form_kwargs, follow=True)
-        cert.refresh_from_db()
-        self.assertEqual(cert.status, Certificate.PREPARED)
-        self.assertTemplateUsed(response, 'certificate/details.html')
 
     def test_form_invalid_if_not_all_fields_provided(self):
         """Form invalid without all fields"""
         cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
         self.form_kwargs.pop('consignee')
-        response = self.c.post(cert.get_absolute_url(), self.form_kwargs, follow=True)
+        response = self.c.post(cert.get_absolute_url(),
+                               self.form_kwargs, follow=True)
         cert.refresh_from_db()
         self.assertEqual(cert.status, Certificate.ASSIGNED)
         self.assertTemplateUsed(response, 'certificate/details-edit.html')
@@ -209,13 +205,50 @@ class CertificateViewTests(TestCase):
         """Button to advance status is rendered if status can be changed"""
         cert = mommy.make(Certificate, status=Certificate.INTRANSIT)
         response = self.c.get(cert.get_absolute_url())
-        self.assertContains(response, f'Set status to: {cert.next_status_label}')
+        self.assertContains(
+            response, f'Set status to: {cert.next_status_label}')
 
     def test_next_status_input_not_rendered_when_unmoddable(self):
         """Button to advance status is NOT rendered if status cannot be changed"""
         cert = mommy.make(Certificate, status=Certificate.VOID)
         response = self.c.get(cert.get_absolute_url())
         self.assertNotContains(response, 'Set status')
+
+    def test_form_valid_if_cert_is_assigned(self):
+        """Cert unchanged and confirmation template displayed w/ valid form"""
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        response = self.c.post(cert.get_absolute_url(),
+                               self.form_kwargs, follow=True)
+        cert.refresh_from_db()
+        self.assertEqual(cert.status, Certificate.ASSIGNED)
+        self.assertTemplateUsed(response, 'certificate/preview.html')
+
+    def test_fields_rendered_for_review(self):
+        """Fields rendered for review template"""
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        response = self.c.post(cert.get_absolute_url(),
+                               self.form_kwargs, follow=True)
+        for field in self.form_kwargs.keys():
+            self.assertContains(response, field)
+
+    def test_pdf_preview_data_in_context(self):
+        """Data for PDF preview is included in context"""
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        response = self.c.post(cert.get_absolute_url(),
+                               self.form_kwargs, follow=True)
+        self.assertTrue('b64_pdf' in response.context)
+
+    def test_edit_form_for_changes_w_get_params(self):
+        """When get params provided, render prepopulated form"""
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        response = self.c.get(cert.get_absolute_url(), self.form_kwargs)
+        # Not rendering confirmation checkbox value
+        self.form_kwargs.pop('attested')
+        for value in self.form_kwargs.values():
+            self.assertContains(response, value)
+        self.assertTemplateUsed(response, 'certificate/details-edit.html')
+        message = list(response.context['messages']).pop()
+        self.assertEqual(message.message, CertificateView.REVIEW_MSG)
 
 
 class CertificateListViewTests(TestCase):
@@ -261,7 +294,8 @@ class CertificateVoidTests(TestCase):
 class ExportViewTests(TestCase):
 
     def setUp(self):
-        self.super_user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
+        self.super_user = mommy.make(
+            settings.AUTH_USER_MODEL, is_superuser=True)
         self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         self.cert = mommy.make(Certificate)
         self.c = Client()
@@ -300,3 +334,23 @@ class LicenseeDetailsViewTests(TestCase):
         response = self.c.get(self.url)
         self.assertContains(response, self.user.email)
         self.assertContains(response, self.user.profile.phone_number)
+
+
+class CertificateConfirmViewTest(CertTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        self.url = reverse('confirm', args=[self.cert.id])
+
+    def test_certificate_issued_on_post(self):
+        self.c.post(self.url, self.form_kwargs)
+        self.cert.refresh_from_db()
+        self.assertEqual(self.cert.status, Certificate.PREPARED)
+
+    def test_certificate_not_issued_on_post_w_invalid_form(self):
+        """If form is invalid, certificate not updated"""
+        self.form_kwargs.pop('attested')
+        self.c.post(self.url, self.form_kwargs)
+        self.cert.refresh_from_db()
+        self.assertEqual(self.cert.status, Certificate.ASSIGNED)

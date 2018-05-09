@@ -21,6 +21,8 @@ django-countries = "*"
 django-datatables-view = "*"
 django-filter = "*"
 django-queryset-csv = "*"
+reportlab = "*"
+"pypdf2" = "*"
 
 
 [dev-packages]
