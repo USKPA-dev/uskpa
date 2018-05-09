@@ -1,12 +1,101 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}USKPA Homepage{% endblock %}
 
 {% block content %}
-<section class="usa-grid usa-section">
-        <p>
-        The United States Kimberley Process Authority (USKPA)
-        is authorized by the U.S. government to provide
-        US Kimberley Process certificates to licensed entities for
-        use in exporting rough diamonds from the U.S.
-        </p>
+<section class="usa-hero usa-section">
+  <div class="usa-grid">
+    <div class="usa-hero-callout usa-section-light">
+      <h1>
+         The United States Kimberley Process Authority
+      </h1>
+
+      <p>Authorized by the U.S. government to provide US Kimberley Process certificates to licensed entities for use in exporting
+      rough diamonds from the U.S.
+      </p>
+
+      <a class="usa-button" href="{% url 'join' %}">Become a Licensee</a>
+
+    </div>
+  </div>
+</section>
+
+<section class="usa-section" id="about">
+  <div class="usa-grid">
+    <div class='usa-width-one-third'>
+      <h2>About Us</h2>
+    </div>
+    <div class='usa-width-two-thirds'>
+      <p>
+        The United States Kimberley Process Authority (USKPA) is a not-for-profit trade association in the United States formed
+        for the purpose of administering and controlling the usage of U.S. Kimberley Process certificates for the export of rough
+        diamonds from the U.S.
+      </p>
+      <p>The USKPA is governed by a Board of Directors and is located in New York City.</p>
+    </div>
+  </div>
+  <div class="usa-grid usa-footer-return-to-top">
+    <a href="#">Return to top</a>
+  </div>
+</section>
+
+<section class="usa-section usa-section-dark usa-graphic_list">
+
+  <div class="usa-grid usa-graphic_list-row">
+    <div class="usa-width-one-third usa-media_block">
+      <div class="usa-media_block-body">
+        <h3>Clean Diamond Trade Act</h3>
+        <p>The law regulating exports of rough diamonds from the US, creating a system for the trade of rough
+        diamonds consistent with the standards set by the Kimberley Process Certification Scheme. </p>
+
+      </div>
+    </div>
+
+    <div class="usa-width-one-third usa-media_block">
+      <div class="usa-media_block-body">
+        <h3>Kimberley Process Certification Scheme (KPCS)</h3>
+        <p>The goal of the KPCS is to restrict the trade of rough diamonds known as "conflict diamonds."</p>
+      </div>
+    </div>
+
+    <div class="usa-width-one-third usa-media_block">
+      <div class="usa-media_block-body">
+        <h3>Conflict Diamonds</h3>
+        <p>Conflict diamonds are rough diamonds used by rebel movements or their allies to finance conflict aimed at undermining legitimate
+        governments.</p>
+      </div>
+    </div>
+  </div>
+  <div class="usa-grid usa-footer-return-to-top">
+    <a href="#">Return to top</a>
+  </div>
+</section>
+
+<section class="usa-section" id='useful-links'>
+  <div class="usa-grid">
+
+    <div class='usa-width-one-fourth'>
+      <h2>Informative Links</h2>
+    </div>
+    <div class='usa-width-one-fourth'>
+      <a href="https://www.kimberleyprocess.com/">
+        <img src="{% static 'assets/kplogo.png' %}" alt="Kimberly Process logo">
+      </a>
+    </div>
+      <div class='usa-width-one-fourth'>
+        <a href="https://www.worlddiamondcouncil.org/">
+          <img src="{% static 'assets/wdclogo.gif' %}" alt="World Diamond Council logo">
+        </a>
+      </div>
+        <div class='usa-width-one-fourth'>
+          <a href="http://www.diamondfacts.org">
+            <img src="{% static 'assets/dfacts.gif' %}" alt="DiamondFacts logo">
+          </a>
+        </div>
+  </div>
+  <div class="usa-grid usa-footer-return-to-top">
+    <a href="#">Return to top</a>
+  </div>
 </section>
 {% endblock %}

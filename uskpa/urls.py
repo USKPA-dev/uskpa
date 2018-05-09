@@ -7,7 +7,6 @@ from kpc import views as kpc_views
 
 urlpatterns = [
     path('accounts/', include('accounts.urls'), name='accounts'),
-    path('about-us/', TemplateView.as_view(template_name='about.html'), name='about'),
     path('become-a-licensee/', TemplateView.as_view(template_name='join.html'), name='join'),
     path('register-certificate/', kpc_views.CertificateRegisterView.as_view(), name='cert-register'),
     path('certificates/<int:number>/confirm', kpc_views.CertificateConfirmView.as_view(), name='confirm'),
