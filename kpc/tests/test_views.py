@@ -1,7 +1,6 @@
 import json
 import datetime
 
-from django.core.management import call_command
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
 from django.contrib.contenttypes.models import ContentType
@@ -14,12 +13,7 @@ from kpc.forms import StatusUpdateForm, LicenseeCertificateForm
 from kpc.models import Certificate
 from kpc.views import (CertificateRegisterView, CertificateView,
                        licensee_contacts, CertificateVoidView)
-from kpc.tests import CERT_FORM_KWARGS
-
-
-def load_groups():
-    """load groups and permissions"""
-    call_command('loaddata', 'groups', verbosity=0)
+from kpc.tests import CERT_FORM_KWARGS, load_groups
 
 
 def _get_expiry_date(date_of_issue):
