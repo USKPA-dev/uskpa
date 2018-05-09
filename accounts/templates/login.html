@@ -3,17 +3,18 @@
 
 {% block content %}
 
-<section class="usa-grid usa-grid-section">
 
 {% if form.errors %}
-<div class="usa-alert usa-alert-error">
-    <div class="usa-alert-body">
-        <h3 class="usa-alert-heading">Login Failed</h3>
-        <p class="usa-alert-text">Your username and password didn't match. Please try again.</p>
+    <div class="usa-grid alert-section">
+        <div class="usa-alert usa-alert-error ">
+            <div class="usa-alert-body">
+                <h3 class="usa-alert-heading">Login Failed</h3>
+                <p class="usa-alert-text">Your username and password didn't match. Please try again.</p>
+            </div>
+        </div>
     </div>
-</div>
 {% endif %}
-
+<div class="usa-grid">
 <form class="usa-form" method='POST' action="{% url 'login' %}">
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ next }}" />
@@ -35,7 +36,6 @@
                 Request an Account</a></p>
     </fieldset>
 </form>
-
-</section>
+</div>
 
 {% endblock %}
