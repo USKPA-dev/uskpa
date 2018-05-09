@@ -1,8 +1,11 @@
+from django.conf import settings
+from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from model_mommy import mommy
-from django.conf import settings
+
 from kpc.models import Certificate, Licensee
+from kpc.tests import load_groups
 
 
 class LicenseeTests(TestCase):
@@ -29,6 +32,13 @@ class LicenseeTests(TestCase):
         """Can access details if admin"""
         superuser = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
         self.assertTrue(self.licensee.user_can_access(superuser))
+
+    def test_auditor_can_access(self):
+        """Can access details if auditor"""
+        load_groups()
+        auditor = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        auditor.groups.add(Group.objects.get(name='Auditor'))
+        self.assertTrue(self.licensee.user_can_access(auditor))
 
     def test_contact_can_access(self):
         """Can access details if contact of licensee"""

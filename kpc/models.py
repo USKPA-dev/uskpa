@@ -26,7 +26,7 @@ class Licensee(models.Model):
                                   RegexValidator(regex='\d{2}-\d{7}',
                                                  message='TIN format: ##-#######'
                                                  )
-                                        ]
+                              ]
                               )
 
     history = HistoricalRecords()
@@ -38,7 +38,8 @@ class Licensee(models.Model):
         return reverse('licensee', args=[self.id])
 
     def user_can_access(self, user):
-        return user.is_superuser or user.profile.licensees.filter(id=self.id).exists()
+        return user.is_superuser or user.profile.is_auditor or \
+            user.profile.licensees.filter(id=self.id).exists()
 
 
 class Certificate(models.Model):
@@ -70,7 +71,8 @@ class Certificate(models.Model):
         ('7102.31', '7102.31'),
     )
 
-    VOID_REASONS = ['Printing Error', 'Typographical error', 'No longer needed', 'Other']
+    VOID_REASONS = ['Printing Error',
+                    'Typographical error', 'No longer needed', 'Other']
 
     # Price in USD of a certificate
     PRICE = 20
@@ -79,19 +81,22 @@ class Certificate(models.Model):
     EXPIRY_DAYS = 60
 
     # Fields on physical certificate
-    number = models.PositiveIntegerField(help_text='USKPA Certificate ID number', unique=True)
+    number = models.PositiveIntegerField(
+        help_text='USKPA Certificate ID number', unique=True)
     aes = models.CharField(max_length=15,
                            blank=True,
                            help_text='AES Confirmation Number (ITN)',
                            verbose_name='AES',
                            validators=[
-                                RegexValidator(regex='X\d{14}',
-                                               message='AES Confirmation (ITN) format is 14 digits prepended by X: X##############'
-                                               )
-                                    ]
+                               RegexValidator(regex='X\d{14}',
+                                              message='AES Confirmation (ITN) format is 14 digits prepended by X: X##############'
+                                              )
+                           ]
                            )
-    country_of_origin = CountryField(blank=True, verbose_name='Country of Origin')
-    date_of_issue = models.DateField(blank=True, null=True, help_text='Date of Issue')
+    country_of_origin = CountryField(
+        blank=True, verbose_name='Country of Origin')
+    date_of_issue = models.DateField(
+        blank=True, null=True, help_text='Date of Issue')
     date_of_expiry = models.DateField(blank=True, null=True,
                                       help_text=f'{EXPIRY_DAYS} from Date of Issue')
     shipped_value = models.DecimalField(max_digits=20, decimal_places=2,
@@ -101,28 +106,36 @@ class Certificate(models.Model):
     number_of_parcels = models.PositiveIntegerField(blank=True, null=True)
     consignee = models.CharField(blank=True, max_length=256)
     consignee_address = models.TextField(blank=True)
-    carat_weight = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    carat_weight = models.DecimalField(
+        max_digits=20, decimal_places=10, blank=True, null=True)
     harmonized_code = models.CharField(choices=HS_CODE_CHOICES, max_length=32,
                                        blank=True)
 
     # Non certificate fields
-    assignor = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
-    licensee = models.ForeignKey('Licensee', blank=True, null=True, on_delete=models.PROTECT)
+    assignor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
+    licensee = models.ForeignKey(
+        'Licensee', blank=True, null=True, on_delete=models.PROTECT)
     status = models.IntegerField(choices=STATUS_CHOICES, default=ASSIGNED)
     last_modified = models.DateTimeField(auto_now=True)
-    date_of_sale = models.DateField(blank=True, null=True, help_text='Date of sale to licensee')
+    date_of_sale = models.DateField(
+        blank=True, null=True, help_text='Date of sale to licensee')
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=5,
                                       blank=True)
-    void = models.BooleanField(default=False, help_text="Certificate has been voided?")
+    void = models.BooleanField(
+        default=False, help_text="Certificate has been voided?")
     notes = models.TextField(blank=True)
 
     attested = models.BooleanField(default=False, help_text="""I have completed the necessary
                                                                 application pertaining to this shipment,
                                                                 including the warranty that the diamonds
                                                                 being shipped were not traded to fund conflict.""")
-    date_of_shipment = models.DateField(blank=True, null=True, help_text='Date certificate was marked IN TRANSIT')
-    date_of_delivery = models.DateField(blank=True, null=True, help_text='Date certificate was marked DELIVERED')
-    date_voided = models.DateField(blank=True, null=True, help_text="Date on which this certificate was voided")
+    date_of_shipment = models.DateField(
+        blank=True, null=True, help_text='Date certificate was marked IN TRANSIT')
+    date_of_delivery = models.DateField(
+        blank=True, null=True, help_text='Date certificate was marked DELIVERED')
+    date_voided = models.DateField(
+        blank=True, null=True, help_text="Date on which this certificate was voided")
     history = HistoricalRecords()
 
     class Meta:
