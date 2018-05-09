@@ -1,9 +1,10 @@
-from django_filters import (DateFromToRangeFilter, FilterSet,
-                            MultipleChoiceFilter, RangeFilter)
-
-from django_filters.widgets import RangeWidget
-from .models import Certificate
 from django import forms
+from django_filters import (DateFromToRangeFilter, FilterSet,
+                            ModelChoiceFilter, MultipleChoiceFilter,
+                            RangeFilter)
+from django_filters.widgets import RangeWidget
+
+from .models import Certificate
 
 
 class RangeWidget(RangeWidget):
@@ -28,12 +29,18 @@ class CertificateFilter(FilterSet):
     carat_weight = RangeFilter(widget=RangeWidget())
     date_of_issue = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     date_of_expiry = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
+    licensee__name = ModelChoiceFilter()
+
+    def __init__(self, *args, **kwargs):
+        """Limit licensees choices to those which are accessible"""
+        super().__init__(*args, **kwargs)
+        self.filters['licensee__name'].queryset = self.request.user.profile.get_licensees()
 
     class Meta:
         model = Certificate
 
         default_fields = ['status', 'last_modified', 'date_of_sale']
-        extra_fields = ['country_of_origin', 'aes', 'harmonized_code',
+        extra_fields = ['licensee__name', 'country_of_origin', 'aes', 'harmonized_code',
                         'date_of_issue', 'date_of_expiry', 'shipped_value',
                         'number_of_parcels', 'carat_weight', 'exporter', 'exporter_address',
                         'consignee', 'consignee_address']

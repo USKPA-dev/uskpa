@@ -23,12 +23,12 @@
                 </li>
                 {% else %}
                 <li>
-                    <input id="id_attested" type="checkbox" name="attested" value="attested">
+                    <input id="id_attested" type="checkbox" name="attested" value="attested" {% if not form.editable %}disabled{% endif %}>
                     <label for="id_attested">{{field.help_text}}</label>
                 </li>
                 {% endif %}
             </ul>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit" {% if not form.editable %}disabled{% endif %}>
         </fieldset>
     </div>
     {% endwith %}

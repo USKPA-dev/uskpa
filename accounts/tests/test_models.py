@@ -1,12 +1,14 @@
 from django.test import TestCase
 from model_mommy import mommy
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from accounts.models import Profile
 
 User = get_user_model()
 
 
 class ProfileTests(TestCase):
+    fixtures = ['groups.json']
 
     def setUp(self):
         self.profile = mommy.prepare(Profile)
@@ -37,6 +39,13 @@ class ProfileTests(TestCase):
         """Superusers can see all certiticates"""
         mommy.make('Certificate')
         user = mommy.make(User, is_superuser=True)
+        self.assertEqual(user.profile.certificates().count(), 1)
+
+    def test_certs_returns_all_for_auditors(self):
+        """Auditors can see all certiticates"""
+        mommy.make('Certificate')
+        user = mommy.make(User, is_superuser=False)
+        user.groups.add(Group.objects.get(name='Auditor'))
         self.assertEqual(user.profile.certificates().count(), 1)
 
     def test_certs_limited_by_licensees_for_users(self):

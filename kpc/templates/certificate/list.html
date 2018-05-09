@@ -46,6 +46,7 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
 <script>
     var statusMap = new Map({{statuses|safe}});
+    var licenseeVisible = {% if user.profile.is_auditor %}true{% else %}false{% endif %};
 
     function dateToMoment(data) {
         if (data) {
@@ -84,7 +85,7 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
                 { data: "shipped_value",
                   name: "shipped_value"
                 },
-                { data: "licensee__name", name: "licensee__name", visible: false },
+                { data: "licensee__name", name: "licensee__name", visible: licenseeVisible },
                 { data: "aes", name: "aes", visible: false },
                 { data: "date_of_issue",
                   name: "date_of_issue",
@@ -142,7 +143,7 @@ src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
                         // attach filter input data to outbound query
                         var filters = [];
 
-                        $('input:not([type="checkbox"])').not('#certSearch').each(function (){
+                        $('input:not([type="checkbox"]), select').not('#certSearch').each(function (){
                             var value = $(this).val();
                             if (value) {
                                 d[$(this).attr('name')] = value;

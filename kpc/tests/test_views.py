@@ -1,7 +1,8 @@
 import json
 
+from django.core.management import call_command
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, Permission
+from django.contrib.auth.models import AnonymousUser, Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.test import Client, RequestFactory, TestCase
@@ -12,6 +13,11 @@ from kpc.forms import StatusUpdateForm, LicenseeCertificateForm
 from kpc.models import Certificate
 from kpc.views import (CertificateRegisterView, CertificateView,
                        licensee_contacts, CertificateVoidView)
+
+
+def load_groups():
+    """load groups and permissions"""
+    call_command('loaddata', 'groups', verbosity=0)
 
 
 class CertTestCase(TestCase):
@@ -250,6 +256,28 @@ class CertificateViewTests(CertTestCase):
         message = list(response.context['messages']).pop()
         self.assertEqual(message.message, CertificateView.REVIEW_MSG)
 
+    def test_auditor_denied_on_post(self):
+        """Auditors cannot POST"""
+        load_groups()
+        self.user.is_superuser = False
+        self.user.save()
+        self.user.groups.add(Group.objects.get(name='Auditor'))
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        response = self.c.post(cert.get_absolute_url(),
+                               self.form_kwargs, follow=True)
+        self.assertTemplateUsed(response, '403.html')
+
+    def test_auditors_can_get(self):
+        """Auditors can GET"""
+        load_groups()
+        self.user.is_superuser = False
+        self.user.save()
+        self.user.groups.add(Group.objects.get(name='Auditor'))
+        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        """User gets an editable form if certificate is editable"""
+        response = self.c.get(cert.get_absolute_url())
+        self.assertTemplateUsed(response, 'certificate/details-edit.html')
+
 
 class CertificateListViewTests(TestCase):
 
@@ -270,6 +298,16 @@ class CertificateVoidTests(TestCase):
         self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
         self.c = Client()
         self.c.force_login(self.user)
+
+    def test_auditor_denied(self):
+        """Auditors cannot access"""
+        load_groups()
+        cert = mommy.make(Certificate, void=False)
+        self.user.is_superuser = False
+        self.user.save()
+        self.user.groups.add(Group.objects.get(name='Auditor'))
+        response = self.c.get(reverse('void', args=[cert.id]), follow=True)
+        self.assertTemplateUsed(response, '403.html')
 
     def test_redirect_to_details_if_void(self):
         """
@@ -342,6 +380,15 @@ class CertificateConfirmViewTest(CertTestCase):
         super().setUp()
         self.cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
         self.url = reverse('confirm', args=[self.cert.id])
+
+    def test_auditor_denied(self):
+        """Auditors cannot access"""
+        load_groups()
+        self.user.is_superuser = False
+        self.user.save()
+        self.user.groups.add(Group.objects.get(name='Auditor'))
+        response = self.c.post(self.url, self.form_kwargs)
+        self.assertTemplateUsed(response, '403.html')
 
     def test_certificate_issued_on_post(self):
         self.c.post(self.url, self.form_kwargs)

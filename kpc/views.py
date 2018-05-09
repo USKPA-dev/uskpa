@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
@@ -28,7 +29,8 @@ class ExportView(LoginRequiredMixin, View):
     def get(self, request):
         """Return CSV of filtered certificates"""
         qs = request.user.profile.certificates()
-        qs = CertificateFilter(_filterable_params(request.GET), queryset=qs).qs
+        qs = CertificateFilter(_filterable_params(
+            request.GET), request=self.request, queryset=qs).qs
         qs = qs.values(*CertificateJson.columns)
 
         export_kwargs = {'field_serializer_map': {
@@ -50,9 +52,11 @@ def licensee_contacts(request):
     """Return users associated with the provided licensee"""
     if request.method == 'GET':
         licensee_id = request.GET.get('licensee')
-        contacts = User.objects.filter(profile__licensees=licensee_id) if licensee_id else []
+        contacts = User.objects.filter(
+            profile__licensees=licensee_id) if licensee_id else []
         if contacts:
-            contacts_json = [{'id': user.id, 'name': user.profile.get_user_display_name()} for user in contacts]
+            contacts_json = [
+                {'id': user.id, 'name': user.profile.get_user_display_name()} for user in contacts]
         else:
             contacts_json = []
     else:
@@ -73,8 +77,9 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
 
     def test_func(self):
         """only for superusers"""
-        if self.request.user.is_superuser:
-            return True
+        if not self.request.user.is_superuser:
+            raise PermissionDenied
+        return True
 
     template_name = 'certificate/register.html'
     form_class = CertificateRegisterForm
@@ -86,8 +91,10 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
                        'date_of_sale': form.cleaned_data['date_of_sale']}
         certs = form.get_cert_list()
         if certs:
-            Certificate.objects.bulk_create(Certificate(number=i, **cert_kwargs) for i in certs)
-        messages.success(self.request, f'Generated {len(certs)} new certificates.')
+            Certificate.objects.bulk_create(Certificate(
+                number=i, **cert_kwargs) for i in certs)
+        messages.success(
+            self.request, f'Generated {len(certs)} new certificates.')
         return super().form_valid(form)
 
 
@@ -96,8 +103,10 @@ class CertificateListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filters'] = CertificateFilter(self.request.GET, queryset=self.request.user.profile.certificates())
-        context['statuses'] = [[status[0], status[1]] for status in Certificate.STATUS_CHOICES]
+        context['filters'] = CertificateFilter(
+            self.request.GET, request=self.request, queryset=self.request.user.profile.certificates())
+        context['statuses'] = [[status[0], status[1]]
+                               for status in Certificate.STATUS_CHOICES]
         context['dt_columns'] = CertificateJson.columns
         return context
 
@@ -121,7 +130,7 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
         # Filter by certificate number
         search = self.request.GET.get('search[value]')
         qs = CertificateFilter(
-            _filterable_params(self.request.GET), queryset=qs).qs
+            _filterable_params(self.request.GET), queryset=qs, request=self.request).qs
         if search:
             qs = qs.filter(number__istartswith=search)
         return qs
@@ -135,13 +144,28 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
 class BaseCertificateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Certificate
 
-    def test_func(self):
-        obj = self.get_object()
-        return obj.user_can_access(self.request.user)
-
 
 class CertificateView(BaseCertificateView):
     REVIEW_MSG = "Please review the certificate data below."
+
+    def test_func(self):
+        obj = self.get_object()
+        if not obj.user_can_access(self.request.user):
+            raise PermissionDenied
+        return True
+
+    def dispatch(self, request, *args, **kwargs):
+        """Disallow POST if user cannot edit a certificate"""
+        if request.method == 'POST':
+            cert = self.get_object()
+            if not cert.user_can_edit(self.request.user):
+                raise PermissionDenied()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['editable'] = self.object.user_can_edit(self.request.user)
+        return kwargs
 
     def get_form_class(self):
         if self.object.licensee_editable:
@@ -153,10 +177,11 @@ class CertificateView(BaseCertificateView):
         Check for incoming GET params
         If present, populate form with values
         """
+        kwargs = self.get_form_kwargs()
         form = super().get_form()
         if self.request.GET and isinstance(form, LicenseeCertificateForm):
             messages.info(self.request, self.REVIEW_MSG)
-            return LicenseeCertificateForm(self.request.GET)
+            return LicenseeCertificateForm(self.request.GET, **kwargs)
         return form
 
     def get_template_names(self):
@@ -183,6 +208,12 @@ class CertificateVoidView(BaseCertificateView):
 
     ALREADY_VOID = "This certificate has already been voided."
 
+    def test_func(self):
+        obj = self.get_object()
+        if not obj.user_can_edit(self.request.user):
+            raise PermissionDenied
+        return True
+
     def dispatch(self, request, *args, **kwargs):
         """Unexpected access if certificate is already voided"""
         obj = self.get_object()
@@ -199,6 +230,12 @@ class CertificateVoidView(BaseCertificateView):
 
 class CertificateConfirmView(BaseCertificateView):
     form_class = LicenseeCertificateForm
+
+    def test_func(self):
+        obj = self.get_object()
+        if not obj.user_can_edit(self.request.user):
+            raise PermissionDenied
+        return True
 
     def form_invalid(self, form):
         """
