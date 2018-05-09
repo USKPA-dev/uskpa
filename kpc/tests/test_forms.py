@@ -5,8 +5,10 @@ from django.conf import settings
 from django.test import TestCase
 from model_mommy import mommy
 
-from kpc.forms import CertificateRegisterForm, StatusUpdateForm, VoidForm
+from kpc.forms import (CertificateRegisterForm, LicenseeCertificateForm,
+                       StatusUpdateForm, VoidForm)
 from kpc.models import Certificate
+from kpc.tests import CERT_FORM_KWARGS
 
 
 class VoidFormTests(TestCase):
@@ -114,21 +116,28 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_sale': '01/01/2018', 'registration_method': 'list',
                             'payment_method': 'cash',
-                            'payment_amount': 1, 'cert_list': 'US1'
+                            'payment_amount': 20, 'cert_list': 'US1'
                             }
+
+    def test_payment_not_expected_amount(self):
+        """Payment must be # of certs * Certificate.PRICE"""
+        self.form_kwargs['payment_amount'] = 1
+        form = CertificateRegisterForm(self.form_kwargs)
+        self.assertFalse(form.is_valid())
+        self.assertIn("A payment of $20 is required. (1 requested certificates @ $20 per certificate.)",
+                      [e.message for e in form.non_field_errors().data])
 
     def test_valid_form_no_errors_list(self):
         """Form validates w/ list data"""
         form = CertificateRegisterForm(self.form_kwargs)
-        valid = form.is_valid()
-        self.assertTrue(valid)
+        self.assertTrue(form.is_valid())
 
     def test_valid_form_no_errors_sequential(self):
         """Form validates w/ sequential data"""
+        self.form_kwargs['payment_amount'] = 40
         form = CertificateRegisterForm(self.form_kwargs)
         self._make_sequential(1, 2)
-        valid = form.is_valid()
-        self.assertTrue(valid)
+        self.assertTrue(form.is_valid())
 
     def test_validation_fails_if_licensee_and_contact_dont_match(self):
         """Fail validation and provide msg if provided user is not associated with licensee"""
@@ -187,3 +196,19 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs.pop('cert_list')
         self.form_kwargs.update(
             {'registration_method': 'sequential', 'cert_from': start, 'cert_to': end})
+
+
+class LicenseeCertificateFormTests(TestCase):
+
+    def setUp(self):
+        self.form_class = LicenseeCertificateForm
+
+    def test_date_expiry_validated_against_date_issued(self):
+        """
+        Date of expiry must be Certificate.EXPIRY_DAYS from date of issue
+        """
+        kwargs = CERT_FORM_KWARGS.copy()
+        kwargs['date_of_expiry'] = '12/12/9999'
+        form = LicenseeCertificateForm(kwargs)
+        self.assertFalse(form.is_valid())
+        self.assertIn(LicenseeCertificateForm.DATE_EXPIRY_INVALID, form.errors['date_of_expiry'])

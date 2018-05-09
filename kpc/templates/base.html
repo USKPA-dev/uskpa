@@ -1,53 +1,55 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>{% block title %}{% endblock %}</title>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"
-            integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.489/pdf.js" integrity="sha256-ROaBCIQcK2T1cSsLHAc+0PfjgcsREGN1yBKNwZcAzvk="
-  crossorigin="anonymous"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uswds/1.6.1/css/uswds.min.css">
-    <link rel="stylesheet" href="{% static 'css/uskpa.css' %}">
-    {% block "header" %}{% endblock %}
-  </head>
-  <body>
-    {% include 'banner.html' %}
-    <header class="usa-header usa-header-extended" role="banner">
-      <div class="usa-navbar">
-        <div class="usa-logo" id="extended-logo">
-          <em class="usa-logo-text">
-            <a href="{% url 'home' %}"
-              title="Home"
-              aria-label="Home">
-              USKPA.org
-            </a>
-          </em>
-        </div>
-        <button class="usa-menu-btn">Menu</button>
+  <title>{% block title %}{% endblock %}</title>
+
+  <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.489/pdf.js" integrity="sha256-ROaBCIQcK2T1cSsLHAc+0PfjgcsREGN1yBKNwZcAzvk="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js" integrity="sha256-L3S3EDEk31HcLA5C6T2ovHvOcD80+fgqaCDt2BAi92o="
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uswds/1.6.1/css/uswds.min.css">
+  <link rel="stylesheet" href="{% static 'css/uskpa.css' %}"> {% block "header" %}{% endblock %}
+</head>
+
+<body>
+  {% include 'banner.html' %}
+  <header class="usa-header usa-header-extended" role="banner">
+    <div class="usa-navbar">
+      <div class="usa-logo" id="extended-logo">
+        <em class="usa-logo-text">
+          <a href="{% url 'home' %}" title="Home" aria-label="Home">
+            USKPA.org
+          </a>
+        </em>
       </div>
-      {% include 'nav.html' %}
-    </header>
+      <button class="usa-menu-btn">Menu</button>
+    </div>
+    {% include 'nav.html' %}
+  </header>
   <div class="usa-overlay"></div>
 
   <main id="main-content">
     {% include 'messages.html' %}
-    {% block content_title %}{% endblock content_title %}
+    {% block content_title %}
+    {% endblock content_title %}
     {% block content %}
-    {% endblock content %}
+    {% endblock content%}
   </main>
 
   {% include 'footer.html' %}
 
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uswds/1.6.1/js/uswds.min.js"></script>
-  </body>
+</body>
+
 </html>

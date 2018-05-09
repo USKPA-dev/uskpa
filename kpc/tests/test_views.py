@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from django.core.management import call_command
 from django.conf import settings
@@ -13,6 +14,7 @@ from kpc.forms import StatusUpdateForm, LicenseeCertificateForm
 from kpc.models import Certificate
 from kpc.views import (CertificateRegisterView, CertificateView,
                        licensee_contacts, CertificateVoidView)
+from kpc.tests import CERT_FORM_KWARGS
 
 
 def load_groups():
@@ -20,16 +22,25 @@ def load_groups():
     call_command('loaddata', 'groups', verbosity=0)
 
 
+def _get_expiry_date(date_of_issue):
+    """determine expiry date"""
+    issued = datetime.datetime.strptime(date_of_issue, "%m/%d/%Y").date()
+    date_of_expiry = issued + \
+        datetime.timedelta(days=Certificate.EXPIRY_DAYS)
+    return date_of_expiry.strftime('%m/%d/%Y')
+
+
 class CertTestCase(TestCase):
+
+    def get_form_kwargs(self):
+        base_kwargs = CERT_FORM_KWARGS.copy()
+        base_kwargs['date_of_expiry'] = _get_expiry_date(
+            base_kwargs['date_of_issue'])
+        return base_kwargs
+
     def setUp(self):
         self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=True)
-        self.form_kwargs = {"country_of_origin": "AQ", 'aes': 'X22222222222222',
-                            'number_of_parcels': 1, 'date_of_issue': '01/31/2018',
-                            'date_of_expiry': '01/31/2019', 'carat_weight': 1,
-                            'harmonized_code': '7102.31', 'exporter': 'test',
-                            'exporter_address': '123', 'consignee': 'test',
-                            'consignee_address': 'test', 'shipped_value': 10,
-                            'attested': True}
+        self.form_kwargs = self.get_form_kwargs()
         self.c = Client()
         self.c.force_login(self.user)
 
@@ -97,11 +108,11 @@ class CertificateRegisterViewTests(TestCase):
         # Valid registration form input
         self.sequential_kwargs = {
             'registration_method': 'sequential',  'cert_from': 1, 'cert_to': 5}
-        self.list_kwargs = {'registration_method': 'list',
+        self.list_kwargs = {'registration_method': 'list', 'payment_amount': 40,
                             'cert_list': 'US201, US123456'}
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_sale': '01/01/2018',
-                            'payment_method': 'cash', 'payment_amount': 1
+                            'payment_method': 'cash', 'payment_amount': 100
                             }
         self.factory = RequestFactory()
 
@@ -289,7 +300,8 @@ class CertificateListViewTests(TestCase):
         """redirect to login if anonymoususer"""
         response = self.c.get(self.url)
         target_url = settings.LOGIN_URL + '?next=' + self.url
-        self.assertRedirects(response, target_url, fetch_redirect_response=False)
+        self.assertRedirects(response, target_url,
+                             fetch_redirect_response=False)
 
 
 class CertificateVoidTests(TestCase):

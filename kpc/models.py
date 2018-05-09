@@ -67,12 +67,16 @@ class Certificate(models.Model):
     HS_CODE_CHOICES = (
         ('7102.10', '7102.10'),
         ('7102.21', '7102.21'),
-        ('7102.29', '7102.29'),
         ('7102.31', '7102.31'),
-        ('7102.39', '7102.39'),
     )
 
     VOID_REASONS = ['Printing Error', 'Typographical error', 'No longer needed', 'Other']
+
+    # Price in USD of a certificate
+    PRICE = 20
+
+    # Days from issue upon which a certificate expires
+    EXPIRY_DAYS = 60
 
     # Fields on physical certificate
     number = models.PositiveIntegerField(help_text='USKPA Certificate ID number', unique=True)
@@ -88,14 +92,15 @@ class Certificate(models.Model):
                            )
     country_of_origin = CountryField(blank=True, verbose_name='Country of Origin')
     date_of_issue = models.DateField(blank=True, null=True, help_text='Date of Issue')
-    date_of_expiry = models.DateField(blank=True, null=True, help_text='Date of Expiry')
+    date_of_expiry = models.DateField(blank=True, null=True,
+                                      help_text=f'{EXPIRY_DAYS} from Date of Issue')
     shipped_value = models.DecimalField(max_digits=20, decimal_places=2,
                                         blank=True, null=True, help_text="Value in USD")
     exporter = models.CharField(blank=True, max_length=256)
     exporter_address = models.TextField(blank=True)
     number_of_parcels = models.PositiveIntegerField(blank=True, null=True)
-    consignee = models.CharField(blank=True, max_length=256, help_text='Ultimate Consignee Name')
-    consignee_address = models.TextField(blank=True, help_text='Ultimate Consignee Address')
+    consignee = models.CharField(blank=True, max_length=256)
+    consignee_address = models.TextField(blank=True)
     carat_weight = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
     harmonized_code = models.CharField(choices=HS_CODE_CHOICES, max_length=32,
                                        blank=True)
