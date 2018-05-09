@@ -1,19 +1,19 @@
-import json
 import datetime
+import json
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, Permission, Group
+from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
-from django.test import Client, RequestFactory, TestCase
+from django.test import Client, RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
 from model_mommy import mommy
 
-from kpc.forms import StatusUpdateForm, LicenseeCertificateForm
+from kpc.forms import LicenseeCertificateForm, StatusUpdateForm
 from kpc.models import Certificate
-from kpc.views import (CertificateRegisterView, CertificateView,
-                       licensee_contacts, CertificateVoidView)
 from kpc.tests import CERT_FORM_KWARGS, load_groups
+from kpc.views import (CertificateJson, CertificateRegisterView,
+                       CertificateView, CertificateVoidView, licensee_contacts)
 
 
 def _get_expiry_date(date_of_issue):
@@ -407,3 +407,12 @@ class CertificateConfirmViewTest(CertTestCase):
         self.c.post(self.url, self.form_kwargs)
         self.cert.refresh_from_db()
         self.assertEqual(self.cert.status, Certificate.ASSIGNED)
+
+
+class CertificateJsonTests(SimpleTestCase):
+
+    def test_json_contains_all_physical_cert_fields(self):
+        """Data returned must contain all physical certificate fields"""
+        returned_columns = set(CertificateJson.columns)
+        physical_fields = set(Certificate.PHYSICAL_FIELDS)
+        self.assertTrue(physical_fields.issubset(returned_columns))

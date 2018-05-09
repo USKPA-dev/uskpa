@@ -12,6 +12,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import FormView, UpdateView
+from django_countries.fields import Country
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from djqscsv import render_to_csv_response
 
@@ -42,7 +43,8 @@ class ExportView(LoginRequiredMixin, View):
             'date_of_expiry': _to_mdy,
             'date_of_shipment': _to_mdy,
             'date_of_delivery': _to_mdy,
-            'date_voided': _to_mdy
+            'date_voided': _to_mdy,
+            'country_of_origin': (lambda code: Country(code=code).name)
         }}
         return render_to_csv_response(qs, **export_kwargs)
 
@@ -121,8 +123,10 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
     columns = ["number", "status", "consignee", "last_modified",
                "shipped_value", "licensee__name", "aes", "date_of_issue",
                "date_of_sale", "date_of_expiry", "number_of_parcels",
-               "carat_weight", "harmonized_code", "exporter", "date_of_shipment",
-               "date_of_delivery", "date_voided"]
+               "carat_weight", "harmonized_code", "country_of_origin",
+               "exporter", "date_of_shipment", "date_of_delivery",
+               "date_voided", "consignee_address", "exporter_address",
+               "notes"]
     order_columns = columns
 
     max_display_length = 500
