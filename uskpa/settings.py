@@ -143,7 +143,7 @@ elif IS_DEPLOYED:
     SECURE_HSTS_PRELOAD = os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', True)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'certificates'
 LOGOUT_REDIRECT_URL = '/'
 
 # Internationalization

@@ -15,8 +15,11 @@
       rough diamonds from the U.S.
       </p>
 
-      <a class="usa-button" href="{% url 'join' %}">Become a Licensee</a>
-
+      {% if user.is_authenticated %}
+          <a class="usa-button" href="{% url 'certificates' %}">Browse Certificates</a>
+      {% else %}
+          <a class="usa-button" href="{% url 'login' %}">Login</a>
+      {% endif %}
     </div>
   </div>
 </section>
