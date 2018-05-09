@@ -1,7 +1,7 @@
 {% extends 'certificate/base.html' %}
 
 {% block certificate-body-fields %}
-<form action="{% url 'cert-details' object.id %}" method="POST">
+<form action="{{object.get_absolute_url}}" method="POST">
     {% csrf_token %}
 
     {% include 'certificate/fields_form.html' %}

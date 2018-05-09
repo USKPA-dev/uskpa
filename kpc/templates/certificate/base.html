@@ -50,7 +50,7 @@
         </div>
         <div class="usa-width-one-half">
             {% if not object.void and form.editable %}
-                <a href='{% url "void" object.id %}' id='void' type='button' class="usa-button">
+                <a href='{% url "void" object.number %}' id='void' type='button' class="usa-button">
                     Void this Certificate
                 </a>
             {% endif %}
