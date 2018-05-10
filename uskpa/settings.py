@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'django.contrib.admin',
     'simple_history',
-    'django_filters'
+    'django_filters',
+    'solo'
 ]
 
 

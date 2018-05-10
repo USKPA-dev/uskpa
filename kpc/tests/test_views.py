@@ -20,7 +20,7 @@ def _get_expiry_date(date_of_issue):
     """determine expiry date"""
     issued = datetime.datetime.strptime(date_of_issue, "%m/%d/%Y").date()
     date_of_expiry = issued + \
-        datetime.timedelta(days=Certificate.EXPIRY_DAYS)
+        datetime.timedelta(days=Certificate.get_expiry_days())
     return date_of_expiry.strftime('%m/%d/%Y')
 
 
@@ -28,6 +28,7 @@ class CertTestCase(TestCase):
 
     def get_form_kwargs(self):
         base_kwargs = CERT_FORM_KWARGS.copy()
+        base_kwargs['harmonized_code'] = mommy.make('HScode').id
         base_kwargs['date_of_expiry'] = _get_expiry_date(
             base_kwargs['date_of_issue'])
         return base_kwargs

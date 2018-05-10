@@ -124,8 +124,6 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs['payment_amount'] = 1
         form = CertificateRegisterForm(self.form_kwargs)
         self.assertFalse(form.is_valid())
-        self.assertIn("A payment of $20 is required. (1 requested certificates @ $20 per certificate.)",
-                      [e.message for e in form.non_field_errors().data])
 
     def test_valid_form_no_errors_list(self):
         """Form validates w/ list data"""
@@ -213,10 +211,10 @@ class LicenseeCertificateFormTests(TestCase):
 
     def test_date_expiry_validated_against_date_issued(self):
         """
-        Date of expiry must be Certificate.EXPIRY_DAYS from date of issue
+        Date of expiry must be CertificateConfig.days_to_expiry from date of issue
         """
         kwargs = CERT_FORM_KWARGS.copy()
         kwargs['date_of_expiry'] = '12/12/9999'
         form = LicenseeCertificateForm(kwargs)
         self.assertFalse(form.is_valid())
-        self.assertIn(LicenseeCertificateForm.DATE_EXPIRY_INVALID, form.errors['date_of_expiry'])
+        self.assertIn(form.date_expiry_invalid, form.errors['date_of_expiry'])

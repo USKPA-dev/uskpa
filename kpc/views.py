@@ -79,7 +79,7 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['price'] = Certificate.PRICE
+        context['price'] = Certificate.get_price()
         return context
 
     def test_func(self):

@@ -20,15 +20,11 @@ class UserModelChoiceField(forms.ModelChoiceField):
 
 
 class LicenseeCertificateForm(forms.ModelForm):
-    EXPIRY_DAYS = Certificate.EXPIRY_DAYS
-
     date_of_issue = forms.DateField(
         widget=forms.DateInput(attrs=DATE_ATTRS))
-    date_of_expiry = forms.DateField(label=f"Date of Expiry ({EXPIRY_DAYS} days from date issued)",
-                                     widget=forms.DateInput(attrs={'readonly': 'readonly',
+    date_of_expiry = forms.DateField(widget=forms.DateInput(attrs={'readonly': 'readonly',
                                                                    'placeholder': 'Auto-filled from Date of Issue'}))
     SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
-    DATE_EXPIRY_INVALID = f'Date of Expiry must be {Certificate.EXPIRY_DAYS} days after Date of Issue'
 
     def __init__(self, *args, **kwargs):
         """
@@ -36,6 +32,9 @@ class LicenseeCertificateForm(forms.ModelForm):
         """
         self.editable = kwargs.pop('editable', True)
         super().__init__(*args, **kwargs)
+        self.expiry_days = Certificate.get_expiry_days()
+        self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue'
+        self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
 
         for field in self.fields:
             self.fields[field].required = True
@@ -52,11 +51,11 @@ class LicenseeCertificateForm(forms.ModelForm):
         date_of_issue = self.cleaned_data.get('date_of_issue')
         date_of_expiry = self.cleaned_data.get('date_of_expiry')
 
-        # Date of expiry must be Certificate.EXPIRY_DAYS days after date of issue
+        # Date of expiry must be CertificateConfig.expiry_days after date of issue
         if date_of_issue and date_of_expiry:
             delta = date_of_expiry - date_of_issue
-            if delta.days != Certificate.EXPIRY_DAYS:
-                self.add_error('date_of_expiry', self.DATE_EXPIRY_INVALID)
+            if delta.days != self.expiry_days:
+                self.add_error('date_of_expiry', self.date_expiry_invalid)
 
     def save(self, commit=True):
         """Set status to PREPARED"""
@@ -85,12 +84,13 @@ class CertificateRegisterForm(forms.Form):
     cert_list = forms.CharField(required=False, label='Certificate ID list')
     payment_method = forms.ChoiceField(
         choices=Certificate.PAYMENT_METHOD_CHOICES)
-    payment_amount = forms.DecimalField(max_digits=10,
-                                        label='Payment amount (Certificate price: $%s)' % Certificate.PRICE,
-                                        decimal_places=2)
+    payment_amount = forms.DecimalField(max_digits=10, decimal_places=2)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.price = Certificate.get_price()
+        self.fields['payment_amount'].label = f'Payment amount (Certificate price: ${self.price})'
+
         data = kwargs.get('data', None)
         if data:
             licensee = data.get('licensee', None)
@@ -142,10 +142,10 @@ class CertificateRegisterForm(forms.Form):
         requested_certs = self.get_cert_list()
         """payment amount matches expected value"""
         requested_cert_count = len(requested_certs)
-        expected_payment = requested_cert_count * Certificate.PRICE
+        expected_payment = requested_cert_count * self.price
         if payment_aount != expected_payment:
             raise forms.ValidationError(
-                f"A payment of ${expected_payment} is required. ({requested_cert_count} requested certificates @ ${Certificate.PRICE} per certificate.)")
+                f"A payment of ${expected_payment} is required. ({requested_cert_count} requested certificates @ ${self.price} per certificate.)")
 
         # Check for existence of requested certficates
         existing = Certificate.objects.filter(
