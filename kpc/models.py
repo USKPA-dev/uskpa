@@ -8,6 +8,16 @@ from simple_history.models import HistoricalRecords
 from django.urls import reverse
 
 
+class HSCode(models.Model):
+    value = models.CharField(max_length=12)
+
+    class Meta:
+        verbose_name = 'Harmonized System Code'
+
+    def __str__(self):
+        return self.value
+
+
 class Licensee(models.Model):
     """
     An entity involved in the export/import of rough diamonds
@@ -65,12 +75,6 @@ class Certificate(models.Model):
         ('check', 'Check'),
     )
 
-    HS_CODE_CHOICES = (
-        ('7102.10', '7102.10'),
-        ('7102.21', '7102.21'),
-        ('7102.31', '7102.31'),
-    )
-
     VOID_REASONS = ['Printing Error',
                     'Typographical error', 'No longer needed', 'Other']
 
@@ -112,8 +116,7 @@ class Certificate(models.Model):
     consignee_address = models.TextField(blank=True)
     carat_weight = models.DecimalField(
         max_digits=20, decimal_places=10, blank=True, null=True)
-    harmonized_code = models.CharField(choices=HS_CODE_CHOICES, max_length=32,
-                                       blank=True)
+    harmonized_code = models.ForeignKey(HSCode, blank=True, null=True, on_delete=models.PROTECT)
 
     # Non certificate fields
     assignor = models.ForeignKey(

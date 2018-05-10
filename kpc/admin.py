@@ -5,7 +5,9 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from accounts.models import Profile
 
-from .models import Certificate, Licensee
+from .models import Certificate, Licensee, HSCode
+
+admin.site.register(HSCode)
 
 
 class LicenseeAdminForm(forms.ModelForm):
