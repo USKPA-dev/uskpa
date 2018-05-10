@@ -27,7 +27,8 @@ class VoidFormTests(TestCase):
     def test_save_sets_void_w_fields(self):
         """Set Certificate.void and all associated fields"""
         cert = mommy.make(Certificate)
-        self.form_kwargs['reason'] = Certificate.VOID_REASONS[0]
+        reason = mommy.make('VoidReason', value='TESTING')
+        self.form_kwargs['reason'] = reason.value
         form = self.form(self.form_kwargs, instance=cert)
         self.assertTrue(form.is_valid())
         form.save()

@@ -89,7 +89,8 @@ class CertificateRegisterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.price = Certificate.get_price()
-        self.fields['payment_amount'].label = f'Payment amount (Certificate price: ${self.price})'
+        self.fields[
+            'payment_amount'].label = f'Payment amount (Certificate price: ${self.price})'
 
         data = kwargs.get('data', None)
         if data:
@@ -228,9 +229,8 @@ class StatusUpdateForm(forms.ModelForm):
 
 class VoidForm(forms.ModelForm):
     OTHER_CHOICE = 'Other'
-    REASON_CHOICES = [(reason, reason) for reason in Certificate.VOID_REASONS]
     void = forms.BooleanField(help_text="I wish to void this certificate.")
-    reason = forms.ChoiceField(choices=REASON_CHOICES)
+    reason = forms.ChoiceField(choices=[])
     notes = forms.CharField(widget=forms.Textarea(), required=False)
 
     SUCCESS_MSG = "Certificate has been successfully voided."
@@ -239,6 +239,14 @@ class VoidForm(forms.ModelForm):
     class Meta:
         model = Certificate
         fields = ("void", "notes")
+
+    def __init__(self, *args, **kwargs):
+        """Set void reason choices"""
+        choices = [(reason.value, reason.value)
+                   for reason in Certificate.get_void_reasons()]
+        choices.append(('Other', 'Other'))
+        super().__init__(*args, **kwargs)
+        self.fields['reason'].choices = choices
 
     def clean(self):
         reason = self.cleaned_data.get('reason')

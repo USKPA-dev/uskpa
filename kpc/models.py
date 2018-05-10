@@ -23,8 +23,21 @@ class CertificateConfig(SingletonModel):
         verbose_name_plural = "Certificate Configuration"
 
 
+class VoidReason(models.Model):
+    value = models.CharField(max_length=500)
+    sort_order = models.IntegerField(default=0)
+
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.value
+
+
 class HSCode(models.Model):
     value = models.CharField(max_length=12)
+    sort_order = models.IntegerField(default=0)
+
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = 'Harmonized System Code'
@@ -89,9 +102,6 @@ class Certificate(models.Model):
         ('cash', 'Cash'),
         ('check', 'Check'),
     )
-
-    VOID_REASONS = ['Printing Error',
-                    'Typographical error', 'No longer needed', 'Other']
 
     # Fields on physical certificate
     PHYSICAL_FIELDS = ('number', 'country_of_origin', 'aes', 'date_of_issue', 'date_of_expiry',
@@ -225,3 +235,8 @@ class Certificate(models.Model):
     @staticmethod
     def get_expiry_days():
         return CertificateConfig.get_solo().days_to_expiry
+
+    @staticmethod
+    def get_void_reasons():
+        reasons = VoidReason.objects.all()
+        return reasons

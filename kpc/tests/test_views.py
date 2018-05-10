@@ -331,8 +331,9 @@ class CertificateVoidTests(TestCase):
         Void form is rendered with choices defined by Certificate model
         """
         cert = mommy.make(Certificate, void=False)
+        mommy.make('VoidReason', _quantity=2)
         response = self.c.get(reverse('void', args=[cert.number]), follow=True)
-        for choice in Certificate.VOID_REASONS:
+        for choice in Certificate.get_void_reasons():
             self.assertContains(response, choice)
 
 

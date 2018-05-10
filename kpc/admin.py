@@ -6,9 +6,8 @@ from solo.admin import SingletonModelAdmin
 
 from accounts.models import Profile
 
-from .models import Certificate, CertificateConfig, HSCode, Licensee
-
-admin.site.register(HSCode)
+from .models import (Certificate, CertificateConfig, HSCode, Licensee,
+                     VoidReason)
 
 
 class LicenseeAdminForm(forms.ModelForm):
@@ -90,6 +89,17 @@ class CertificateAdmin(SimpleHistoryAdmin):
     search_fields = ('number',)
 
 
+@admin.register(HSCode)
+class HSCodeAdmin(SimpleHistoryAdmin):
+    list_display = ('value', 'sort_order')
+
+
+@admin.register(VoidReason)
+class VoidReasonAdmin(SimpleHistoryAdmin):
+    list_display = ('value', 'sort_order')
+
+
 @admin.register(CertificateConfig)
 class ConfigAdmin(SimpleHistoryAdmin, SingletonModelAdmin):
     pass
+
