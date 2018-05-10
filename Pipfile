@@ -23,6 +23,7 @@ django-filter = "*"
 django-queryset-csv = "*"
 reportlab = "*"
 "pypdf2" = "*"
+django-solo = "*"
 
 
 [dev-packages]

@@ -102,4 +102,3 @@ class VoidReasonAdmin(SimpleHistoryAdmin):
 @admin.register(CertificateConfig)
 class ConfigAdmin(SimpleHistoryAdmin, SingletonModelAdmin):
     pass
-
