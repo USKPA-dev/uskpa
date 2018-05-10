@@ -139,15 +139,21 @@ class CertificateRegisterForm(forms.Form):
                 raise forms.ValidationError(
                     "Certificate 'To' value must be greater than or equal to 'From' value.")
 
+        requested_certs = self.get_cert_list()
         """payment amount matches expected value"""
-        requested_certs = len(self.get_cert_list())
-        expected_payment = requested_certs * Certificate.PRICE
+        requested_cert_count = len(requested_certs)
+        expected_payment = requested_cert_count * Certificate.PRICE
         if payment_aount != expected_payment:
             raise forms.ValidationError(
-                f"A payment of ${expected_payment} is required. ({requested_certs} requested certificates @ ${Certificate.PRICE} per certificate.)")
+                f"A payment of ${expected_payment} is required. ({requested_cert_count} requested certificates @ ${Certificate.PRICE} per certificate.)")
 
-        # TODO more validation to be done here.
-        # Check for requested Cert Number conflicts before attempting creation
+        # Check for existence of requested certficates
+        existing = Certificate.objects.filter(
+            number__in=requested_certs).exists()
+        if existing:
+            raise forms.ValidationError(
+                f"""At least one of the requested certificates already exists in the database.
+                    The next available certificate number is: {Certificate.next_available_number()}""")
 
     def get_cert_list(self):
         """return list of certificates to generate"""

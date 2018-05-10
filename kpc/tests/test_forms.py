@@ -197,6 +197,14 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs.update(
             {'registration_method': 'sequential', 'cert_from': start, 'cert_to': end})
 
+    def test_dupe_certificate_invalid(self):
+        """
+        Validation fails when requested certificates already exist
+        """
+        mommy.make(Certificate, number=1)
+        form = CertificateRegisterForm(self.form_kwargs)
+        self.assertFalse(form.is_valid())
+
 
 class LicenseeCertificateFormTests(TestCase):
 
