@@ -29,6 +29,9 @@ class VoidReason(models.Model):
 
     history = HistoricalRecords()
 
+    class Meta:
+        ordering = ['sort_order']
+
     def __str__(self):
         return self.value
 
@@ -41,6 +44,7 @@ class HSCode(models.Model):
 
     class Meta:
         verbose_name = 'Harmonized System Code'
+        ordering = ['sort_order']
 
     def __str__(self):
         return self.value
