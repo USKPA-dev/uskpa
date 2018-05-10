@@ -192,3 +192,11 @@ elif EMAIL_BACKEND.startswith("anymail"):
 
 SHOW_CERT_PDF_ADDRESS_BOUNDARY = False
 KPC_BASE = os.path.join(BASE_DIR, 'kpc', 'resources', 'kpc_base.pdf')
+
+# Cache for CertificateConfig
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
+}
+SOLO_CACHE = 'default'
