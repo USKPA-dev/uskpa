@@ -8,7 +8,7 @@ User = get_user_model()
 
 
 class ProfileTests(TestCase):
-    fixtures = ['groups.json']
+    fixtures = ['initial_data.json']
 
     def setUp(self):
         self.profile = mommy.prepare(Profile)

@@ -1,0 +1,40 @@
+[
+  {
+    "model": "auth.group",
+    "fields": {
+      "name": "Auditor",
+      "permissions": [["can_review_certificates", "accounts", "profile"]]
+    }
+  },
+  {
+    "model": "auth.group",
+    "fields": {
+      "name": "Licensee",
+      "permissions": []
+    }
+  },
+  {
+    "model": "kpc.hscode",
+    "pk": 1,
+    "fields": {
+      "value": "7102.10",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.hscode",
+    "pk": 2,
+    "fields": {
+      "value": "7102.21",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.hscode",
+    "pk": 3,
+    "fields": {
+      "value": "7102.31",
+      "sort_order": 0
+    }
+  }
+]

@@ -2,10 +2,52 @@ from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
 from django.http import QueryDict
+from django.urls import reverse
 from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
-from django.urls import reverse
+from solo.models import SingletonModel
+
+
+class CertificateConfig(SingletonModel):
+    days_to_expiry = models.PositiveIntegerField(default=60)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=20.00)
+
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return "Configuration"
+
+    class Meta:
+        verbose_name = "Certificate Configuration"
+        verbose_name_plural = "Certificate Configuration"
+
+
+class VoidReason(models.Model):
+    value = models.CharField(max_length=500)
+    sort_order = models.IntegerField(default=0)
+
+    history = HistoricalRecords()
+
+    class Meta:
+        ordering = ['sort_order']
+
+    def __str__(self):
+        return self.value
+
+
+class HSCode(models.Model):
+    value = models.CharField(max_length=12)
+    sort_order = models.IntegerField(default=0)
+
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name = 'Harmonized System Code'
+        ordering = ['sort_order']
+
+    def __str__(self):
+        return self.value
 
 
 class Licensee(models.Model):
@@ -65,21 +107,6 @@ class Certificate(models.Model):
         ('check', 'Check'),
     )
 
-    HS_CODE_CHOICES = (
-        ('7102.10', '7102.10'),
-        ('7102.21', '7102.21'),
-        ('7102.31', '7102.31'),
-    )
-
-    VOID_REASONS = ['Printing Error',
-                    'Typographical error', 'No longer needed', 'Other']
-
-    # Price in USD of a certificate
-    PRICE = 20
-
-    # Days from issue upon which a certificate expires
-    EXPIRY_DAYS = 60
-
     # Fields on physical certificate
     PHYSICAL_FIELDS = ('number', 'country_of_origin', 'aes', 'date_of_issue', 'date_of_expiry',
                        'shipped_value', 'exporter', 'exporter_address', 'number_of_parcels',
@@ -101,8 +128,7 @@ class Certificate(models.Model):
         blank=True, verbose_name='Country of Origin')
     date_of_issue = models.DateField(
         blank=True, null=True, help_text='Date of Issue')
-    date_of_expiry = models.DateField(blank=True, null=True,
-                                      help_text=f'{EXPIRY_DAYS} from Date of Issue')
+    date_of_expiry = models.DateField(blank=True, null=True)
     shipped_value = models.DecimalField(max_digits=20, decimal_places=2,
                                         blank=True, null=True, help_text="Value in USD")
     exporter = models.CharField(blank=True, max_length=256)
@@ -112,8 +138,7 @@ class Certificate(models.Model):
     consignee_address = models.TextField(blank=True)
     carat_weight = models.DecimalField(
         max_digits=20, decimal_places=10, blank=True, null=True)
-    harmonized_code = models.CharField(choices=HS_CODE_CHOICES, max_length=32,
-                                       blank=True)
+    harmonized_code = models.ForeignKey(HSCode, blank=True, null=True, on_delete=models.PROTECT)
 
     # Non certificate fields
     assignor = models.ForeignKey(
@@ -206,3 +231,15 @@ class Certificate(models.Model):
     @classmethod
     def get_label_for_status(cls, status):
         return dict(cls.STATUS_CHOICES).get(status)
+
+    @staticmethod
+    def get_price():
+        return CertificateConfig.get_solo().price
+
+    @staticmethod
+    def get_expiry_days():
+        return CertificateConfig.get_solo().days_to_expiry
+
+    @staticmethod
+    def get_void_reasons():
+        return VoidReason.objects.all()

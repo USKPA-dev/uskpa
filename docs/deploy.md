@@ -60,7 +60,7 @@ use functionality provided by Django.
 Additional data will be included as development continues.
 
 ```shell
-$ heroku run python manage.py loaddata groups.json
+$ heroku run python manage.py loaddata initial-data.json
 ```
 
 ### Environment Variables

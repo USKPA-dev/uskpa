@@ -2,10 +2,12 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from simple_history.admin import SimpleHistoryAdmin
+from solo.admin import SingletonModelAdmin
 
 from accounts.models import Profile
 
-from .models import Certificate, Licensee
+from .models import (Certificate, CertificateConfig, HSCode, Licensee,
+                     VoidReason)
 
 
 class LicenseeAdminForm(forms.ModelForm):
@@ -85,3 +87,18 @@ class CertificateAdmin(SimpleHistoryAdmin):
                     'last_modified', 'licensee', 'assignor',)
     list_filter = ('status', 'licensee',)
     search_fields = ('number',)
+
+
+@admin.register(HSCode)
+class HSCodeAdmin(SimpleHistoryAdmin):
+    list_display = ('value', 'sort_order')
+
+
+@admin.register(VoidReason)
+class VoidReasonAdmin(SimpleHistoryAdmin):
+    list_display = ('value', 'sort_order')
+
+
+@admin.register(CertificateConfig)
+class ConfigAdmin(SimpleHistoryAdmin, SingletonModelAdmin):
+    pass
