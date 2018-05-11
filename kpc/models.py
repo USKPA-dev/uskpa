@@ -30,7 +30,7 @@ class VoidReason(models.Model):
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ['sort_order']
+        ordering = ['sort_order', 'value']
 
     def __str__(self):
         return self.value
@@ -44,11 +44,25 @@ class HSCode(models.Model):
 
     class Meta:
         verbose_name = 'Harmonized System Code'
-        ordering = ['sort_order']
+        ordering = ['sort_order', 'value']
 
     def __str__(self):
         return self.value
 
+
+class PortOfExport(models.Model):
+    name = models.CharField(max_length=50)
+    sort_order = models.IntegerField(default=0)
+
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name = 'Port of Export'
+        verbose_name_plural = 'Ports of Export'
+        ordering = ['sort_order', 'name']
+
+    def __str__(self):
+        return self.name
 
 class Licensee(models.Model):
     """
@@ -114,7 +128,7 @@ class Certificate(models.Model):
 
     number = models.PositiveIntegerField(
         help_text='USKPA Certificate ID number', unique=True)
-    aes = models.CharField(max_length=15,
+    aes = models.CharField(max_length=30,
                            blank=True,
                            help_text='AES Confirmation Number (ITN)',
                            verbose_name='AES',
@@ -141,6 +155,7 @@ class Certificate(models.Model):
     harmonized_code = models.ForeignKey(HSCode, blank=True, null=True, on_delete=models.PROTECT)
 
     # Non certificate fields
+    port_of_export = models.ForeignKey(PortOfExport, blank=True, null=True, on_delete=models.PROTECT)
     assignor = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
     licensee = models.ForeignKey(

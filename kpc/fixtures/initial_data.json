@@ -36,5 +36,133 @@
       "value": "7102.31",
       "sort_order": 0
     }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 1,
+    "fields": {
+      "value": "New York (JFK)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 2,
+    "fields": {
+      "value": "Miami (MIA)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 3,
+    "fields": {
+      "value": "Los Angeles (LAX)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 4,
+    "fields": {
+      "value": "Chicago (ORD)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 5,
+    "fields": {
+      "value": "Memphis (MEM)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 6,
+    "fields": {
+      "value": "Houston (HOU)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 7,
+    "fields": {
+      "value": "Dallas (DFW)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 8,
+    "fields": {
+      "value": "Memphis (TN)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 9,
+    "fields": {
+      "value": "Newark (NJ)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 10,
+    "fields": {
+      "value": "Indianapolis (IN)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 11,
+    "fields": {
+      "value": "Philadelphia (PA)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 12,
+    "fields": {
+      "value": "Louisville (KY)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 13,
+    "fields": {
+      "value": "Detroit (MI)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 14,
+    "fields": {
+      "value": "Honolulu (HA)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 15,
+    "fields": {
+      "value": "Anchorage (AK)",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.portofexport",
+    "pk": 16,
+    "fields": {
+      "value": "Cincinnati (OH)",
+      "sort_order": 0
+    }
   }
 ]
