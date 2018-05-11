@@ -242,5 +242,4 @@ class Certificate(models.Model):
 
     @staticmethod
     def get_void_reasons():
-        reasons = VoidReason.objects.all()
-        return reasons
+        return VoidReason.objects.all()

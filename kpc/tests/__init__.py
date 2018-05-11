@@ -16,4 +16,4 @@ CERT_FORM_KWARGS = {"country_of_origin": "AQ", 'aes': 'X22222222222222',
 
 def load_groups():
     """load groups and permissions"""
-    call_command('loaddata', 'groups', verbosity=0)
+    call_command('loaddata', 'initial_data', verbosity=0)

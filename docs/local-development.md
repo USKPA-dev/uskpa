@@ -18,7 +18,7 @@ Documentation](../docs)
 1. Load initial data:
 
     ```shell
-    $ docker-compose run app python manage.py loaddata groups.json
+    $ docker-compose run app python manage.py loaddata initial-data.json
     ```
 1. If desired, create a super-user account:
 
