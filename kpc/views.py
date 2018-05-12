@@ -120,12 +120,11 @@ class CertificateListView(LoginRequiredMixin, TemplateView):
 
 class CertificateJson(LoginRequiredMixin, BaseDatatableView):
     model = Certificate
-    columns = ["number", "status", "consignee", "last_modified",
-               "shipped_value", "licensee__name", "aes", "date_of_issue",
-               "date_of_sale", "date_of_expiry", "number_of_parcels",
-               "carat_weight", "harmonized_code", "country_of_origin",
-               "exporter", "date_of_shipment", "date_of_delivery",
-               "date_voided", "consignee_address", "exporter_address",
+    columns = ["number", "aes", "licensee__name", "status", 
+               "last_modified", "date_of_sale", "date_of_issue", "date_of_expiry", "date_of_shipment", "date_of_delivery", "date_voided", 
+               "country_of_origin", "shipped_value", "number_of_parcels", "carat_weight", "harmonized_code",
+               "exporter", "exporter_address",
+               "consignee", "consignee_address",  
                "notes"]
     order_columns = columns
 
