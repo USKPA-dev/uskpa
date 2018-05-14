@@ -8,7 +8,7 @@ from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
 from solo.models import SingletonModel
-from decimpal import DecimalField
+from decimal import Decimal
 
 
 class CertificateConfig(SingletonModel):
