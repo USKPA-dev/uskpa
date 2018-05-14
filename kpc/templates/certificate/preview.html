@@ -22,20 +22,26 @@
   <div class="usa-grid">
       <div class='pdf-preview'><small>Trouble viewing the preview below? <a class="alt-preview">Click here to view as plain text</a></small></div>
       <div class="text-preview hidden"><small><a class="alt-preview">Click here to view draft certificate</a></small></div>
-      <div class="hidden text-preview">
-        {% include 'certificate/fields_form.html' %}
-        <div class="hidden">
-          {% comment %}
-            Hidden inputs to store form values for confirm submission
-          {% endcomment %}
-          <input name="country_of_origin" value="{{form.country_of_origin.value}}">
-          <input name="port_of_export" value="{{form.port_of_export.value}}">
-          <input name="harmonized_code" value="{{form.harmonized_code.value}}">
-          <input name="attested" value="attested">
+      <div class="usa-width-three-fourths">
+        <div class="hidden text-preview">
+          {% include 'certificate/fields_form.html' %}
+          <div class="hidden">
+            {% comment %}
+              Hidden inputs to store form values for confirm submission
+            {% endcomment %}
+            <input name="country_of_origin" value="{{form.country_of_origin.value}}">
+            <input name="port_of_export" value="{{form.port_of_export.value}}">
+            <input name="harmonized_code" value="{{form.harmonized_code.value}}">
+            <input name="attested" value="attested">
+          </div>
+        </div>
+        <div class="pdf-preview">
+              <canvas class='hidden' id="the-canvas"></canvas>
         </div>
       </div>
-      <div class="pdf-preview">
-        <canvas class='hidden' id="the-canvas"></canvas>
+      <div class="usa-width-one-fourth">
+        <h3>Data not on physical certificate:</h3>
+        {% include 'certificate/fields-not-on-certificate.html' %}
       </div>
   </div>
 <form>
@@ -63,7 +69,7 @@
           // Fetch our only page
           var pageNumber = 1;
           pdf.getPage(pageNumber).then(function (page) {
-            var scale = 1;
+            var scale = 0.75;
             var viewport = page.getViewport(scale);
 
             // Prepare canvas using PDF dimensions
