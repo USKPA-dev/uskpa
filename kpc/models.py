@@ -143,7 +143,7 @@ class Certificate(models.Model):
     consignee = models.CharField(blank=True, max_length=256)
     consignee_address = models.TextField(blank=True)
     carat_weight = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True,
-                                       validators=[MinValueValidator(Decimal(0.009)
+                                       validators=[MinValueValidator(Decimal(0.009),
                                                                      message='Carat weight must be at least 0.01')
                                                    ]
                                        )
