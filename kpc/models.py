@@ -8,6 +8,7 @@ from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
 from solo.models import SingletonModel
+from decimpal import DecimalField
 
 
 class CertificateConfig(SingletonModel):
@@ -132,7 +133,7 @@ class Certificate(models.Model):
     date_of_expiry = models.DateField(blank=True, null=True)
     shipped_value = models.DecimalField(max_digits=20, decimal_places=2,
                                         blank=True, null=True, help_text="Value in USD",
-                                        validators=[MinValueValidator(0,
+                                        validators=[MinValueValidator(Decimal(0.009),
                                                                       message='Shipped value must be greater than 0')
                                                     ]
                                         )
@@ -142,8 +143,8 @@ class Certificate(models.Model):
     consignee = models.CharField(blank=True, max_length=256)
     consignee_address = models.TextField(blank=True)
     carat_weight = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True,
-                                       validators=[MinValueValidator(0,
-                                                                     message='Shipped value must be greater than 0')
+                                       validators=[MinValueValidator(Decimal(0.009)
+                                                                     message='Carat weight must be at least 0.01')
                                                    ]
                                        )
     harmonized_code = models.ForeignKey(HSCode, blank=True, null=True, on_delete=models.PROTECT)
