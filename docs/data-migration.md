@@ -75,15 +75,15 @@ Steps to migrate data:
 
 1. Copy exported CSV files into a directory, `./data`, in the same folder as `manage.py`
 2. Load initial data:
-    ```python
-    python manage.py loaddata initial-data
+    ```
+    python manage.py loaddata initial_data
     ```
 3. Import Licensee data:
-    ```python
+    ```
     python manage.py load_licensees --filepath ./data/tblLicensee.csv
     ```
 4. Import Certificate data:
-    ```python
+    ```
     python manage.py load_certs --filepath ./data/tblCertificate.csv
     ```
 
