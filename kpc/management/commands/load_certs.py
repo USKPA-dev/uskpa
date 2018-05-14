@@ -78,7 +78,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f'Processed {self.counter} certificate records.'))
         self.stdout.write(self.style.SUCCESS(
-            f'Excluded {self.test_excluded} certificates with Licensee: TEST'))
+            f'Excluded {self.test_excluded} certificates with Licensee: TEST or Number < 10000'))
         self.stdout.write(self.style.SUCCESS(
             f'Imported {self.counter-self.test_excluded} certificates!'))
 
@@ -88,8 +88,9 @@ class Command(BaseCommand):
         cert.number = prepare_number(row['CertNumber'])
 
         licensee_id = int(row['LicenseeID'])
-        # Ignore TEST(17) licensee records
-        if licensee_id == 17:
+        # Ignore TEST(17) licensee records and
+        # and Certificate numbers with less than 5 digits
+        if licensee_id == 17 or cert.number < 10000:
             self.test_excluded += 1
             return
         if licensee_id in self.licensee_id_list:
@@ -120,7 +121,7 @@ class Command(BaseCommand):
         cert.notes = ignore_null_str(row['VoidComment'])
 
         status_id = ignore_null_str(row['DeliveryStatusID'])
-        if not status_id and cert.void:
+        if cert.void:
             cert.status = Certificate.VOID
         elif not status_id:
             cert.status = Certificate.ASSIGNED
