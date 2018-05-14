@@ -64,6 +64,7 @@ class PortOfExport(models.Model):
     def __str__(self):
         return self.name
 
+
 class Licensee(models.Model):
     """
     An entity involved in the export/import of rough diamonds

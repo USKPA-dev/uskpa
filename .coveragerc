@@ -7,6 +7,7 @@ source =
 omit =
     .venv/*
     /*migrations*/
+    /*management*/
     manage.py
     */tests/*
     uskpa/wsgi.py
