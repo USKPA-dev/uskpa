@@ -97,6 +97,12 @@
             {% endif %}
         </div>
     </div>
+    <div class="usa-grid">
+        {% if object.port_of_export %}
+            <span class="attr-label">Port of Export:</span>
+            {{object.port_of_export}}
+        {% endif %}
+    </div>
     {% if object.notes %}
     <div class="usa-grid">
         <span class="attr-label">Notes:</span> {{object.notes}}

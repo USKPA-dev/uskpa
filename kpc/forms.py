@@ -45,7 +45,7 @@ class LicenseeCertificateForm(forms.ModelForm):
         model = Certificate
         fields = ('aes', 'country_of_origin', 'shipped_value', 'exporter', 'exporter_address',
                   'number_of_parcels', 'consignee', 'consignee_address', 'carat_weight', 'harmonized_code',
-                  'date_of_issue', 'date_of_expiry', 'attested')
+                  'date_of_issue', 'date_of_expiry', 'attested', 'port_of_export')
 
     def clean(self):
         date_of_issue = self.cleaned_data.get('date_of_issue')

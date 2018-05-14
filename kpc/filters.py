@@ -43,7 +43,8 @@ class CertificateFilter(FilterSet):
         model = Certificate
 
         default_fields = ['status', 'aes', 'date_of_issue']
-        extra_fields = ['licensee__name', 'country_of_origin', 'harmonized_code',
+        extra_fields = ['licensee__name', 'country_of_origin',
+                        'harmonized_code', 'port_of_export',
                         'shipped_value',
                         'number_of_parcels', 'carat_weight',
                         'date_of_expiry', 'date_of_shipment', 'date_of_delivery',
