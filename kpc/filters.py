@@ -30,6 +30,9 @@ class CertificateFilter(FilterSet):
     date_of_issue = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     date_of_expiry = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     licensee__name = ModelChoiceFilter()
+    date_of_delivery = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
+    date_of_shipment = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
+    date_voided = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
 
     def __init__(self, *args, **kwargs):
         """Limit licensees choices to those which are accessible"""
@@ -39,11 +42,14 @@ class CertificateFilter(FilterSet):
     class Meta:
         model = Certificate
 
-        default_fields = ['status', 'last_modified', 'date_of_sale']
-        extra_fields = ['licensee__name', 'country_of_origin', 'aes', 'harmonized_code',
-                        'date_of_issue', 'date_of_expiry', 'shipped_value',
-                        'number_of_parcels', 'carat_weight', 'exporter', 'exporter_address',
-                        'consignee', 'consignee_address']
+        default_fields = ['status', 'aes', 'date_of_issue']
+        extra_fields = ['licensee__name', 'country_of_origin', 'harmonized_code',
+                        'shipped_value',
+                        'number_of_parcels', 'carat_weight',
+                        'date_of_expiry', 'date_of_shipment', 'date_of_delivery',
+                        'exporter', 'exporter_address',
+                        'consignee', 'consignee_address',
+                        'last_modified', 'date_of_sale', 'date_voided']
 
         fields = default_fields + extra_fields
 
