@@ -76,6 +76,9 @@ class CertificatePreview(object):
             drawer(x, y, output)
 
     def format_country_of_origin(self, value):
+        if isinstance(value, list):
+            """Multiple countries"""
+            return '***'
         return value.name
 
     def _paragraph_address(self, field):

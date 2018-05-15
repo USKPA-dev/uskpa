@@ -282,3 +282,8 @@ class Certificate(models.Model):
     @staticmethod
     def get_void_reasons():
         return VoidReason.objects.all()
+
+    @property
+    def get_country_of_origin_display(self):
+        countries = [country.name for country in self.country_of_origin]
+        return ', '.join(countries)
