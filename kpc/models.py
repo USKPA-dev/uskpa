@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models
@@ -162,7 +164,7 @@ class Certificate(models.Model):
     licensee = models.ForeignKey(
         'Licensee', blank=True, null=True, on_delete=models.PROTECT)
     status = models.IntegerField(choices=STATUS_CHOICES, default=ASSIGNED)
-    last_modified = models.DateTimeField(auto_now=True)
+    last_modified = models.DateTimeField(blank=True, editable=False)
     date_of_sale = models.DateField(
         blank=True, null=True, help_text='Date of sale to licensee')
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=5,
@@ -188,6 +190,15 @@ class Certificate(models.Model):
 
     def __str__(self):
         return self.display_name
+
+    def save(self, *args, **kwargs):
+        """
+        Update last_modified if object already exists
+        Or we're creating a new object and not setting it ourselves
+        """
+        if self.id or not self.last_modified:
+            self.last_modified = datetime.datetime.now()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         from django.urls import reverse

@@ -141,8 +141,9 @@ elif IS_DEPLOYED:
     # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
     SECURE_HSTS_SECONDS = 60
     SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', True)
-    SECURE_HSTS_PRELOAD = os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', True)
+    SECURE_HSTS_PRELOAD = os.enviroTZn.get('DJANGO_SECURE_HSTS_PRELOAD', True)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    USE_TZ = True
 
 LOGIN_REDIRECT_URL = 'certificates'
 LOGOUT_REDIRECT_URL = '/'
@@ -151,21 +152,14 @@ LOGOUT_REDIRECT_URL = '/'
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'America/New_York'
-
 USE_I18N = True
-
 USE_L10N = True
-
-USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 
 # MAIL
 # default to mailhog for development, let env configure SendGrid otherwise

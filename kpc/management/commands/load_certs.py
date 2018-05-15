@@ -4,6 +4,8 @@ import re
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
+import pytz
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django_countries import countries
@@ -73,6 +75,7 @@ class Command(BaseCommand):
             cert = self.make_certificate(row)
             if cert:
                 cert_list.append(cert)
+
         Certificate.objects.bulk_create(cert_list)
 
         self.stdout.write(self.style.SUCCESS(
@@ -117,7 +120,6 @@ class Command(BaseCommand):
                     f"{cert}: Unknown Port of Export: ({poe}) setting to None"))
 
         cert.void = prepare_boolean(row['VoidCert'])
-        cert.date_voided = prepare_date(row['VoidDate'])
         cert.notes = ignore_null_str(row['VoidComment'])
 
         status_id = ignore_null_str(row['DeliveryStatusID'])
@@ -160,6 +162,18 @@ class Command(BaseCommand):
         cert.date_of_expiry = prepare_date(row['DateOfExpiry'])
         cert.date_of_delivery = prepare_date(row['DeliveryDate'])
         cert.date_of_shipment = prepare_date(row['ShipDate'])
+        cert.date_voided = prepare_date(row['VoidDate'])
+
+        # get most recent date to set last_modified
+        dates = [cert.date_of_sale, cert.date_of_issue,
+                 cert.date_of_expiry, cert.date_of_delivery,
+                 cert.date_of_shipment, cert.date_voided]
+        most_recent = max([date for date in dates if date is not None])
+        # Set time to midnight EST
+        most_recent = datetime.combine(most_recent, datetime.min.time())
+        most_recent = pytz.timezone(settings.TIME_ZONE).localize(most_recent)
+        cert.last_modified = most_recent
+
         cert.number_of_parcels = ignore_null(row['NumberOfParcels'])
         cert.carat_weight = ignore_null(row['CaratWeight'])
         return cert
