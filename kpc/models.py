@@ -104,19 +104,19 @@ class Licensee(models.Model):
 
 
 class Certificate(models.Model):
-    ASSIGNED = 0
+    AVAILABLE = 0
     PREPARED = 1
-    INTRANSIT = 2
+    SHIPPED = 2
     DELIVERED = 3
     VOID = 4
 
-    DEFAULT_SEARCH = [ASSIGNED, PREPARED, INTRANSIT]
-    MODIFIABLE_STATUSES = [PREPARED, INTRANSIT]
+    DEFAULT_SEARCH = [AVAILABLE, PREPARED, SHIPPED]
+    MODIFIABLE_STATUSES = [PREPARED, SHIPPED]
 
     STATUS_CHOICES = (
-        (ASSIGNED, 'Assigned'),
+        (AVAILABLE, 'Available'),
         (PREPARED, 'Prepared'),
-        (INTRANSIT, 'In-transit'),
+        (SHIPPED, 'Shipped'),
         (DELIVERED, 'Delivered'),
         (VOID, 'Void')
     )
@@ -172,7 +172,7 @@ class Certificate(models.Model):
         settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
     licensee = models.ForeignKey(
         'Licensee', blank=True, null=True, on_delete=models.PROTECT)
-    status = models.IntegerField(choices=STATUS_CHOICES, default=ASSIGNED)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=AVAILABLE)
     last_modified = models.DateTimeField(blank=True, editable=False)
     date_of_sale = models.DateField(
         blank=True, null=True, help_text='Date of sale to licensee')
@@ -187,7 +187,7 @@ class Certificate(models.Model):
                                                                 including the warranty that the diamonds
                                                                 being shipped were not traded to fund conflict.""")
     date_of_shipment = models.DateField(
-        blank=True, null=True, help_text='Date certificate was marked IN TRANSIT')
+        blank=True, null=True, help_text='Date certificate was marked SHIPPED')
     date_of_delivery = models.DateField(
         blank=True, null=True, help_text='Date certificate was marked DELIVERED')
     date_voided = models.DateField(
@@ -238,7 +238,7 @@ class Certificate(models.Model):
 
     @property
     def licensee_editable(self):
-        return self.status == self.ASSIGNED
+        return self.status == self.AVAILABLE
 
     @property
     def status_can_be_updated(self):

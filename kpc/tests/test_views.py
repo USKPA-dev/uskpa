@@ -174,30 +174,30 @@ class CertificateViewTests(CertTestCase):
         status form is used when certificate is not editable
         by licensees
         """
-        cert = mommy.make(Certificate, status=Certificate.INTRANSIT)
+        cert = mommy.make(Certificate, status=Certificate.SHIPPED)
         form = CertificateView(object=cert).get_form_class()
         self.assertIs(form, StatusUpdateForm)
 
     def test_cert_form_when_editable(self):
         """Licensee form is used when certificate is  editable"""
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         form = CertificateView(object=cert).get_form_class()
         self.assertIs(form, LicenseeCertificateForm)
 
-    def test_editable_form_rendered_if_assigned(self):
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+    def test_editable_form_rendered_if_available(self):
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         """User gets an editable form if certificate is editable"""
         response = self.c.get(cert.get_absolute_url())
         self.assertTemplateUsed(response, 'certificate/details-edit.html')
 
-    def test_non_editable_form_rendered_if_assigned(self):
+    def test_non_editable_form_rendered_if_available(self):
         """User gets a non-editable form if certificate is editable"""
         cert = mommy.make(Certificate, status=Certificate.VOID)
         response = self.c.get(cert.get_absolute_url())
         self.assertTemplateUsed(response, 'certificate/details.html')
 
-    def test_form_invalid_if_cert_is_not_assigned(self):
-        """Users can't use this form if certificate is not ASSIGNED"""
+    def test_form_invalid_if_cert_is_not_available(self):
+        """Users can't use this form if certificate is not AVAILABLE"""
         cert = mommy.make(Certificate, status=Certificate.VOID)
         response = self.c.post(cert.get_absolute_url(),
                                self.form_kwargs, follow=True)
@@ -205,18 +205,18 @@ class CertificateViewTests(CertTestCase):
 
     def test_form_invalid_if_not_all_fields_provided(self):
         """Form invalid without all fields"""
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         self.form_kwargs.pop('consignee')
         response = self.c.post(cert.get_absolute_url(),
                                self.form_kwargs, follow=True)
         cert.refresh_from_db()
-        self.assertEqual(cert.status, Certificate.ASSIGNED)
+        self.assertEqual(cert.status, Certificate.AVAILABLE)
         self.assertTemplateUsed(response, 'certificate/details-edit.html')
         self.assertContains(response, 'required')
 
     def test_next_status_input_rendered_when_moddable(self):
         """Button to advance status is rendered if status can be changed"""
-        cert = mommy.make(Certificate, status=Certificate.INTRANSIT)
+        cert = mommy.make(Certificate, status=Certificate.SHIPPED)
         response = self.c.get(cert.get_absolute_url())
         self.assertContains(
             response, f'Set status to: {cert.next_status_label}')
@@ -227,18 +227,18 @@ class CertificateViewTests(CertTestCase):
         response = self.c.get(cert.get_absolute_url())
         self.assertNotContains(response, 'Set status')
 
-    def test_form_valid_if_cert_is_assigned(self):
+    def test_form_valid_if_cert_is_available(self):
         """Cert unchanged and confirmation template displayed w/ valid form"""
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         response = self.c.post(cert.get_absolute_url(),
                                self.form_kwargs, follow=True)
         cert.refresh_from_db()
-        self.assertEqual(cert.status, Certificate.ASSIGNED)
+        self.assertEqual(cert.status, Certificate.AVAILABLE)
         self.assertTemplateUsed(response, 'certificate/preview.html')
 
     def test_fields_rendered_for_review(self):
         """Fields rendered for review template"""
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         response = self.c.post(cert.get_absolute_url(),
                                self.form_kwargs, follow=True)
         for field in self.form_kwargs.keys():
@@ -246,14 +246,14 @@ class CertificateViewTests(CertTestCase):
 
     def test_pdf_preview_data_in_context(self):
         """Data for PDF preview is included in context"""
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         response = self.c.post(cert.get_absolute_url(),
                                self.form_kwargs, follow=True)
         self.assertTrue('b64_pdf' in response.context)
 
     def test_edit_form_for_changes_w_get_params(self):
         """When get params provided, render prepopulated form"""
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         response = self.c.get(cert.get_absolute_url(), self.form_kwargs)
         # Not rendering confirmation checkbox value
         self.form_kwargs.pop('attested')
@@ -269,7 +269,7 @@ class CertificateViewTests(CertTestCase):
         self.user.is_superuser = False
         self.user.save()
         self.user.groups.add(Group.objects.get(name='Auditor'))
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         response = self.c.post(cert.get_absolute_url(),
                                self.form_kwargs, follow=True)
         self.assertTemplateUsed(response, '403.html')
@@ -280,7 +280,7 @@ class CertificateViewTests(CertTestCase):
         self.user.is_superuser = False
         self.user.save()
         self.user.groups.add(Group.objects.get(name='Auditor'))
-        cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         """User gets an editable form if certificate is editable"""
         response = self.c.get(cert.get_absolute_url())
         self.assertTemplateUsed(response, 'certificate/details-edit.html')
@@ -387,7 +387,7 @@ class CertificateConfirmViewTest(CertTestCase):
 
     def setUp(self):
         super().setUp()
-        self.cert = mommy.make(Certificate, status=Certificate.ASSIGNED)
+        self.cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         self.url = reverse('confirm', args=[self.cert.number])
 
     def test_auditor_denied(self):
@@ -409,7 +409,7 @@ class CertificateConfirmViewTest(CertTestCase):
         self.form_kwargs.pop('attested')
         self.c.post(self.url, self.form_kwargs)
         self.cert.refresh_from_db()
-        self.assertEqual(self.cert.status, Certificate.ASSIGNED)
+        self.assertEqual(self.cert.status, Certificate.AVAILABLE)
 
 
 class CertificateJsonTests(SimpleTestCase):

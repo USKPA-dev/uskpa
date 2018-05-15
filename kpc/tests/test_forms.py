@@ -44,7 +44,7 @@ class StatusUpdateFormTests(TestCase):
         self.cert = mommy.prepare(Certificate)
         self.form = StatusUpdateForm
         self.form_kwargs = {
-            'next_status': Certificate.INTRANSIT, 'date': '2018-01-01'}
+            'next_status': Certificate.SHIPPED, 'date': '2018-01-01'}
 
     def test_invalid_if_licensee_form_field_submitted(self):
         """Form fields from licensee cert form submitted, invalid"""
@@ -65,7 +65,7 @@ class StatusUpdateFormTests(TestCase):
 
     def test_invalid_if_delivered_is_before_shipped(self):
         """Delivered date must be on or after shipped date"""
-        self.cert.status = Certificate.INTRANSIT
+        self.cert.status = Certificate.SHIPPED
         self.cert.date_of_shipment = datetime.date.today()
         form = self.form(self.form_kwargs, instance=self.cert)
         self.assertFalse(form.is_valid())
@@ -81,7 +81,7 @@ class StatusUpdateFormTests(TestCase):
         with self.assertRaisesRegex(forms.ValidationError, form.UNEXPECTED_STATUS):
             form.clean()
 
-    def test_intransit_and_date_set_if_valid(self):
+    def test_shipped_and_date_set_if_valid(self):
         cert = mommy.make(Certificate, status=Certificate.PREPARED,
                           date_of_issue=datetime.date.today())
         self.form_kwargs['date'] = datetime.date.today()
@@ -94,7 +94,7 @@ class StatusUpdateFormTests(TestCase):
         self.assertEqual(cert.date_of_shipment, datetime.date.today())
 
     def test_delivered_and_date_set_if_valid(self):
-        cert = mommy.make(Certificate, status=Certificate.INTRANSIT,
+        cert = mommy.make(Certificate, status=Certificate.SHIPPED,
                           date_of_shipment=datetime.date.today())
         form_kwargs = {'date': datetime.date.today(
         ), 'next_status': Certificate.DELIVERED}

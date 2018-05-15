@@ -10,7 +10,7 @@ from kpc.models import Certificate, Licensee
 class CertificateAdminFormTests(TestCase):
 
     def setUp(self):
-        self.data = {'number': 1, 'status': Certificate.ASSIGNED,
+        self.data = {'number': 1, 'status': Certificate.AVAILABLE,
                      'date_of_issue': '2018-01-01', 'date_of_sale': '2018-01-01',
                      'date_of_shipment': '2018-01-01', 'date_of_delivery': '2018-01-01'}
 
