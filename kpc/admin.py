@@ -48,6 +48,7 @@ class LicenseeAdmin(SimpleHistoryAdmin):
 
 class CertificateAdminForm(forms.ModelForm):
     """Enforce date consistency"""
+
     class Meta:
         model = Certificate
         fields = ("__all__")
@@ -61,11 +62,14 @@ class CertificateAdminForm(forms.ModelForm):
         delivered = cleaned_data.get('date_of_delivery')
 
         if issued and not sold:
-            raise forms.ValidationError("Date Issued cannot be set without Date Sold")
+            raise forms.ValidationError(
+                "Date Issued cannot be set without Date Sold")
         if shipped and not issued:
-            raise forms.ValidationError("Date Shipped cannot be set without Date Issued")
+            raise forms.ValidationError(
+                "Date Shipped cannot be set without Date Issued")
         if delivered and not shipped:
-            raise forms.ValidationError("Date Delivered cannot be set without Date Shipped")
+            raise forms.ValidationError(
+                "Date Delivered cannot be set without Date Shipped")
 
         if sold and issued:
             if issued < sold:
@@ -76,8 +80,8 @@ class CertificateAdminForm(forms.ModelForm):
                     raise forms.ValidationError(
                         'Date shipped can not pre-date Date Issued')
                 if delivered and delivered < shipped:
-                        raise forms.ValidationError(
-                            'Date delivered can not pre-date Date Shipped')
+                    raise forms.ValidationError(
+                        'Date delivered can not pre-date Date Shipped')
 
 
 @admin.register(Certificate)
@@ -89,14 +93,14 @@ class CertificateAdmin(SimpleHistoryAdmin):
     search_fields = ('number',)
 
 
-@admin.register(CertificateConfig)
-class ConfigAdmin(SimpleHistoryAdmin, SingletonModelAdmin):
-    pass
-
-
 @admin.register(PortOfExport)
 class PortOfExportAdmin(SimpleHistoryAdmin):
     list_display = ('name', 'sort_order')
+
+
+@admin.register(CertificateConfig)
+class ConfigAdmin(SimpleHistoryAdmin, SingletonModelAdmin):
+    pass
 
 
 class KpcAdmin(SimpleHistoryAdmin):
