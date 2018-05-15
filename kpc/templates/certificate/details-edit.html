@@ -1,4 +1,10 @@
 {% extends 'certificate/base.html' %}
+{% load staticfiles %}
+{% block header %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="{% static 'js/select2-position.js' %}"></script>
+{% endblock %}
 
 {% block certificate-body-fields %}
 <form action="{{object.get_absolute_url}}" method="POST">
@@ -35,13 +41,15 @@
         </fieldset>
     </div>
     {% endwith %}
-
 </form>
 
 <script>
     var EXPIRY_DAYS = {{form.expiry_days}};
 
     $(document).ready(function () {
+        $('#id_country_of_origin').select2({
+            placeholder: 'Select one or more countries'
+        });
 
         // Calculate and set Date of Expiry
         $('#id_date_of_issue').change(function(){

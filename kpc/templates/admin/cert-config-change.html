@@ -1,0 +1,35 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% load admin_urls %}
+{% load staticfiles %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a> &rsaquo;
+    <a href="../">{{ opts.app_label|capfirst|escape }}</a> &rsaquo;
+    {{ opts.verbose_name|capfirst }}
+</div>
+{% endblock %}
+
+{% block extrahead %}
+  <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+  {{ block.super }}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block object-tools-items %}
+<li><a href="{% url opts|admin_urlname:'history' %}" class="historylink">{% trans "History" %}</a></li>
+{% if has_absolute_url %}<li><a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+{% endblock %}
+
+{% block admin_change_form_document_ready %}
+  {{block.super}}
+  <script>
+    $('#id_kp_countries').select2({
+      placeholder: 'Select one or more country',
+      closeOnSelect: false
+    });
+  </script>
+{% endblock %}

@@ -7,7 +7,7 @@ from solo.admin import SingletonModelAdmin
 from accounts.models import Profile
 
 from .models import (Certificate, CertificateConfig, HSCode, Licensee,
-                     VoidReason, PortOfExport)
+                     PortOfExport, VoidReason)
 
 
 class LicenseeAdminForm(forms.ModelForm):
@@ -87,6 +87,7 @@ class CertificateAdminForm(forms.ModelForm):
 @admin.register(Certificate)
 class CertificateAdmin(SimpleHistoryAdmin):
     form = CertificateAdminForm
+    change_form_template = "admin/cert-change.html"
     list_display = ('display_name', 'status',
                     'last_modified', 'licensee', 'assignor',)
     list_filter = ('status', 'licensee',)
@@ -100,7 +101,7 @@ class PortOfExportAdmin(SimpleHistoryAdmin):
 
 @admin.register(CertificateConfig)
 class ConfigAdmin(SimpleHistoryAdmin, SingletonModelAdmin):
-    pass
+    change_form_template = "admin/cert-config-change.html"
 
 
 class KpcAdmin(SimpleHistoryAdmin):
