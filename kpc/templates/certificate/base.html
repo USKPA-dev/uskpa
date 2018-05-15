@@ -36,8 +36,6 @@
 
 <div class='cert-header'>
 
-
-
     <div class="usa-grid cert-row-one">
         <div class="usa-width-one-half">
             <h1>{{object}}
@@ -96,6 +94,12 @@
             <span class="attr-label">Date Delivered:</span> {{object.date_of_delivery}}
             {% endif %}
         </div>
+    </div>
+    <div class="usa-grid">
+        {% if object.port_of_export %}
+            <span class="attr-label">Port of Export:</span>
+            {{object.port_of_export}}
+        {% endif %}
     </div>
     {% if object.notes %}
     <div class="usa-grid">

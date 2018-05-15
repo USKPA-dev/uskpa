@@ -129,7 +129,7 @@ class Certificate(models.Model):
     # Fields on physical certificate
     PHYSICAL_FIELDS = ('number', 'country_of_origin', 'aes', 'date_of_issue', 'date_of_expiry',
                        'shipped_value', 'exporter', 'exporter_address', 'number_of_parcels',
-                       'consignee', 'consignee_address', 'carat_weight', 'harmonized_code')
+                       'consignee', 'consignee_address', 'carat_weight', 'harmonized_code__value')
 
     number = models.PositiveIntegerField(
         help_text='USKPA Certificate ID number', unique=True)

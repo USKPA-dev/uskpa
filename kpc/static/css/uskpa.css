@@ -94,7 +94,7 @@ h1 {
     padding-top: 6rem;
 }
 
-#certificate-body-fields *>label {
+#certificate-fields *>label {
     font-weight: bold;
     margin-top: 1rem;
 }

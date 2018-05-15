@@ -5,7 +5,10 @@
     {% csrf_token %}
 
     {% include 'certificate/fields_form.html' %}
-
+    <div class="usa-grid">
+        {% include 'certificate/fields-not-on-certificate.html' %}
+        <hr>
+    </div>
     {% with form.attested as field %}
     <div id="attestation" class="usa-grid">
         <fieldset class="usa-fieldset-inputs usa-sans">

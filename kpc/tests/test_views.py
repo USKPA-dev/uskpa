@@ -29,6 +29,7 @@ class CertTestCase(TestCase):
     def get_form_kwargs(self):
         base_kwargs = CERT_FORM_KWARGS.copy()
         base_kwargs['harmonized_code'] = mommy.make('HScode').id
+        base_kwargs['port_of_export'] = mommy.make('PortOfExport').id
         base_kwargs['date_of_expiry'] = _get_expiry_date(
             base_kwargs['date_of_issue'])
         return base_kwargs
