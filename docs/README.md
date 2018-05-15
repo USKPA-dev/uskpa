@@ -9,5 +9,6 @@ Welcome to the USKPA website documentation. This documentation is written in
 - [Deployment Process](deploy.md)
 - [Email configuration for new instances](email.md)
 - [Change Tracking & Data Lineage](history.md)
+- [Legacy Data Migration](data-migration.md)
 
 [gh-md]: https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown

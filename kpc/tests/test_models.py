@@ -58,6 +58,20 @@ class CertificateTests(TestCase):
     def setUp(self):
         self.cert = mommy.make(Certificate, number=1)
 
+    def test_save_sets_last_modified(self):
+        """Last modified set on object creation"""
+        cert = mommy.prepare(Certificate, last_modified=None)
+        cert.save()
+        self.assertIsNotNone(cert.last_modified)
+
+    def test_last_modified_updated_for_existing_objects(self):
+        """Last modified set on existing object update"""
+        cert = mommy.make(Certificate, last_modified=None)
+        orig_modified = cert.last_modified
+        cert.save()
+        cert.refresh_from_db()
+        self.assertNotEqual(orig_modified, cert.last_modified)
+
     def test_display_name(self):
         """Certificates displays as 'US{number}"""
         self.assertEqual(str(self.cert), f'US{self.cert.number}')

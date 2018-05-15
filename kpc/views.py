@@ -1,3 +1,4 @@
+import datetime
 import urllib
 
 from django.contrib import messages
@@ -95,7 +96,8 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
     def form_valid(self, form):
         """Generate requested Certificates"""
         cert_kwargs = {'assignor': self.request.user, 'licensee': form.cleaned_data['licensee'],
-                       'date_of_sale': form.cleaned_data['date_of_sale']}
+                       'date_of_sale': form.cleaned_data['date_of_sale'],
+                       'last_modified': datetime.datetime.now()}
         certs = form.get_cert_list()
         if certs:
             Certificate.objects.bulk_create(Certificate(

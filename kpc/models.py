@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
@@ -32,7 +34,7 @@ class VoidReason(models.Model):
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ['sort_order']
+        ordering = ['sort_order', 'value']
 
     def __str__(self):
         return self.value
@@ -46,10 +48,25 @@ class HSCode(models.Model):
 
     class Meta:
         verbose_name = 'Harmonized System Code'
-        ordering = ['sort_order']
+        ordering = ['sort_order', 'value']
 
     def __str__(self):
         return self.value
+
+
+class PortOfExport(models.Model):
+    name = models.CharField(max_length=50)
+    sort_order = models.IntegerField(default=0)
+
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name = 'Port of Export'
+        verbose_name_plural = 'Ports of Export'
+        ordering = ['sort_order', 'name']
+
+    def __str__(self):
+        return self.name
 
 
 class Licensee(models.Model):
@@ -116,7 +133,7 @@ class Certificate(models.Model):
 
     number = models.PositiveIntegerField(
         help_text='USKPA Certificate ID number', unique=True)
-    aes = models.CharField(max_length=15,
+    aes = models.CharField(max_length=30,
                            blank=True,
                            help_text='AES Confirmation Number (ITN)',
                            verbose_name='AES',
@@ -150,12 +167,13 @@ class Certificate(models.Model):
     harmonized_code = models.ForeignKey(HSCode, blank=True, null=True, on_delete=models.PROTECT)
 
     # Non certificate fields
+    port_of_export = models.ForeignKey(PortOfExport, blank=True, null=True, on_delete=models.PROTECT)
     assignor = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
     licensee = models.ForeignKey(
         'Licensee', blank=True, null=True, on_delete=models.PROTECT)
     status = models.IntegerField(choices=STATUS_CHOICES, default=ASSIGNED)
-    last_modified = models.DateTimeField(auto_now=True)
+    last_modified = models.DateTimeField(blank=True, editable=False)
     date_of_sale = models.DateField(
         blank=True, null=True, help_text='Date of sale to licensee')
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=5,
@@ -181,6 +199,15 @@ class Certificate(models.Model):
 
     def __str__(self):
         return self.display_name
+
+    def save(self, *args, **kwargs):
+        """
+        Update last_modified if object already exists
+        Or we're creating a new object and not setting it ourselves
+        """
+        if self.id or not self.last_modified:
+            self.last_modified = datetime.datetime.now()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         from django.urls import reverse
