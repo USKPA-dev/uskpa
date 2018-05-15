@@ -20,7 +20,7 @@ HSCODE_MAP = {'3': 2, '4': 1, '6': 3}
 
 # Map status codes to Certificate attributes
 STATUS_MAP = {'2': Certificate.PREPARED,
-              '3': Certificate.DELIVERED, '4': Certificate.INTRANSIT}
+              '3': Certificate.DELIVERED, '4': Certificate.SHIPPED}
 
 # relative path from manage.py to the refCountries.csv file
 COUNTRY_CSV = './data/refCountries.csv'
@@ -126,7 +126,7 @@ class Command(BaseCommand):
         if cert.void:
             cert.status = Certificate.VOID
         elif not status_id:
-            cert.status = Certificate.ASSIGNED
+            cert.status = Certificate.AVAILABLE
         else:
             try:
                 cert.status = STATUS_MAP[status_id]

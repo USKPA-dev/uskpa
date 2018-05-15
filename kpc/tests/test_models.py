@@ -106,9 +106,9 @@ class CertificateTests(TestCase):
     def test_status_not_modifiable(self):
         """
            Certificate status is NOT user moddable status it
-           not PREPARED or INTRANSIT
+           not PREPARED or SHIPPED
         """
-        self.cert.status = Certificate.ASSIGNED
+        self.cert.status = Certificate.AVAILABLE
         self.assertFalse(self.cert.status_can_be_updated)
         self.cert.status = Certificate.DELIVERED
         self.assertFalse(self.cert.status_can_be_updated)
@@ -116,10 +116,10 @@ class CertificateTests(TestCase):
         self.assertFalse(self.cert.status_can_be_updated)
 
     def test_status_modifiable(self):
-        """certificate status is user moddable if its PREPARED or INTRANSIT"""
+        """certificate status is user moddable if its PREPARED or SHIPPED"""
         self.cert.status = Certificate.PREPARED
         self.assertTrue(self.cert.status_can_be_updated)
-        self.cert.status = Certificate.INTRANSIT
+        self.cert.status = Certificate.SHIPPED
         self.assertTrue(self.cert.status_can_be_updated)
 
     def test_next_status_label_returns_none(self):
@@ -131,9 +131,9 @@ class CertificateTests(TestCase):
     def test_next_status_label(self):
         """Return display value next status value"""
         self.cert.status = Certificate.PREPARED
-        self.assertEqual(self.cert.next_status_label, 'In-transit')
+        self.assertEqual(self.cert.next_status_label, 'Shipped')
 
     def test_next_status_value(self):
         """Return integer of next status"""
         self.cert.status = Certificate.PREPARED
-        self.assertEqual(self.cert.next_status_value, Certificate.INTRANSIT)
+        self.assertEqual(self.cert.next_status_value, Certificate.SHIPPED)

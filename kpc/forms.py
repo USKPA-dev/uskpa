@@ -174,7 +174,7 @@ class StatusUpdateForm(forms.ModelForm):
     next_status = forms.IntegerField(required=True)
 
     UNEXPECTED_STATUS = 'Unable to update status, please reload the page and try again.'
-    INTRANSIT_DATE = "The In-Transit date must be on or after the certificate's date of issue (%s)."
+    SHIPPED_DATE = "The Shipped date must be on or after the certificate's date of issue (%s)."
     DELIVERY_DATE = "The Delivered date must be on or after the certificate's date of shipment (%s)."
     NOT_AVAILABLE = "This certificate has already been issued."
     SUCCESS_MSG = 'Certificate status has been succesfully updated.'
@@ -202,10 +202,10 @@ class StatusUpdateForm(forms.ModelForm):
         if new_status != self.instance.next_status_value:
             raise forms.ValidationError(self.UNEXPECTED_STATUS)
 
-        if new_status == Certificate.INTRANSIT:
+        if new_status == Certificate.SHIPPED:
             if date < self.instance.date_of_issue:
                 raise forms.ValidationError(
-                    self.INTRANSIT_DATE % self.instance.date_of_issue)
+                    self.SHIPPED_DATE % self.instance.date_of_issue)
 
         if new_status == Certificate.DELIVERED:
             if date < self.instance.date_of_shipment:
@@ -218,7 +218,7 @@ class StatusUpdateForm(forms.ModelForm):
         new_status = self.cleaned_data['next_status']
         self.instance.status = new_status
 
-        if new_status == Certificate.INTRANSIT:
+        if new_status == Certificate.SHIPPED:
             self.instance.date_of_shipment = date
         if new_status == Certificate.DELIVERED:
             self.instance.date_of_delivery = date
