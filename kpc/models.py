@@ -112,6 +112,7 @@ class Certificate(models.Model):
     VOID = 4
 
     DEFAULT_SEARCH = [AVAILABLE, PREPARED, SHIPPED]
+    DEFAULT_AUDITOR_SEARCH = [PREPARED, SHIPPED, DELIVERED]
     MODIFIABLE_STATUSES = [PREPARED, SHIPPED]
 
     STATUS_CHOICES = (
@@ -232,10 +233,13 @@ class Certificate(models.Model):
             return 1
 
     @classmethod
-    def default_search_filters(cls):
+    def default_search_filters(cls, user):
         """Return default search as URL parameters"""
         q = QueryDict(mutable=True)
-        q.setlist('status', cls.DEFAULT_SEARCH)
+        if user.profile.is_auditor:
+            q.setlist('status', cls.DEFAULT_AUDITOR_SEARCH)
+        else:
+            q.setlist('status', cls.DEFAULT_SEARCH)
         return q.urlencode()
 
     @property
