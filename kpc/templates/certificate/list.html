@@ -23,11 +23,11 @@
         <thead>
             <th>Number</th>
             <th>Status</th>
-            <th>Consignee</th>
             <th>Last Modified</th>
-            <th>Value</th>
             <th>Licensee</th>
             <th>AES</th>
+            <th>Consignee</th>
+            <th>Value</th>
             <th>Date Issued</th>
             <th>Date Sold</th>
             <th>Expiry</th>
@@ -38,6 +38,7 @@
             <th>Date Shipped</th>
             <th>Date Delivered</th>
             <th>Date Voided</th>
+            <th>Port of Export</th>
         </thead>
         <tbody>
         </tbody>
@@ -47,7 +48,7 @@
 
 <script>
     const statuses = {{statuses|safe}};
-    const licenseeVisible = {% if user.profile.is_auditor %}true{% else %}false{% endif %};
+    const ifAuditor = {% if user.profile.is_auditor %}true{% else %}false{% endif %};
 
     function dateToMoment(data) {
         if (data) {
@@ -77,22 +78,22 @@
                       return statuses[data];
                   }
                 },
-                { data: "consignee",
-                  name: "consignee"
-                },
                 { data: "last_modified",
                   name: "last_modified",
                   render: function(data, type, row) {
                       return dateToMoment(data);
                   }},
+                { data: "licensee__name", name: "licensee__name", visible: ifAuditor },
+                { data: "aes", name: "aes", visible: ifAuditor },
+                { data: "consignee",
+                  name: "consignee"
+                },
                 { data: "shipped_value",
                   name: "shipped_value"
                 },
-                { data: "licensee__name", name: "licensee__name", visible: licenseeVisible },
-                { data: "aes", name: "aes", visible: false },
                 { data: "date_of_issue",
                   name: "date_of_issue",
-                  visible: false,
+                  visible: ifAuditor,
                   render: function (data, type, row) {
                     return dateToMoment(data);
                   }
@@ -114,7 +115,7 @@
                 { data: "number_of_parcels", name: "number_of_parcels", visible: false },
                 { data: "carat_weight", name: "carat_weight", visible: false },
                 { data: "harmonized_code__value", name: "harmonized_code", visible: false },
-                { data: "exporter", name: "exporter", visible: false },
+                { data: "exporter", name: "exporter", visible: ifAuditor },
                 {
                     data: "date_of_shipment",
                     name: "date_of_shipment",
@@ -138,7 +139,8 @@
                     render: function (data, type, row) {
                         return dateToMoment(data);
                     }
-                }
+                },
+                { data: "port_of_export__name", name: "port_of_export", visible: ifAuditor }
             ],
             "ajax": {
                 url: "{% url 'certificate-data' %}",
