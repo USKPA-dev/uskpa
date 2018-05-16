@@ -1,5 +1,9 @@
 {% extends 'certificate/base.html' %}
 
+{% block header %}
+  {% include 'select2.html' %}
+{% endblock %}
+
 {% block certificate-body-fields %}
 <form action="{{object.get_absolute_url}}" method="POST">
     {% csrf_token %}
@@ -35,13 +39,15 @@
         </fieldset>
     </div>
     {% endwith %}
-
 </form>
 
 <script>
     var EXPIRY_DAYS = {{form.expiry_days}};
 
     $(document).ready(function () {
+        $('#id_country_of_origin').select2({
+            placeholder: 'Select one or more countries'
+        });
 
         // Calculate and set Date of Expiry
         $('#id_date_of_issue').change(function(){
@@ -54,7 +60,6 @@
             }
         })
     });
-
 
 </script>
 

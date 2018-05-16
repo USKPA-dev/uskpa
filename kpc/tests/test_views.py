@@ -11,7 +11,7 @@ from model_mommy import mommy
 
 from kpc.forms import LicenseeCertificateForm, StatusUpdateForm
 from kpc.models import Certificate
-from kpc.tests import CERT_FORM_KWARGS, load_groups
+from kpc.tests import CERT_FORM_KWARGS, load_initial_data
 from kpc.views import (CertificateJson, CertificateRegisterView,
                        CertificateView, CertificateVoidView, licensee_contacts)
 
@@ -265,7 +265,7 @@ class CertificateViewTests(CertTestCase):
 
     def test_auditor_denied_on_post(self):
         """Auditors cannot POST"""
-        load_groups()
+        load_initial_data()
         self.user.is_superuser = False
         self.user.save()
         self.user.groups.add(Group.objects.get(name='Auditor'))
@@ -276,7 +276,7 @@ class CertificateViewTests(CertTestCase):
 
     def test_auditors_can_get(self):
         """Auditors can GET"""
-        load_groups()
+        load_initial_data()
         self.user.is_superuser = False
         self.user.save()
         self.user.groups.add(Group.objects.get(name='Auditor'))
@@ -309,7 +309,7 @@ class CertificateVoidTests(TestCase):
 
     def test_auditor_denied(self):
         """Auditors cannot access"""
-        load_groups()
+        load_initial_data()
         cert = mommy.make(Certificate, void=False)
         self.user.is_superuser = False
         self.user.save()
@@ -392,7 +392,7 @@ class CertificateConfirmViewTest(CertTestCase):
 
     def test_auditor_denied(self):
         """Auditors cannot access"""
-        load_groups()
+        load_initial_data()
         self.user.is_superuser = False
         self.user.save()
         self.user.groups.add(Group.objects.get(name='Auditor'))

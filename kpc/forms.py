@@ -2,8 +2,10 @@ import datetime
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django_countries.fields import CountryField
+from django_countries import Countries
 
-from .models import Certificate, Licensee
+from .models import Certificate, Licensee, CertificateConfig
 
 User = get_user_model()
 
@@ -19,11 +21,23 @@ class UserModelChoiceField(forms.ModelChoiceField):
         return obj.get_full_name()
 
 
+class KPCountries(Countries):
+
+    def __init__(self, *args, **kwargs):
+        self.only = self._get_countries()
+
+    def _get_countries(self):
+        """Return list of selectable countries"""
+        countries = CertificateConfig.get_solo().kp_countries
+        return [country.code for country in countries]
+
+
 class LicenseeCertificateForm(forms.ModelForm):
     date_of_issue = forms.DateField(
         widget=forms.DateInput(attrs=DATE_ATTRS))
     date_of_expiry = forms.DateField(widget=forms.DateInput(attrs={'readonly': 'readonly',
                                                                    'placeholder': 'Auto-filled from Date of Issue'}))
+
     SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
 
     def __init__(self, *args, **kwargs):
@@ -35,7 +49,8 @@ class LicenseeCertificateForm(forms.ModelForm):
         self.expiry_days = Certificate.get_expiry_days()
         self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue'
         self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
-
+        self.fields['country_of_origin'] = CountryField(
+            countries=KPCountries, multiple=True).formfield()
         for field in self.fields:
             self.fields[field].required = True
             if not self.editable:

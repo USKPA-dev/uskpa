@@ -1,6 +1,7 @@
 from django.core.management import call_command
 from model_mommy import mommy
 
+from kpc.models import CertificateConfig
 # setup model_mommy for django-localflavor
 mommy.generators.add('localflavor.us.models.USZipCodeField', lambda: "00000-0000")
 mommy.generators.add('localflavor.us.models.USStateField', lambda: "NY")
@@ -14,6 +15,9 @@ CERT_FORM_KWARGS = {"country_of_origin": "AQ", 'aes': 'X22222222222222',
                     'attested': True}
 
 
-def load_groups():
-    """load groups and permissions"""
+def load_initial_data():
+    """load initial data and configuration"""
+    config = CertificateConfig.get_solo()
+    config.kp_countries = 'AQ'
+    config.save()
     call_command('loaddata', 'initial_data', verbosity=0)

@@ -1,8 +1,8 @@
 import datetime
+from decimal import Decimal
 
 from django.conf import settings
-from django.core.validators import RegexValidator
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.http import QueryDict
 from django.urls import reverse
@@ -10,13 +10,14 @@ from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
 from solo.models import SingletonModel
-from decimal import Decimal
 
 
 class CertificateConfig(SingletonModel):
     days_to_expiry = models.PositiveIntegerField(default=60)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=20.00)
-
+    kp_countries = CountryField(multiple=True, blank=True,
+                                help_text='Countries available for selection as Country of Origin',
+                                verbose_name='KP Countries')
     history = HistoricalRecords()
 
     def __str__(self):
@@ -143,8 +144,8 @@ class Certificate(models.Model):
                                               )
                            ]
                            )
-    country_of_origin = CountryField(
-        blank=True, verbose_name='Country of Origin')
+    country_of_origin = CountryField(multiple=True,
+                                     blank=True, verbose_name='Country of Origin')
     date_of_issue = models.DateField(
         blank=True, null=True, help_text='Date of Issue')
     date_of_expiry = models.DateField(blank=True, null=True)
@@ -167,7 +168,8 @@ class Certificate(models.Model):
     harmonized_code = models.ForeignKey(HSCode, blank=True, null=True, on_delete=models.PROTECT)
 
     # Non certificate fields
-    port_of_export = models.ForeignKey(PortOfExport, blank=True, null=True, on_delete=models.PROTECT)
+    port_of_export = models.ForeignKey(
+        PortOfExport, blank=True, null=True, on_delete=models.PROTECT)
     assignor = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT)
     licensee = models.ForeignKey(
@@ -279,3 +281,8 @@ class Certificate(models.Model):
     @staticmethod
     def get_void_reasons():
         return VoidReason.objects.all()
+
+    @property
+    def get_country_of_origin_display(self):
+        countries = [country.name for country in self.country_of_origin]
+        return ', '.join(countries)

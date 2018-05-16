@@ -5,7 +5,7 @@ from django.test import TestCase
 from model_mommy import mommy
 
 from kpc.models import Certificate, Licensee
-from kpc.tests import load_groups
+from kpc.tests import load_initial_data
 
 
 class LicenseeTests(TestCase):
@@ -35,7 +35,7 @@ class LicenseeTests(TestCase):
 
     def test_auditor_can_access(self):
         """Can access details if auditor"""
-        load_groups()
+        load_initial_data()
         auditor = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         auditor.groups.add(Group.objects.get(name='Auditor'))
         self.assertTrue(self.licensee.user_can_access(auditor))
@@ -137,3 +137,12 @@ class CertificateTests(TestCase):
         """Return integer of next status"""
         self.cert.status = Certificate.PREPARED
         self.assertEqual(self.cert.next_status_value, Certificate.SHIPPED)
+
+    def test_get_country_of_origin_display(self):
+        """
+        Country of origin displayed as comma delimited list of ISO-3166 short names
+        """
+        cert = mommy.prepare(Certificate, country_of_origin='AQ')
+        self.assertEqual(cert.get_country_of_origin_display, 'Antarctica')
+        cert.country_of_origin = 'AQ,IN'
+        self.assertEqual(cert.get_country_of_origin_display, 'Antarctica, India')

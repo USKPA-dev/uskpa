@@ -1,0 +1,6 @@
+{% extends "admin/select2-change.html" %} {% block admin_change_form_document_ready %} {{block.super}}
+<script>
+  $('#id_country_of_origin').select2({
+    placeholder: 'Select one or more country',
+  });
+</script> {% endblock %}
