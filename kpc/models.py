@@ -1,8 +1,8 @@
 import datetime
+from decimal import Decimal
 
 from django.conf import settings
-from django.core.validators import RegexValidator
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.http import QueryDict
 from django.urls import reverse
@@ -10,7 +10,6 @@ from django_countries.fields import CountryField
 from localflavor.us.models import USStateField, USZipCodeField
 from simple_history.models import HistoricalRecords
 from solo.models import SingletonModel
-from decimal import Decimal
 
 
 class CertificateConfig(SingletonModel):
