@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Certificate US{{object.number}}{% endblock %}
+
+{% block header %}
+  {% include 'select2.html' %}
+{% endblock %}
 
 {% block content %}
 
@@ -60,6 +63,10 @@
           $('.preview-confirm input').removeAttr('disabled');
           $('.pdf-preview').toggle();
           $('.text-preview').toggle();
+        });
+
+        $('#id_country_of_origin').select2({
+          disabled: true
         });
 
         var pdfData = atob("{{b64_pdf|safe}}");
