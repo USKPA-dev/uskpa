@@ -5,7 +5,7 @@ from django.test import TestCase
 from model_mommy import mommy
 
 from kpc.models import Certificate, Licensee
-from kpc.tests import load_groups
+from kpc.tests import load_initial_data
 
 
 class LicenseeTests(TestCase):
@@ -35,7 +35,7 @@ class LicenseeTests(TestCase):
 
     def test_auditor_can_access(self):
         """Can access details if auditor"""
-        load_groups()
+        load_initial_data()
         auditor = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         auditor.groups.add(Group.objects.get(name='Auditor'))
         self.assertTrue(self.licensee.user_can_access(auditor))

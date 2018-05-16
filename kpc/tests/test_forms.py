@@ -7,7 +7,7 @@ from model_mommy import mommy
 
 from kpc.forms import (CertificateRegisterForm, LicenseeCertificateForm,
                        StatusUpdateForm, VoidForm)
-from kpc.models import Certificate
+from kpc.models import Certificate, CertificateConfig
 from kpc.tests import CERT_FORM_KWARGS
 
 
@@ -219,3 +219,12 @@ class LicenseeCertificateFormTests(TestCase):
         form = LicenseeCertificateForm(kwargs)
         self.assertFalse(form.is_valid())
         self.assertIn(form.date_expiry_invalid, form.errors['date_of_expiry'])
+
+    def test_countries_limited_by_config(self):
+        """Selections limited by CertificateConfig"""
+        countries = [('FR', 'France'), ('IN', 'India')]
+        config = CertificateConfig.get_solo()
+        config.kp_countries = "FR,IN"
+        config.save()
+        form = LicenseeCertificateForm()
+        self.assertEqual(countries, form.fields['country_of_origin'].choices)
