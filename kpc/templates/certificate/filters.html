@@ -13,12 +13,15 @@
         </div>
     </div>
 
-    <label for="certSearch">Certificate number starts with</label>
-    <input id="certSearch" class='table-search' name="search" type="number">
-    <small>Numeric portion only, don't include 'US'.</small>
-
+    <fieldset>
+        <label for="certSearch">Certificate number starts with</label>
+        <input id="certSearch" class='table-search' name="search" type="number">
+        <small>Numeric portion only, don't include 'US'.</small>
+    </fieldset>
     {% for field in filters.default_fields %}
-        {% include 'certificate/filter_field.html' %}
+        <fieldset>
+            {% include 'certificate/filter_field.html' %}
+        </fieldset>
     {% endfor %}
     <hr>
 

@@ -4,11 +4,11 @@
 {% block page-title %} Certificate Search {% endblock %}
 
 {% block header %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8"
     src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
     <script type="text/javascript" charset="utf8"
     src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
-
 {% endblock header %}
 
 {% block content %}
@@ -19,7 +19,7 @@
     </div>
     <div class="usa-width-two-thirds cert-listing">
 
-    <table id='certDataTable' class='table dataTable'>
+    <table id='certDataTable' class='compact'>
         <thead>
             <th>Number</th>
             <th>Status</th>
