@@ -12,8 +12,8 @@ from model_mommy import mommy
 from kpc.forms import LicenseeCertificateForm, StatusUpdateForm
 from kpc.models import Certificate
 from kpc.tests import CERT_FORM_KWARGS, load_initial_data
-from kpc.views import (CertificateJson, CertificateRegisterView,
-                       CertificateView, CertificateVoidView, licensee_contacts)
+from kpc.views import (CertificateRegisterView, CertificateView,
+                       CertificateVoidView, ExportView, licensee_contacts)
 
 
 def _get_expiry_date(date_of_issue):
@@ -416,6 +416,6 @@ class CertificateJsonTests(SimpleTestCase):
 
     def test_json_contains_all_physical_cert_fields(self):
         """Data returned must contain all physical certificate fields"""
-        returned_columns = set(CertificateJson.columns)
+        returned_columns = set(ExportView.columns)
         physical_fields = set(Certificate.PHYSICAL_FIELDS)
         self.assertTrue(physical_fields.issubset(returned_columns))

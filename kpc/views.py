@@ -27,20 +27,20 @@ User = get_user_model()
 
 class ExportView(LoginRequiredMixin, View):
 
-    export = ["number", "aes", "licensee__name", "status",
-              "last_modified", "date_of_sale", "date_of_issue", "date_of_expiry", "date_of_shipment", "date_of_delivery", "date_voided",
-              "country_of_origin", "shipped_value", "number_of_parcels", "carat_weight", "harmonized_code__value",
-              "exporter", "exporter_address",
-              "consignee", "consignee_address",
-              "port_of_export__name",
-              "notes"]
+    columns = ["number", "aes", "licensee__name", "status",
+               "last_modified", "date_of_sale", "date_of_issue", "date_of_expiry", "date_of_shipment", "date_of_delivery", "date_voided",
+               "country_of_origin", "shipped_value", "number_of_parcels", "carat_weight", "harmonized_code__value",
+               "exporter", "exporter_address",
+               "consignee", "consignee_address",
+               "port_of_export__name",
+               "notes"]
 
     def get(self, request):
         """Return CSV of filtered certificates"""
         qs = request.user.profile.certificates()
         qs = CertificateFilter(_filterable_params(
             request.GET), request=self.request, queryset=qs).qs
-        qs = qs.values(*self.export)
+        qs = qs.values(*self.columns)
 
         export_kwargs = {'field_serializer_map': {
             'number': (lambda number: 'US' + str(number)),
