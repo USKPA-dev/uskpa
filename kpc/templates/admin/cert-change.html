@@ -1,21 +1,6 @@
-
-
-{% extends "admin/change_form.html" %}
-{% load staticfiles %}
-
-{% block extrahead %}
-  <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-  {{ block.super }}
-{% endblock %}
-
-{% block admin_change_form_document_ready %}
-  {{block.super}}
-  <script>
-    $('#id_country_of_origin').select2({
-      placeholder: 'Select one or more country',
-      closeOnSelect: false
-    });
-  </script>
-{% endblock %}
+{% extends "admin/select2-change.html" %} {% block admin_change_form_document_ready %} {{block.super}}
+<script>
+  $('#id_country_of_origin').select2({
+    placeholder: 'Select one or more country',
+  });
+</script> {% endblock %}
