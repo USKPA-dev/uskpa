@@ -8,16 +8,17 @@
     src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
     <script type="text/javascript" charset="utf8"
     src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+
 {% endblock header %}
 
 {% block content %}
 <section class="usa-grid usa-section">
 <h1>Certificate Search</h1>
-
     <div class='usa-width-one-third filters'>
         {% include 'certificate/filters.html' %}
     </div>
     <div class="usa-width-two-thirds cert-listing">
+
     <table id='certDataTable' class='table dataTable'>
         <thead>
             <th>Number</th>
@@ -57,10 +58,12 @@
     }
 
     $(document).ready(function() {
+
         var oTable = $('#certDataTable').DataTable({
-            "dom": "irtlp",
-            "processing": true,
-            "serverSide": true,
+            dom: "irtlp",
+            pageLength: 100,
+            processing: true,
+            serverSide: true,
             columns: [
                 { data: "number",
                   render: function(data, type, row) {
@@ -166,6 +169,7 @@
                         if (filters.lengths != 0) {
                             window.history.pushState({}, null, '?' + filters.join('&'));
                         }
+                        console.log(filters);
 
                 }
             },
@@ -180,10 +184,17 @@
             }
         });
 
-        // Run our filtered search!
+
+
+        // Run our filtered search on submit
         $('#filterApply').click(function (event) {
             oTable.search($('#certSearch').val()).draw();
             event.preventDefault();
+        });
+
+        // Or on search form change
+        $('#dataTable-filters').change(function () {
+            oTable.search($('#certSearch').val()).draw();
         });
 
         // clear all search filters and refresh data
@@ -192,6 +203,7 @@
             $('input:checked').prop('checked', false);
             window.history.pushState({}, null, '.');
             oTable.search($('#certSearch').val()).draw();
+            event.preventDefault();
         });
 
         $('[name=certDataTable_length]').change(function(){
@@ -199,6 +211,7 @@
         });
 
         $('#export').click(function (){
+            event.preventDefault();
             var filters = oTable.ajax.params();
             var params = jQuery.param(filters);
             var export_url = 'export?' + params;

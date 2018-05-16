@@ -1,20 +1,19 @@
 
-<div>
-    <div class="usa-width-one-third">
-        <button id='filterApply' class="usa-button">Filter</button>
-    </div>
-    <div class="usa-width-one-third">
-        <button id='resetFilters' class="usa-button">Reset</button>
-    </div>
-    <div class="usa-width-one-third">
-        <button id='export' class="usa-button">Export</i>
-</button>
-    </div>
-
-</div>
 
 <form id="dataTable-filters" class="usa-form">
-    <label for="certSearch">Search by Certificate number</label>
+    <div>
+        <div class="usa-width-one-third">
+            <button id='filterApply' class="usa-button">Search</button>
+        </div>
+        <div class="usa-width-one-third">
+            <button id='resetFilters' class="usa-button">Reset</button>
+        </div>
+        <div class="usa-width-one-third">
+            <button id='export' class="usa-button">Export</button>
+        </div>
+    </div>
+
+    <label for="certSearch">Certificate number starts with</label>
     <input id="certSearch" class='table-search' name="search" type="number">
     <small>Numeric portion only, don't include 'US'.</small>
 
