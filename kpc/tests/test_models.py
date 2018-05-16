@@ -137,3 +137,12 @@ class CertificateTests(TestCase):
         """Return integer of next status"""
         self.cert.status = Certificate.PREPARED
         self.assertEqual(self.cert.next_status_value, Certificate.SHIPPED)
+
+    def test_get_country_of_origin_display(self):
+        """
+        Country of origin displayed as comma delimited list of ISO-3166 short names
+        """
+        cert = mommy.prepare(Certificate, country_of_origin='AQ')
+        self.assertEqual(cert.get_country_of_origin_display, 'Antarctica')
+        cert.country_of_origin = 'AQ,IN'
+        self.assertEqual(cert.get_country_of_origin_display, 'Antarctica, India')
