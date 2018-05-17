@@ -105,7 +105,7 @@ class CertificateTests(TestCase):
         self.assertEqual(Certificate.default_search_filters(user), expected)
 
     def test_default_auditor_search_filters_returns_query_params(self):
-        load_groups()
+        load_initial_data()
         auditor = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         auditor.groups.add(Group.objects.get(name='Auditor'))
         """Query parameters for default auditor cert search are generated"""
