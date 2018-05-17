@@ -34,10 +34,12 @@ class ProfileUserAdmin(SimpleHistoryAdmin, UserAdmin):
     )
 
     def save_model(self, request, obj, form, change):
-        if not change and (not form.cleaned_data['password1'] or not obj.has_usable_password()):
-            # Django's PasswordResetForm won't let us reset an unusable
-            # password. We set it above super() so we don't have to save twice.
-            obj.set_password(get_random_string())
+        if not change:
+            # Creating user, send a password reset email
+            if not form.cleaned_data['password1'] or not obj.has_usable_password():
+                # Django's PasswordResetForm won't let us reset an unusable
+                # password. We set it above super() so we don't have to save twice.
+                obj.set_password(get_random_string())
             reset_password = True
         else:
             reset_password = False
