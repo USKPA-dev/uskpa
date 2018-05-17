@@ -17,7 +17,7 @@ class CheckboxSelectMultiple(forms.CheckboxSelectMultiple):
 
 
 class CertificateFilter(FilterSet):
-    DATE_ATTR = {'type': 'date'}
+    DATE_ATTR = {'type': 'date', 'placeholder': 'mm/dd/yyyy'}
 
     status = MultipleChoiceFilter(
         choices=Certificate.STATUS_CHOICES,

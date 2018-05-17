@@ -120,8 +120,8 @@ class CertificateListView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['filters'] = CertificateFilter(
             self.request.GET, request=self.request, queryset=self.request.user.profile.certificates())
-        context['statuses'] = [[status[0], status[1]]
-                               for status in Certificate.STATUS_CHOICES]
+        context['statuses'] = {status[0]: status[1]
+                               for status in Certificate.STATUS_CHOICES}
         context['dt_columns'] = CertificateJson.columns
         return context
 

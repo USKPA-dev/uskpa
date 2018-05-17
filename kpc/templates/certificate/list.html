@@ -46,8 +46,8 @@
 </section>
 
 <script>
-    var statusMap = new Map({{statuses|safe}});
-    var licenseeVisible = {% if user.profile.is_auditor %}true{% else %}false{% endif %};
+    const statuses = {{statuses|safe}};
+    const licenseeVisible = {% if user.profile.is_auditor %}true{% else %}false{% endif %};
 
     function dateToMoment(data) {
         if (data) {
@@ -74,7 +74,7 @@
                 { data: "status" ,
                   name: "status",
                   render: function(data, type, row) {
-                      return statusMap.get(data);
+                      return statuses[data];
                   }
                 },
                 { data: "consignee",
@@ -169,8 +169,6 @@
                         if (filters.lengths != 0) {
                             window.history.pushState({}, null, '?' + filters.join('&'));
                         }
-                        console.log(filters);
-
                 }
             },
             "order": [[1, "asc"],
