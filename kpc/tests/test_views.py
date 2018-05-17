@@ -169,6 +169,16 @@ class CertificateRegisterViewTests(TestCase):
 
 class CertificateViewTests(CertTestCase):
 
+    def test_cannot_access_if_licensee_inactive(self):
+        """Certificate cannot be accessed by contact if licensee if not active"""
+        licensee = mommy.make('Licensee', is_active=False)
+        user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        user.profile.licensees.add(licensee)
+        self.c.force_login(user)
+        cert = mommy.make(Certificate, licensee=licensee)
+        response = self.c.get(cert.get_absolute_url())
+        self.assertEqual(response.status_code, 403)
+
     def test_status_form_when_not_editable(self):
         """
         status form is used when certificate is not editable

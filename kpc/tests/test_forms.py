@@ -147,6 +147,14 @@ class CertificateRegistrationTests(TestCase):
                       [e.message for e in form.non_field_errors().data])
         self.assertFalse(valid)
 
+    def test_validation_fails_if_licensee_inactive(self):
+        """Fail validation if licensee not active"""
+        self.licensee.is_active = False
+        self.licensee.save()
+        form = CertificateRegisterForm(self.form_kwargs)
+        valid = form.is_valid()
+        self.assertFalse(valid)
+
     def test_id_list_required_if_method_is_list(self):
         """Reject w/ message if cert_list isn't populated but List method is selected"""
         self.form_kwargs.pop('cert_list')

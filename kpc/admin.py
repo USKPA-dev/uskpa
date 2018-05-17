@@ -22,7 +22,7 @@ class LicenseeAdminForm(forms.ModelForm):
 
     class Meta:
         model = Licensee
-        fields = ('name', 'address', 'address2', 'city', 'state',
+        fields = ('name', 'is_active', 'address', 'address2', 'city', 'state',
                   'zip_code', 'tax_id', 'contacts', )
 
     def __init__(self, *args, **kwargs):
@@ -35,7 +35,7 @@ class LicenseeAdminForm(forms.ModelForm):
 @admin.register(Licensee)
 class LicenseeAdmin(SimpleHistoryAdmin):
     form = LicenseeAdminForm
-    list_display = ('name', 'address', 'city', 'state', 'zip_code', 'tax_id', )
+    list_display = ('name', 'address', 'city', 'state', 'zip_code', 'tax_id', 'is_active')
 
     def save_related(self, request, form, formsets, change):
         """

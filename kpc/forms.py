@@ -86,8 +86,9 @@ class CertificateRegisterForm(forms.Form):
 
     REGISTRATION_METHODS = ((SEQUENTIAL, 'Sequential'), (LIST, 'List'))
 
-    licensee = forms.ModelChoiceField(queryset=Licensee.objects.all())
-    contact = UserModelChoiceField(queryset=User.objects.all())
+    licensee = forms.ModelChoiceField(
+        queryset=Licensee.objects.filter(is_active=True))
+    contact = UserModelChoiceField(queryset=User.objects.filter(is_active=True))
     date_of_sale = forms.DateField(
         initial=datetime.date.today, widget=forms.DateInput(attrs=DATE_ATTRS))
     registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS,
@@ -112,8 +113,9 @@ class CertificateRegisterForm(forms.Form):
             licensee = data.get('licensee', None)
             contact = data.get('contact', None)
             if licensee:
-                self.fields['contact'].queryset = User.objects.filter(
-                    profile__licensees__in=[licensee])
+                self.fields['contact'].queryset = \
+                    User.objects.filter(is_active=True,
+                                        profile__licensees__in=[licensee])
             if contact:
                 self.fields['contact'].initial = contact
         else:
