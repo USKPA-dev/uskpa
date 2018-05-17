@@ -8,6 +8,18 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Frame, KeepInFrame, Paragraph
 
+from kpc.filters import CertificateFilter
+
+
+def apply_certificate_search(request, qs):
+    """Apply incoming search criteria to base queryset"""
+    search = request.GET.get('search[value]')
+    if search:
+        qs = qs.filter(number__istartswith=search)
+    qs = CertificateFilter(_filterable_params(
+        request.GET), request=request, queryset=qs).qs
+    return qs
+
 
 def _filterable_params(qd):
     """

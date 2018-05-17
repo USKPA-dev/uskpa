@@ -20,7 +20,8 @@ from .filters import CertificateFilter
 from .forms import (CertificateRegisterForm, LicenseeCertificateForm,
                     StatusUpdateForm, VoidForm)
 from .models import Certificate, Licensee
-from .utils import CertificatePreview, _filterable_params, _to_mdy
+from .utils import (CertificatePreview, apply_certificate_search,
+                    _to_mdy)
 
 User = get_user_model()
 
@@ -37,9 +38,7 @@ class ExportView(LoginRequiredMixin, View):
 
     def get(self, request):
         """Return CSV of filtered certificates"""
-        qs = request.user.profile.certificates()
-        qs = CertificateFilter(_filterable_params(
-            request.GET), request=self.request, queryset=qs).qs
+        qs = apply_certificate_search(request, request.user.profile.certificates())
         qs = qs.values(*self.columns)
 
         export_kwargs = {'field_serializer_map': {
@@ -143,13 +142,7 @@ class CertificateJson(LoginRequiredMixin, BaseDatatableView):
         return self.request.user.profile.certificates()
 
     def filter_queryset(self, qs):
-        # Filter by certificate number
-        search = self.request.GET.get('search[value]')
-        qs = CertificateFilter(
-            _filterable_params(self.request.GET), queryset=qs, request=self.request).qs
-        if search:
-            qs = qs.filter(number__istartswith=search)
-        return qs
+        return apply_certificate_search(self.request, qs)
 
     def prepare_results(self, qs):
         qs = qs.values(*self.columns)
