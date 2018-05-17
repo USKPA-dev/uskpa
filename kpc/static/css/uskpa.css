@@ -1,5 +1,10 @@
 /* USWDS OVERRIDES */
 
+fieldset {
+    border: none;
+    margin: 0px;
+    padding: 0.1em;
+}
 .usa-footer-contact_info a {
     color: white;
 }
