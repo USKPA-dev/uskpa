@@ -1,7 +1,7 @@
 from django import forms
 from django_filters import (DateFromToRangeFilter, FilterSet,
                             ModelChoiceFilter, MultipleChoiceFilter,
-                            RangeFilter)
+                            RangeFilter, CharFilter)
 from django_filters.widgets import RangeWidget
 
 from .models import Certificate
@@ -33,6 +33,12 @@ class CertificateFilter(FilterSet):
     date_of_delivery = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     date_of_shipment = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     date_voided = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
+
+    aes = CharFilter(lookup_expr='icontains')
+    exporter = CharFilter(lookup_expr='icontains')
+    exporter_address = CharFilter(lookup_expr='icontains')
+    consignee = CharFilter(lookup_expr='icontains')
+    consignee_address = CharFilter(lookup_expr='icontains')
 
     def __init__(self, *args, **kwargs):
         """Limit licensees choices to those which are accessible"""
