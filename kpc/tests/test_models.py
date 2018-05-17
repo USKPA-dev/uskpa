@@ -99,9 +99,18 @@ class CertificateTests(TestCase):
         self.assertEquals(Certificate.next_available_number(), 2)
 
     def test_default_search_filters_returns_query_params(self):
+        user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         """Query parameters for default cert search are generated"""
         expected = 'status=0&status=1&status=2'
-        self.assertEqual(Certificate.default_search_filters(), expected)
+        self.assertEqual(Certificate.default_search_filters(user), expected)
+
+    def test_default_auditor_search_filters_returns_query_params(self):
+        load_initial_data()
+        auditor = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        auditor.groups.add(Group.objects.get(name='Auditor'))
+        """Query parameters for default auditor cert search are generated"""
+        expected = 'status=1&status=2&status=3'
+        self.assertEqual(Certificate.default_search_filters(auditor), expected)
 
     def test_status_not_modifiable(self):
         """

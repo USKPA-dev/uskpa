@@ -5,5 +5,5 @@ register = template.Library()
 
 
 @register.simple_tag
-def default_search():
-    return '?' + Certificate.default_search_filters()
+def default_search(user):
+    return '?' + Certificate.default_search_filters(user)

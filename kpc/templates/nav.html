@@ -19,7 +19,7 @@
             {% if user.is_authenticated %}
             <li>
                 <a class="usa-nav-link {% if request.resolver_match.url_name == 'certificates' %}usa-current{% endif %}"
-                  href="{% url 'certificates' %}{% default_search %}">
+                  href="{% url 'certificates' %}{% default_search user %}">
                   <span>Certificates</span>
                 </a>
             </li>

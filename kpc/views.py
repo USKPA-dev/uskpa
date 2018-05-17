@@ -38,7 +38,8 @@ class ExportView(LoginRequiredMixin, View):
 
     def get(self, request):
         """Return CSV of filtered certificates"""
-        qs = apply_certificate_search(request, request.user.profile.certificates())
+        qs = apply_certificate_search(
+            request, request.user.profile.certificates())
         qs = qs.values(*self.columns)
 
         export_kwargs = {'field_serializer_map': {
@@ -128,11 +129,12 @@ class CertificateListView(LoginRequiredMixin, TemplateView):
 
 class CertificateJson(LoginRequiredMixin, BaseDatatableView):
     model = Certificate
-    columns = ["number", "status", "consignee", "last_modified", "shipped_value",
-               "licensee__name", "aes", "date_of_issue", "date_of_sale",
+    columns = ["number", "status", "last_modified", "licensee__name",
+               "aes", "consignee", "shipped_value",
+               "date_of_issue", "date_of_sale",
                "date_of_expiry", "number_of_parcels", "carat_weight",
                "harmonized_code__value", "exporter", "date_of_shipment",
-               "date_of_delivery", "date_voided"]
+               "date_of_delivery", "date_voided", "port_of_export__name"]
     order_columns = columns
 
     max_display_length = 500
