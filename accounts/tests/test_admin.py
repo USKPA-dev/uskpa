@@ -12,8 +12,8 @@ User = get_user_model()
 class ProfileAdminTests(TestCase):
 
     def setUp(self):
-
-        self.form = UserCreationForm({'username': 'test', 'email': 'test@test.com'})
+        self.form_kwargs = {'username': 'test', 'email': 'test@test.com'}
+        self.form = UserCreationForm(self.form_kwargs)
         self.user = self.form.save(commit=False)
         # We don't need to target the real URL here, just making an HttpRequest()
         self.request = RequestFactory().get('/')
@@ -21,8 +21,17 @@ class ProfileAdminTests(TestCase):
         self.site = 'SITE'
 
     def test_email_on_user_add(self):
-        """Send an email to the user on creation of their account"""
+        """Send an email to the user on creation of their account when no pw set"""
         ProfileUserAdmin(User, self.site).save_model(self.request, self.user, self.form, False,)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_email_on_user_add_w_password(self):
+        """Send an email to the user on creation of their account when pw set"""
+        self.form_kwargs.update({'password1': 'a', 'password2': 'a'})
+        form = UserCreationForm(self.form_kwargs)
+        self.assertTrue(form.is_valid())
+        ProfileUserAdmin(User, self.site).save_model(
+            self.request, self.user, form, False,)
         self.assertEqual(len(mail.outbox), 1)
 
     def test_no_email_on_user_edit(self):
