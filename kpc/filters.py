@@ -16,6 +16,10 @@ class CheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     template_name = 'uswds/checkbox_input.html'
 
 
+def licensees(request):
+    return request.user.profile.get_licensees()
+
+
 class CertificateFilter(FilterSet):
     DATE_ATTR = {'type': 'date', 'placeholder': 'mm/dd/yyyy'}
 
@@ -29,7 +33,7 @@ class CertificateFilter(FilterSet):
     carat_weight = RangeFilter(widget=RangeWidget())
     date_of_issue = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     date_of_expiry = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
-    licensee__name = ModelChoiceFilter()
+    licensee__name = ModelChoiceFilter(queryset=licensees)
     date_of_delivery = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     date_of_shipment = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
     date_voided = DateFromToRangeFilter(widget=RangeWidget(attrs=DATE_ATTR))
@@ -39,11 +43,6 @@ class CertificateFilter(FilterSet):
     exporter_address = CharFilter(lookup_expr='icontains')
     consignee = CharFilter(lookup_expr='icontains')
     consignee_address = CharFilter(lookup_expr='icontains')
-
-    def __init__(self, *args, **kwargs):
-        """Limit licensees choices to those which are accessible"""
-        super().__init__(*args, **kwargs)
-        self.filters['licensee__name'].queryset = self.request.user.profile.get_licensees()
 
     class Meta:
         model = Certificate

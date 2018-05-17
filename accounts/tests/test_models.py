@@ -56,3 +56,15 @@ class ProfileTests(TestCase):
         self.assertEqual(user.profile.certificates().count(), 0)
         user.profile.licensees.add(licensee)
         self.assertEqual(user.profile.certificates().count(), 1)
+
+    def test_certs_limited_by_active_licensees_for_users(self):
+        """Users can only see certificates associated with their ACTIVE licensees"""
+        licensee = mommy.make('Licensee')
+        licensee_b = mommy.make('Licensee', is_active=False)
+
+        mommy.make('Certificate', licensee=licensee)
+        mommy.make('Certificate', licensee=licensee_b)
+        user = mommy.make(User)
+        user.profile.licensees.add(licensee)
+        user.profile.licensees.add(licensee_b)
+        self.assertEqual(user.profile.certificates().count(), 1)

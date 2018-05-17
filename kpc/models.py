@@ -90,8 +90,11 @@ class Licensee(models.Model):
                                                  )
                               ]
                               )
-
+    is_active = models.BooleanField(default=True, help_text="Licensee is active - able to request and access certificates")
     history = HistoricalRecords()
+
+    class Meta:
+        ordering = ['name']
 
     def __str__(self):
         return self.name

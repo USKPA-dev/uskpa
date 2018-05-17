@@ -5,7 +5,7 @@
 {% block content %}
 <div class="usa-grid">
   <div class='usa-width-one-third address-block'>
-    <h1>{{object.name}}</h1>
+    <h1>{{object.name}} {% if not object.is_active %} (inactive) {% endif %}</h1>
     <p>{{object.address}}</p>
     {% if objects.address2 %}
     <p>{{object.address2}}</p>

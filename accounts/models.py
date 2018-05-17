@@ -49,7 +49,7 @@ class Profile(models.Model):
         """List of licensees to which this user has access"""
         if self.user.is_superuser or self.is_auditor:
             return Licensee.objects.all()
-        return self.licensees.all()
+        return self.licensees.filter(is_active=True)
 
     @property
     def is_auditor(self):
@@ -61,4 +61,4 @@ class Profile(models.Model):
         if self.user.is_superuser or self.is_auditor:
             return Certificate.objects.all()
         else:
-            return Certificate.objects.filter(licensee__in=self.licensees.all())
+            return Certificate.objects.filter(licensee__in=self.get_licensees())
