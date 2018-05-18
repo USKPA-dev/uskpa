@@ -165,7 +165,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # default to mailhog for development, let env configure SendGrid otherwise
 EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 DEFAULT_FROM_EMAIL = os.environ.get(
-    'DJANGO_DEFAULT_FROM_EMAIL',
+    'DJANGO_FROM_EMAIL',
     default='NOT-CONFIGURED@LOCALHOST.ORG'
 )
 EMAIL_SUBJECT_PREFIX = os.environ.get('DJANGO_EMAIL_SUBJECT_PREFIX', default='[LOCALHOST] ')

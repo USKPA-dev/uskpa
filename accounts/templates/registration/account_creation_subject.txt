@@ -1,1 +1,1 @@
-An account has been created for you on {{ site_name }}
+Please set your password for {{ site_name }}
