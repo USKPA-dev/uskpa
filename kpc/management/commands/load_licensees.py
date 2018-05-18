@@ -43,7 +43,7 @@ class Command(BaseCommand):
             for row in reader:
                 licensee = Licensee()
                 licensee.id = row['\ufeffLicenseeID']
-                if licensee.id == 17:
+                if licensee.id == '17':
                     self.stdout.write(f'Skipping Licensee ID 17 (TEST).')
                     continue
                 licensee.name = row['LicenseeName']

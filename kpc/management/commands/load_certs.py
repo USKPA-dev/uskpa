@@ -306,6 +306,8 @@ def prepare_hscode(value):
 def prepare_boolean(value):
     if value == 'NULL':
         value = None
+    elif value == '0':
+        value = None
     return bool(value)
 
 
