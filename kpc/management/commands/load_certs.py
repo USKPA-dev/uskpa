@@ -119,7 +119,12 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(
                     f"{cert}: Unknown Port of Export: ({poe}) setting to None"))
 
-        cert.void = prepare_boolean(row['VoidCert'])
+        try:
+            cert.void = prepare_boolean(row['VoidCert'])
+        except ValueError:
+            self.stdout.write(self.style.WARNING(
+                    f"{cert}: Unknown Void value of {row['VoidCert']}: Setting VOID to True"))
+            cert.void = True
         cert.notes = ignore_null_str(row['VoidComment'])
 
         status_id = ignore_null_str(row['DeliveryStatusID'])
@@ -306,6 +311,12 @@ def prepare_hscode(value):
 def prepare_boolean(value):
     if value == 'NULL':
         value = None
+    elif value == '0':
+        value = False
+    elif value == '1':
+        value = True
+    else:
+        raise ValueError("Value is not NULL,0,1")
     return bool(value)
 
 
