@@ -7,21 +7,20 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, TemplateView
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import FormView, UpdateView, DeleteView
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from djqscsv import render_to_csv_response
 
 from .filters import CertificateFilter
-from .forms import (CertificateRegisterForm, LicenseeCertificateForm,
-                    StatusUpdateForm, VoidForm)
-from .models import Certificate, Licensee
-from .utils import (CertificatePreview, apply_certificate_search,
-                    _to_mdy)
+from .forms import (CertificateRegisterForm, KpcAddressForm,
+                    LicenseeCertificateForm, StatusUpdateForm, VoidForm)
+from .models import Certificate, Licensee, KpcAddress
+from .utils import CertificatePreview, _to_mdy, apply_certificate_search
 
 User = get_user_model()
 
@@ -261,3 +260,79 @@ class CertificateConfirmView(BaseCertificateView):
         form.save()
         messages.success(self.request, form.SUCCESS_MSG)
         return redirect(form.instance.get_absolute_url())
+
+
+class BaseAddressView(LoginRequiredMixin, UserPassesTestMixin):
+
+    def test_func(self):
+        """
+           Auditors cannot modify address book
+           Licensee contacts may
+        """
+        if self.request.user.profile.is_auditor:
+            raise PermissionDenied
+
+        obj = self.get_object()
+        if isinstance(obj, Licensee):
+            accessible = obj.user_can_access(self.request.user)
+        elif isinstance(obj, KpcAddress):
+            accessible = obj.licensee.user_can_access(self.request.user)
+        if not accessible:
+            PermissionDenied
+        return accessible
+
+
+class KpcAddressCreate(BaseAddressView, FormView):
+    form_class = KpcAddressForm
+    template_name = 'kpc_address/create.html'
+
+    def get_object(self):
+        return get_object_or_404(Licensee, id=self.kwargs['pk'])
+
+    def get_success_url(self):
+        return self.get_object().get_absolute_url()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['licensee'] = self.get_object()
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        kpc_address = form.save(commit=False)
+        kpc_address.licensee = self.get_object()
+        kpc_address.save()
+
+        message = f'Successfully added "{form.instance.name}" to the address book.'
+        messages.success(self.request, message)
+        return response
+
+
+class KpcAddressUpdate(BaseAddressView, UpdateView):
+    model = KpcAddress
+    form_class = KpcAddressForm
+    template_name = 'kpc_address/update.html'
+
+    def get_success_url(self):
+        return self.object.licensee.get_absolute_url()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        message = f'Successfully updated "{form.instance.name}".'
+        messages.success(self.request, message)
+        return response
+
+
+class KpcAddressDelete(BaseAddressView, DeleteView):
+    model = KpcAddress
+    template_name = 'kpc_address/delete.html'
+
+    def get_success_url(self):
+        return self.object.licensee.get_absolute_url()
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        message = f'Successfully deleted "{self.object.name}" from the address book.'
+        messages.success(self.request, message)
+        return response

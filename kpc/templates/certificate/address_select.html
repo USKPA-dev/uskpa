@@ -1,0 +1,10 @@
+
+
+<label for="id_{{target}}_addresses">Address Book</label>
+<span class="usa-form-hint">Select to pre-populate the {{target}} fields</span>
+<select id="id_{{target}}_addresses" data-target="{{target}}">
+  <option value="">--------</option>
+  {% for option in field.field.queryset.all %}
+    <option value="{{ option.id }}" data-address="{{ option.address }}" data-country="{{ option.country.name }}">{{ option.name }}</option>
+  {% endfor %}
+</select>

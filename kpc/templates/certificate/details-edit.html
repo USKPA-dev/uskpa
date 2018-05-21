@@ -44,10 +44,32 @@
 <script>
     var EXPIRY_DAYS = {{form.expiry_days}};
 
+    function prePopulateAddress(e) {
+        var selected = $(e.target).find('option:selected');
+        var target = $(e.target).data('target');
+
+        var target_name_field = $('#id_' + target);
+        var target_address_field = $('#id_' + target + '_address');
+
+        if (selected.val()) {
+            var new_name_value = selected.text();
+            var new_address_value = selected.data('address') + '\n' + selected.data('country');
+
+        } else {
+            var new_name_value = '';
+            var new_address_value = '';
+        }
+        target_name_field.val(new_name_value);
+        target_address_field.val(new_address_value);
+    }
+
     $(document).ready(function () {
         $('#id_country_of_origin').select2({
             placeholder: 'Select one or more countries'
         });
+
+        $('#id_exporter_addresses').change(prePopulateAddress);
+        $('#id_consignee_addresses').change(prePopulateAddress);
 
         // Calculate and set Date of Expiry
         $('#id_date_of_issue').change(function(){

@@ -429,3 +429,79 @@ class CertificateJsonTests(SimpleTestCase):
         returned_columns = set(ExportView.columns)
         physical_fields = set(Certificate.PHYSICAL_FIELDS)
         self.assertTrue(physical_fields.issubset(returned_columns))
+
+
+def make_auditor():
+    load_initial_data()
+    user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+    user.groups.add(Group.objects.get(name='Auditor'))
+    return user
+
+
+class KpcAdressViewTests(TestCase):
+
+    def setUp(self):
+        self.destination = mommy.make('KpcAddress')
+        self.licensee = self.destination.licensee
+        self.c = Client()
+
+    def test_auditor_cannot_add(self):
+        user = make_auditor()
+        self.c.force_login(user)
+        response = self.c.get(reverse('new-addressee', args=[self.licensee.id]))
+        self.assertEqual(403, response.status_code)
+
+    def test_auditor_cannot_edit(self):
+        user = make_auditor()
+        self.c.force_login(user)
+        response = self.c.get(self.destination.get_absolute_url())
+        self.assertEqual(403, response.status_code)
+
+    def test_auditor_cannot_delete(self):
+        user = make_auditor()
+        self.c.force_login(user)
+        response = self.c.get(self.destination.get_delete_url())
+        self.assertEqual(403, response.status_code)
+
+
+class KpcAddressCreateTests(TestCase):
+
+    def setUp(self):
+        load_initial_data()
+        self.licensee = mommy.make('Licensee')
+        self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        self.user.profile.licensees.add(self.licensee)
+        self.url = reverse('new-addressee', args=[self.licensee.id])
+        self.c = Client()
+        self.c.force_login(self.user)
+
+    def test_contact_can_create_destination(self):
+        """Licensee's contact can add destination to address book"""
+        data = {'name': 'TEST', 'address': 'TEST', "country": 'AQ'}
+        self.c.post(self.url, data=data)
+        self.assertEqual(1, self.licensee.addresses.count())
+
+
+class KpcAddressEditDeleteTests(TestCase):
+
+    def setUp(self):
+        load_initial_data()
+        self.destination = mommy.make('KpcAddress', country='IN')
+        self.licensee = self.destination.licensee
+        self.user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        self.user.profile.licensees.add(self.licensee)
+        self.url = self.destination.get_absolute_url()
+        self.c = Client()
+        self.c.force_login(self.user)
+
+    def test_contact_can_create_destination(self):
+        """Licensee's contact can edit destination"""
+        data = {'name': 'TEST', 'address': 'TEST', "country": 'AQ'}
+        self.c.post(self.url, data=data)
+        self.destination.refresh_from_db()
+        self.assertEqual('AQ', self.destination.country)
+
+    def test_contact_can_delete_destination(self):
+        """Licensee's contact can delete destination"""
+        self.c.post(self.destination.get_delete_url())
+        self.assertEqual(0, self.licensee.addresses.count())

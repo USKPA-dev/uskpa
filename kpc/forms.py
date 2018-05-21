@@ -2,10 +2,10 @@ import datetime
 
 from django import forms
 from django.contrib.auth import get_user_model
-from django_countries.fields import CountryField
 from django_countries import Countries
+from django_countries.fields import CountryField
 
-from .models import Certificate, Licensee, CertificateConfig
+from .models import Certificate, CertificateConfig, KpcAddress, Licensee
 
 User = get_user_model()
 
@@ -19,6 +19,10 @@ class USWDSRadioSelect(forms.RadioSelect):
 class UserModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.get_full_name()
+
+
+class AddressChoiceWidget(forms.widgets.Select):
+    option_template_name = 'widgets/address_option.html'
 
 
 class KPCountries(Countries):
@@ -46,13 +50,24 @@ class LicenseeCertificateForm(forms.ModelForm):
         """
         self.editable = kwargs.pop('editable', True)
         super().__init__(*args, **kwargs)
+
         self.expiry_days = Certificate.get_expiry_days()
         self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue'
         self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
         self.fields['country_of_origin'] = CountryField(
             countries=KPCountries, multiple=True).formfield()
+
+        if self.instance.licensee:
+            addresses = self.instance.licensee.addresses.all()
+        else:
+            addresses = Licensee.objects.none()
+
+        self.fields['addresses'] = forms.ModelChoiceField(
+            required=False, queryset=addresses)
+
         for field in self.fields:
-            self.fields[field].required = True
+            if field != 'addresses':
+                self.fields[field].required = True
             if not self.editable:
                 self.fields[field].disabled = True
 
@@ -88,7 +103,8 @@ class CertificateRegisterForm(forms.Form):
 
     licensee = forms.ModelChoiceField(
         queryset=Licensee.objects.filter(is_active=True))
-    contact = UserModelChoiceField(queryset=User.objects.filter(is_active=True))
+    contact = UserModelChoiceField(
+        queryset=User.objects.filter(is_active=True))
     date_of_sale = forms.DateField(
         initial=datetime.date.today, widget=forms.DateInput(attrs=DATE_ATTRS))
     registration_method = forms.ChoiceField(choices=REGISTRATION_METHODS,
@@ -281,3 +297,18 @@ class VoidForm(forms.ModelForm):
         cert.date_voided = datetime.date.today()
         cert.save()
         return cert
+
+
+class KpcAddressForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Limit country field
+        """
+        super().__init__(*args, **kwargs)
+        self.fields['country'] = CountryField(countries=KPCountries).formfield(
+            help_text='Appended to address when pre-populating a Certificiate address field')
+
+    class Meta:
+        model = KpcAddress
+        fields = ('name', 'address', 'country')

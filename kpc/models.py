@@ -107,6 +107,27 @@ class Licensee(models.Model):
             user.profile.licensees.filter(id=self.id).exists()
 
 
+class KpcAddress(models.Model):
+    """Common address used by licensees when completing Certificates"""
+    name = models.CharField(max_length=256)
+    address = models.TextField()
+    country = CountryField()
+    licensee = models.ForeignKey(Licensee, related_name='addresses', on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('licensee', 'name',)
+        ordering = ['licensee', 'name', ]
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('addressee', args=[self.id])
+
+    def get_delete_url(self):
+        return reverse('addressee-delete', args=[self.id])
+
+
 class Certificate(models.Model):
     AVAILABLE = 0
     PREPARED = 1

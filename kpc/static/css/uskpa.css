@@ -5,6 +5,7 @@ fieldset {
     margin: 0px;
     padding: 0.1em;
 }
+
 .usa-footer-contact_info a {
     color: white;
 }
@@ -82,6 +83,11 @@ h1 {
     margin-top: 0.5em !important;
 }
 
+h2 {
+    font-size: 1.8rem;
+    margin-top: 0.5em !important;
+}
+
 .cert-body,
 .cert-body-top {
     margin-top: 1em;
@@ -146,14 +152,6 @@ input[type="date"] {
     margin-bottom: 0em;
 }
 
-.contacts table {
-    margin: auto;
-}
-
-.contacts h2 {
-    text-align: center;
-}
-
 .pdf-preview {
     overflow-x: auto;
 }
@@ -164,4 +162,8 @@ input[type="date"] {
 
 .preview-confirm input {
     display: inline;
+}
+
+.licensee-details-table {
+    margin: 0em;
 }
