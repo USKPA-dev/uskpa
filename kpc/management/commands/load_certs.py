@@ -314,7 +314,7 @@ def prepare_boolean(value):
     elif value == '0':
         value = False
     elif value == '1':
-        value == True
+        value = True
     else:
         raise ValueError("Value is not NULL,0,1")
     return bool(value)
