@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{object.name}}{% endblock %}
+
+{% block content %}
+<div class="usa-grid">
+  <h1>Deleting address book entry for {{object.licensee.name}}</h1>
+  <form method="post" action="">
+    {% csrf_token %}
+    <p> Are you sure you want to delete the address book entry: <strong>"{{object}}"</strong></p>
+    <p> This addressee will no longer be available to pre-populate form fields when preparing a certificate for {{object.licensee.name}}.</p>
+    <input type="submit" value="Confirm">
+    <a class="usa-button" href="{{object.licensee.get_absolute_url}}">Cancel</a>
+  </form>
+</div>
+
+{% endblock content %}

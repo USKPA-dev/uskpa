@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Update: {{object.name}}{% endblock %}
+
+{% block content %}
+<div class="usa-grid">
+  <h1>Editing address book entry for {{object.licensee}}</h1>
+  <form method="post" action="">
+    {% csrf_token %}
+    {% for field in form %}
+      {% include 'uswds/form-field.html' %}
+    {% endfor %}
+    <input type="submit" value="Update">
+    <a class="usa-button" href="{{object.licensee.get_absolute_url}}">Cancel</a>
+  </form>
+</div>
+
+{% endblock content %}

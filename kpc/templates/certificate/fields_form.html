@@ -36,6 +36,8 @@
       <hr>
       <div class="usa-width-one-half">
         {% include 'uswds/form-field.html' with field=form.exporter %}
+        {% include 'certificate/address_select.html' with field=form.addresses target="exporter" %}
+
       </div>
       <div class="usa-width-one-half">
         {% include 'uswds/form-field.html' with field=form.exporter_address %}
@@ -44,6 +46,8 @@
     <div class="usa-grid">
       <div class="usa-width-one-half">
         {% include 'uswds/form-field.html' with field=form.consignee %}
+        {% include 'certificate/address_select.html' with field=form.addresses target="consignee" %}
+
       </div>
       <div class="usa-width-one-half">
         {% include 'uswds/form-field.html' with field=form.consignee_address %}

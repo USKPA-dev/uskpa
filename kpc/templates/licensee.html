@@ -4,38 +4,74 @@
 
 {% block content %}
 <div class="usa-grid">
-  <div class='usa-width-one-third address-block'>
-    <h1>{{object.name}} {% if not object.is_active %} (inactive) {% endif %}</h1>
-    <p>{{object.address}}</p>
-    {% if objects.address2 %}
-    <p>{{object.address2}}</p>
-    {% endif %}
-    <p>{{object.city}}, {{object.state}} {{object.zip_code}}</p>
-    <p><span class="attr-label">Tax ID:</span> {{object.tax_id}}</p>
-    {% if user.is_superuser %}
-      <a title='Edit licensee' href="{% url 'admin:kpc_licensee_change' object.id %}">
-        <i class="far fa-edit"></i>
-      </a>
-    {% endif %}
+  <div class='usa-width-one-half address-block'>
+
+    <div>
+      <h1>{{object.name}} {% if not object.is_active %} (inactive) {% endif %}</h1>
+      <p>{{object.address}}</p>
+      {% if object.address2 %}
+        <p>{{object.address2}}</p>
+      {% endif %}
+      <p>{{object.city}}, {{object.state}} {{object.zip_code}}</p>
+      <p><span class="attr-label">Tax ID:</span> {{object.tax_id}}</p>
+      {% if user.is_superuser %}
+        <a title='Edit licensee' href="{% url 'admin:kpc_licensee_change' object.id %}">
+          <i class="far fa-edit"></i>
+        </a>
+      {% endif %}
+    </div>
+
+    <div>
+      <h2>Contacts</h2>
+      <table class="licensee-details-table">
+        <thead>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Phone</th>
+        </thead>
+        <tbody>
+          {% for profile in object.contacts.all %}
+          <tr>
+            <td>{{profile}}</td>
+            <td>{{profile.user.email}}</td>
+            <td>{{profile.phone_number}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div class="usa-width-two-thirds contacts">
-    <h2>Contacts</h2>
-    <table id='contacts-table' >
-      <thead>
-        <th scope="col">Name</th>
-        <th scope="col">Email</th>
-        <th scope="col">Phone</th>
-      </thead>
-      <tbody>
-        {% for profile in object.contacts.all %}
-        <tr>
-          <td>{{profile}}</td>
-          <td>{{profile.user.email}}</td>
-          <td>{{profile.phone_number}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+  <div class="usa-width-one-half">
+    <h2>Address Book</h2>
+    <span class="usa-form-hint">Made available as options to pre-populate 'Exporter' and 'Consignee' fields when preparing a certificate.</span>
+    {% if object.addresses.all.exists %}
+      <p><a href="{% url 'new-addressee' object.id %}">Click here to add a new addressee</a></p>
+      <table class="licensee-details-table">
+        <thead>
+          <th scope="col">Name</th>
+          <th scope="col">Address</th>
+          <th scope="col">Country</th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+        </thead>
+        <tbody>
+          {% for addressee in object.addresses.all %}
+          <tr>
+            <td>{{addressee.name}}</td>
+            <td>{{addressee.address}}</td>
+            <td>{{addressee.country.name}}</td>
+            <td><a href="{{addressee.get_absolute_url}}">Edit</a></td>
+            <td><a href="{{addressee.get_delete_url}}">Delete</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>
+        <a href="{% url 'new-addressee' object.id %}">There are currently no address book entries, click here to add one.</a>
+      </p>
+      {% endif %}
   </div>
 </div>
 

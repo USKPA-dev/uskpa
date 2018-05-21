@@ -7,7 +7,7 @@ from solo.admin import SingletonModelAdmin
 from accounts.models import Profile
 
 from .models import (Certificate, CertificateConfig, HSCode, Licensee,
-                     PortOfExport, VoidReason)
+                     PortOfExport, VoidReason, KpcAddress)
 
 
 class LicenseeAdminForm(forms.ModelForm):
@@ -110,3 +110,4 @@ class KpcAdmin(SimpleHistoryAdmin):
 
 admin.site.register(HSCode, KpcAdmin)
 admin.site.register(VoidReason, KpcAdmin)
+admin.site.register(KpcAddress, admin.ModelAdmin)

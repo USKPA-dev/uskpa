@@ -6,7 +6,7 @@ from django.test import TestCase
 from model_mommy import mommy
 
 from kpc.forms import (CertificateRegisterForm, LicenseeCertificateForm,
-                       StatusUpdateForm, VoidForm)
+                       StatusUpdateForm, VoidForm, KpcAddressForm)
 from kpc.models import Certificate, CertificateConfig
 from kpc.tests import CERT_FORM_KWARGS
 
@@ -236,3 +236,32 @@ class LicenseeCertificateFormTests(TestCase):
         config.save()
         form = LicenseeCertificateForm()
         self.assertEqual(countries, form.fields['country_of_origin'].choices)
+
+    def test_address_book_options_rendered(self):
+        """Address book select options rendered if they exist for licensee"""
+        destination = mommy.make('KpcAddress')
+        cert = mommy.prepare(Certificate, licensee=destination.licensee)
+        form = LicenseeCertificateForm(instance=cert)
+        choice = (destination.id, destination.name)
+        self.assertIn(
+            choice, [choice for choice in form.fields['addresses'].choices])
+
+    def test_exporter_prepopulated(self):
+        """Exporter and Exporter address fields are prepopulated with licensee's info"""
+        licensee = mommy.make('Licensee')
+        cert = mommy.prepare(Certificate, licensee=licensee)
+        form = LicenseeCertificateForm(instance=cert)
+        self.assertEquals(form.initial['exporter'], licensee.name)
+        self.assertEquals(form.initial['exporter_address'], licensee.address_text)
+
+
+class KpcAddressFormTests(TestCase):
+
+    def test_countries_limited_by_config(self):
+        """Selections limited by CertificateConfig"""
+        countries = [('', '---------'), ('FR', 'France'), ('IN', 'India')]
+        config = CertificateConfig.get_solo()
+        config.kp_countries = "FR,IN"
+        config.save()
+        form = KpcAddressForm()
+        self.assertEqual(countries, form.fields['country'].choices)
