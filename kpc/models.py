@@ -106,6 +106,16 @@ class Licensee(models.Model):
         return user.is_superuser or user.profile.is_auditor or \
             user.profile.licensees.filter(id=self.id).exists()
 
+    @property
+    def address_text(self):
+        """compose address fields into text block"""
+        address = self.address
+        if self.address2:
+            address += f'\n{self.address2}'
+        address += f"\n{self.city}, {self.state} {self.zip_code}"
+        address += '\nUnited States of America'
+        return address
+
 
 class KpcAddress(models.Model):
     """Common address used by licensees when completing Certificates"""

@@ -59,6 +59,8 @@ class LicenseeCertificateForm(forms.ModelForm):
 
         if self.instance.licensee:
             addresses = self.instance.licensee.addresses.all()
+            self.initial.update({'exporter': self.instance.licensee.name,
+                                 'exporter_address': self.instance.licensee.address_text})
         else:
             addresses = Licensee.objects.none()
 

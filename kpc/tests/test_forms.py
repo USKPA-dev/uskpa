@@ -246,6 +246,14 @@ class LicenseeCertificateFormTests(TestCase):
         self.assertIn(
             choice, [choice for choice in form.fields['addresses'].choices])
 
+    def test_exporter_prepopulated(self):
+        """Exporter and Exporter address fields are prepopulated with licensee's info"""
+        licensee = mommy.make('Licensee')
+        cert = mommy.prepare(Certificate, licensee=licensee)
+        form = LicenseeCertificateForm(instance=cert)
+        self.assertEquals(form.initial['exporter'], licensee.name)
+        self.assertEquals(form.initial['exporter_address'], licensee.address_text)
+
 
 class KpcAddressFormTests(TestCase):
 

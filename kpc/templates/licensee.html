@@ -9,7 +9,7 @@
     <div>
       <h1>{{object.name}} {% if not object.is_active %} (inactive) {% endif %}</h1>
       <p>{{object.address}}</p>
-      {% if objects.address2 %}
+      {% if object.address2 %}
         <p>{{object.address2}}</p>
       {% endif %}
       <p>{{object.city}}, {{object.state}} {{object.zip_code}}</p>
