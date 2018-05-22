@@ -7,7 +7,7 @@ from solo.admin import SingletonModelAdmin
 from accounts.models import Profile
 
 from .models import (Certificate, CertificateConfig, HSCode, Licensee,
-                     PortOfExport, VoidReason, KpcAddress, Receipt)
+                     PortOfExport, VoidReason, KpcAddress, Receipt, EditRequest)
 
 
 class LicenseeAdminForm(forms.ModelForm):
@@ -112,6 +112,12 @@ class KpcAdmin(SimpleHistoryAdmin):
 class ReceiptAdmin(SimpleHistoryAdmin):
     list_display = ('number', 'licensee_name', 'contact', 'date_sold', 'certificates_sold')
     list_filter = ('date_sold', 'licensee_name', 'contact',)
+
+
+@admin.register(EditRequest)
+class EditRequestAdmin(SimpleHistoryAdmin):
+    list_display = ('certificate', 'date_requested', 'contact', 'status')
+    list_filter = ('date_requested', 'contact', 'status')
 
 
 admin.site.register(HSCode, KpcAdmin)

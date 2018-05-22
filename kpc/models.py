@@ -92,7 +92,8 @@ class Licensee(models.Model):
                                                  )
                               ]
                               )
-    is_active = models.BooleanField(default=True, help_text="Licensee is active - able to request and access certificates")
+    is_active = models.BooleanField(
+        default=True, help_text="Licensee is active - able to request and access certificates")
     history = HistoricalRecords()
 
     class Meta:
@@ -124,7 +125,8 @@ class KpcAddress(models.Model):
     name = models.CharField(max_length=256)
     address = models.TextField()
     country = CountryField()
-    licensee = models.ForeignKey(Licensee, related_name='addresses', on_delete=models.PROTECT)
+    licensee = models.ForeignKey(
+        Licensee, related_name='addresses', on_delete=models.PROTECT)
 
     class Meta:
         unique_together = ('licensee', 'name',)
@@ -141,7 +143,8 @@ class KpcAddress(models.Model):
 
 
 class Receipt(models.Model):
-    number = models.IntegerField(default=settings.LAST_RECEIPT_NUMBER, unique=True)
+    number = models.IntegerField(
+        default=settings.LAST_RECEIPT_NUMBER, unique=True)
     licensee_name = models.CharField(max_length=256)
     licensee_address = models.TextField()
     certificates = ArrayField(models.CharField(max_length=32))
@@ -175,7 +178,8 @@ class Receipt(models.Model):
         receipt.certificates_sold = len(receipt.certificates)
         receipt.unit_price = CertificateConfig.get_solo().price
         receipt.payment_method = form.cleaned_data['payment_method']
-        receipt.contact = form.cleaned_data['contact'].profile.get_user_display_name()
+        receipt.contact = form.cleaned_data['contact'].profile.get_user_display_name(
+        )
         receipt.date_sold = form.cleaned_data['date_of_sale']
         return receipt
 
@@ -190,37 +194,10 @@ class Receipt(models.Model):
         return ', '.join(self.certificates)
 
 
-class Certificate(models.Model):
-    AVAILABLE = 0
-    PREPARED = 1
-    SHIPPED = 2
-    DELIVERED = 3
-    VOID = 4
+class BaseCertificate(models.Model):
+    """Base model containing physical certificate fields"""
+    # Fields on physical certificate, excluding 'number'
 
-    DEFAULT_SEARCH = [AVAILABLE, PREPARED, SHIPPED]
-    DEFAULT_AUDITOR_SEARCH = [PREPARED, SHIPPED, DELIVERED]
-    MODIFIABLE_STATUSES = [PREPARED, SHIPPED]
-
-    STATUS_CHOICES = (
-        (AVAILABLE, 'Available'),
-        (PREPARED, 'Prepared'),
-        (SHIPPED, 'Shipped'),
-        (DELIVERED, 'Delivered'),
-        (VOID, 'Void')
-    )
-
-    PAYMENT_METHOD_CHOICES = (
-        ('cash', 'Cash'),
-        ('check', 'Check'),
-    )
-
-    # Fields on physical certificate
-    PHYSICAL_FIELDS = ('number', 'country_of_origin', 'aes', 'date_of_issue', 'date_of_expiry',
-                       'shipped_value', 'exporter', 'exporter_address', 'number_of_parcels',
-                       'consignee', 'consignee_address', 'carat_weight', 'harmonized_code__value')
-
-    number = models.PositiveIntegerField(
-        help_text='USKPA Certificate ID number', unique=True)
     aes = models.CharField(max_length=30,
                            blank=True,
                            help_text='AES Confirmation Number (ITN)',
@@ -251,7 +228,43 @@ class Certificate(models.Model):
                                                                      message='Carat weight must be at least 0.01')
                                                    ]
                                        )
-    harmonized_code = models.ForeignKey(HSCode, blank=True, null=True, on_delete=models.PROTECT)
+    harmonized_code = models.ForeignKey(
+        HSCode, blank=True, null=True, on_delete=models.PROTECT)
+
+    class Meta:
+        abstract = True
+
+
+class Certificate(BaseCertificate):
+    AVAILABLE = 0
+    PREPARED = 1
+    SHIPPED = 2
+    DELIVERED = 3
+    VOID = 4
+
+    DEFAULT_SEARCH = [AVAILABLE, PREPARED, SHIPPED]
+    DEFAULT_AUDITOR_SEARCH = [PREPARED, SHIPPED, DELIVERED]
+    MODIFIABLE_STATUSES = [PREPARED, SHIPPED]
+
+    STATUS_CHOICES = (
+        (AVAILABLE, 'Available'),
+        (PREPARED, 'Prepared'),
+        (SHIPPED, 'Shipped'),
+        (DELIVERED, 'Delivered'),
+        (VOID, 'Void')
+    )
+
+    PAYMENT_METHOD_CHOICES = (
+        ('cash', 'Cash'),
+        ('check', 'Check'),
+    )
+    # Physical fields
+    number = models.PositiveIntegerField(
+        help_text='USKPA Certificate ID number', unique=True)
+
+    PHYSICAL_FIELDS = ('number', 'country_of_origin', 'aes', 'date_of_issue', 'date_of_expiry',
+                       'shipped_value', 'exporter', 'exporter_address', 'number_of_parcels',
+                       'consignee', 'consignee_address', 'carat_weight', 'harmonized_code__value')
 
     # Non certificate fields
     port_of_export = models.ForeignKey(
@@ -370,3 +383,26 @@ class Certificate(models.Model):
     @staticmethod
     def get_void_reasons():
         return VoidReason.objects.all()
+
+
+class EditRequest(BaseCertificate):
+    PENDING = 0
+    APPROVED = 1
+    REJECTED = 2
+
+    STATUS_CHOICES = (
+        (PENDING, "Pending"),
+        (APPROVED, "Approved"),
+        (REJECTED, "Rejected")
+    )
+    """Requested change to an existing Certificate record"""
+    certificate = models.ForeignKey(Certificate, on_delete=models.PROTECT)
+    status = models.IntegerField(choices=STATUS_CHOICES)
+    contact = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='edit_requests')
+    date_requested = models.DateField(auto_now_add=True)
+    date_reviewed = models.DateField(blank=True, null=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='reviewed_edit_requests')
+
+    class Meta:
+        ordering = ['-date_requested']
