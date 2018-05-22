@@ -201,7 +201,7 @@ class CertificateRegisterForm(forms.Form):
             certs = [i for i in range(start, end+1)]
         elif self.method == self.LIST:
             cert_list = self.cleaned_data['cert_list'].split(',')
-            certs = [int(cert_number.strip()[2:]) for cert_number in cert_list]
+            certs = [cert_number for cert_number in cert_list]
         return certs
 
     def save(self, commit=False):
