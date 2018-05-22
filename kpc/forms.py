@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django_countries import Countries
 from django_countries.fields import CountryField
+from django.core.validators import RegexValidator
 
 from .models import (Certificate, CertificateConfig, KpcAddress, Licensee,
                      Receipt)
@@ -116,7 +117,12 @@ class CertificateRegisterForm(forms.Form):
                                             initial=SEQUENTIAL)
     cert_from = forms.IntegerField(min_value=0, required=False, label='From')
     cert_to = forms.IntegerField(min_value=1, required=False, label='To')
-    cert_list = forms.CharField(required=False, label='Certificate ID list')
+    cert_list = forms.CharField(required=False, label='Certificate ID list',
+                                validators=[
+                                    RegexValidator(regex='^(\d+(,\d+)*)?$',
+                                                   message='Certificate list must be a comma delimited list of numeric IDs, without spaces.'
+                                                   )
+                                ])
     payment_method = forms.ChoiceField(
         choices=Certificate.PAYMENT_METHOD_CHOICES)
     payment_amount = forms.DecimalField(max_digits=10, decimal_places=2)
@@ -160,9 +166,9 @@ class CertificateRegisterForm(forms.Form):
                 )
 
         if self.method == self.LIST and not cert_list:
-            self.add_error('cert_list', 'List of ID values required.')
+            self.add_error('cert_list', 'Valid list of ID values required.')
             raise forms.ValidationError(
-                "Certificate List must be provided when List method is selected.")
+                "A valid certificate list must be provided when List method is selected.")
 
         if self.method == self.SEQUENTIAL and (not cert_from or not cert_to):
             raise forms.ValidationError(
@@ -177,6 +183,11 @@ class CertificateRegisterForm(forms.Form):
                     "Certificate 'To' value must be greater than or equal to 'From' value.")
 
         requested_certs = self.get_cert_list()
+        """duplicate certs requested"""
+        if len(requested_certs) != len(set(requested_certs)):
+            raise forms.ValidationError(
+                f"At least two requested certificates were requested with the same ID value, duplicate certificate IDs are not allowed.")
+
         """payment amount matches expected value"""
         requested_cert_count = len(requested_certs)
         expected_payment = requested_cert_count * self.price
@@ -195,13 +206,13 @@ class CertificateRegisterForm(forms.Form):
     def get_cert_list(self):
         """return list of certificates to generate"""
         certs = []
-        if self.method == self.SEQUENTIAL:
-            start = self.cleaned_data['cert_from']
-            end = self.cleaned_data['cert_to']
+        cert_list = self.cleaned_data.get('cert_list')
+        start = self.cleaned_data.get('cert_from')
+        end = self.cleaned_data.get('cert_to')
+        if self.method == self.SEQUENTIAL and start and end:
             certs = [i for i in range(start, end+1)]
-        elif self.method == self.LIST:
-            cert_list = self.cleaned_data['cert_list'].split(',')
-            certs = [cert_number for cert_number in cert_list]
+        elif self.method == self.LIST and cert_list:
+            certs = [int(cert_number) for cert_number in cert_list.split(',')]
         return certs
 
     def save(self, commit=False):

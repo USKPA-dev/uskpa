@@ -105,7 +105,7 @@ class CertificateRegisterViewTests(TestCase):
         self.sequential_kwargs = {
             'registration_method': 'sequential',  'cert_from': 1, 'cert_to': 5}
         self.list_kwargs = {'registration_method': 'list', 'payment_amount': 40,
-                            'cert_list': 'US201, US123456'}
+                            'cert_list': '201,123456'}
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_sale': '01/01/2018',
                             'payment_method': 'cash', 'payment_amount': 100
@@ -181,12 +181,15 @@ class CertificateRegisterViewTests(TestCase):
         receipt = Receipt.objects.first()
         response = client.get(receipt.get_absolute_url())
 
+        requested_cert_list = self.form_kwargs['cert_list'].split(',')
+        expected_certs = ', '.join([f'US{num}' for num in requested_cert_list])
+
         self.assertContains(response, self.licensee.name)
         self.assertContains(response, f'Receipt #{receipt.number}')
         self.assertContains(response, self.licensee.address)
         self.assertContains(response, self.user.profile)
         self.assertContains(response, self.form_kwargs['payment_amount'])
-        self.assertContains(response, self.form_kwargs['cert_list'])
+        self.assertContains(response, expected_certs)
         self.assertContains(response, f'${CertificateConfig.get_solo().price}')
         self.assertContains(response, '2 certificates')
 
