@@ -112,6 +112,7 @@
 <div id="certificate-fields">
     {% block certificate-body-fields %}
     {% endblock %}
+
     {% if object.status_can_be_updated and form.editable %}
     <div id="status-update" class="usa-grid">
         <hr>
@@ -119,7 +120,12 @@
             {% csrf_token %}
             <fieldset>
                 <label for="id_date">{{object.next_status_label}} as of:</label>
-                <input type="date" name="date" placeholder="mm/dd/yyyy"  id="id_date">
+                <input type="date" name="date" placeholder="mm/dd/yyyy" id="id_date" required>
+                {% for error in form.date.errors %}
+                    <span class="usa-input-error-message" role="alert">
+                        {{error}}
+                    </span>
+                {% endfor %}
             </fieldset>
             <fieldset>
                 <input type="hidden" name="next_status" value="{{object.next_status_value}}" id="id_next_status">

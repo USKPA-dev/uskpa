@@ -46,6 +46,13 @@ class StatusUpdateFormTests(TestCase):
         self.form_kwargs = {
             'next_status': Certificate.SHIPPED, 'date': '2018-01-01'}
 
+    def test_invalid_if_no_date(self):
+        """Date is required"""
+        self.cert.status = Certificate.PREPARED
+        self.form_kwargs.pop('date')
+        form = self.form(self.form_kwargs, instance=self.cert)
+        self.assertFalse(form.is_valid())
+
     def test_invalid_if_licensee_form_field_submitted(self):
         """Form fields from licensee cert form submitted, invalid"""
         self.form_kwargs['attested'] = True
