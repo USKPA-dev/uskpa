@@ -155,3 +155,27 @@ class CertificateTests(TestCase):
         self.assertEqual(cert.get_country_of_origin_display, 'Antarctica')
         cert.country_of_origin = 'AQ,IN'
         self.assertEqual(cert.get_country_of_origin_display, 'Antarctica, India')
+
+
+class ReceiptTests(TestCase):
+
+    def test_receipt_number_starts_at_default(self):
+        """Receipt.number starts at settings.LAST_RECEIPT_NUMBER"""
+        receipt = mommy.make('Receipt')
+        self.assertEqual(receipt.number, settings.LAST_RECEIPT_NUMBER)
+
+    def test_receipt_number_increments_from_default(self):
+        """Receipt.number starts at settings.LAST_RECEIPT_NUMBER and increments by 1"""
+        mommy.make('Receipt')
+        receipt = mommy.make('Receipt')
+
+        self.assertEqual(receipt.number, settings.LAST_RECEIPT_NUMBER + 1)
+
+    def test_receipt_number_unchanged_by_update(self):
+        """Receipt.number unchanged by update to existing instance"""
+        receipt = mommy.make('Receipt')
+        self.assertEqual(receipt.number, settings.LAST_RECEIPT_NUMBER)
+        receipt.licensee_name = 'UPDATED'
+        receipt.save()
+        receipt.refresh_from_db()
+        self.assertEqual(receipt.number, settings.LAST_RECEIPT_NUMBER)

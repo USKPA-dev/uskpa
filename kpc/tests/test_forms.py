@@ -124,7 +124,7 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs = {'licensee': self.licensee.id, 'contact': self.user.id,
                             'date_of_sale': '01/01/2018', 'registration_method': 'list',
                             'payment_method': 'cash',
-                            'payment_amount': 20, 'cert_list': 'US1'
+                            'payment_amount': 20, 'cert_list': '1'
                             }
 
     def test_payment_not_expected_amount(self):
@@ -167,7 +167,7 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs.pop('cert_list')
         form = CertificateRegisterForm(self.form_kwargs)
         valid = form.is_valid()
-        self.assertIn("Certificate List must be provided when List method is selected.",
+        self.assertIn("A valid certificate list must be provided when List method is selected.",
                       [e.message for e in form.non_field_errors().data])
         self.assertFalse(valid)
 
@@ -211,11 +211,27 @@ class CertificateRegistrationTests(TestCase):
         self.form_kwargs.update(
             {'registration_method': 'sequential', 'cert_from': start, 'cert_to': end})
 
+    def test_dupe_requested_certificate_invalid(self):
+        """
+        Validation fails when requested certificates contain duplicates
+        """
+        self.form_kwargs.update({'cert_list': '1,1'})
+        form = CertificateRegisterForm(self.form_kwargs)
+        self.assertFalse(form.is_valid())
+
     def test_dupe_certificate_invalid(self):
         """
         Validation fails when requested certificates already exist
         """
         mommy.make(Certificate, number=1)
+        form = CertificateRegisterForm(self.form_kwargs)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_cert_list_rejected(self):
+        """
+        Cert list rejected if not a spaceless comma delimited list of integers
+        """
+        self.form_kwargs.update({'cert_list': 'US1,US2'})
         form = CertificateRegisterForm(self.form_kwargs)
         self.assertFalse(form.is_valid())
 

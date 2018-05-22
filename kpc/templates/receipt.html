@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}{{object}}{% endblock %}
+{% block header %}
+  <link rel="stylesheet" href="{% static 'css/receipt.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="usa-section">
+  <div class="usa-grid">
+    <p>This page may be printed to produce a hard copy of this receipt.</p>
+  </div>
+  <div id='kpc-receipt' class="usa-grid receipt">
+    <h1>USKPA</h1>
+    <h2>United States Kimberly Process Authority</h2>
+    <h3>United States Kimberly Process Certificate Receipt</h3>
+    <h4>Receipt #{{object.number}}</h4>
+    {% if object.certificates_sold == 1 %}
+      <p>The following Kimberly process certificate was sold to:</p>
+    {% else %}
+      <p>The following sequentially numbered Kimberly process certificates were sold to:</p>
+    {% endif %}
+    <p class="indent">{{object.licensee_name}}</p>
+    <p class="indent">{{object.licensee_address}}</p>
+    <p>Certificate{{ object.certificates_sold|pluralize }}:</p>
+    <p class="indent">{{object.certificates_text}}</p>
+
+    <br>
+
+    <p>
+       The certificate{{object.certificates_sold|pluralize}}
+       w{{object.certificates_sold|pluralize:'as,ere'}}
+       sold for ${{object.total_paid}}
+       (
+         {{object.certificates_sold}} certificate{{object.certificates_sold|pluralize}}
+         @ ${{object.unit_price}}
+        per certificate
+      ).
+    </p>
+
+    <div class="payable-box">
+      <p>Payment in U.S. Dollars is due upon receipt. Make check payable to USKPA c/o JVC and mail it to:</p>
+      <p>Martin Hochbaum</p>
+      <p>Jewelers Vigilance Committee</p>
+      <p>801 Second Avenue, Suite 303, New York, New York, 10017</p>
+    </div>
+
+    <br>
+
+    <p>
+      I,
+      <strong>{{object.contact}}</strong>, certify on behalf of
+      <strong>{{object.licensee_name}}</strong>, that I have received the Kimberly Process certificate{{object.certificates_sold|pluralize}} listed above.
+    </p>
+
+    <div class="signed">
+      <p class="indent">Signed:</p>
+    </div>
+    <div class="signed">
+      <p class="indent">Name:</p>
+    </div>
+    <div class="signed">
+      <p class="indent">Signed:</p>
+    </div>
+    <div class="signed">
+      <p class="indent">Name:</p>
+    </div>
+
+    <br>
+
+    <p>Date: {{object.date_sold}}</p>
+  </div>
+</section>
+{% endblock %}

@@ -194,3 +194,8 @@ CACHES = {
     },
 }
 SOLO_CACHE = 'default'
+
+# Last receipt number
+# Should only be modified upon initial release of the system
+# Sets starting value for Receipt.number field
+LAST_RECEIPT_NUMBER = 1300

@@ -20,6 +20,7 @@ urlpatterns = [
     path('addresee/<int:pk>', kpc_views.KpcAddressUpdate.as_view(), name='addressee'),
     path('addresee/<int:pk>/delete', kpc_views.KpcAddressDelete.as_view(), name='addressee-delete'),
     path('licensee-contacts/', kpc_views.licensee_contacts, name='licensee-contacts'),
+    path('receipt/<int:pk>', kpc_views.ReceiptView.as_view(), name='receipt'),
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
 ]

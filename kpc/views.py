@@ -7,19 +7,20 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
+from django.utils.safestring import mark_safe
 from django.views import View
 from django.views.generic import DetailView, TemplateView
-from django.views.generic.edit import FormView, UpdateView, DeleteView
+from django.views.generic.edit import DeleteView, FormView, UpdateView
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from djqscsv import render_to_csv_response
 
 from .filters import CertificateFilter
 from .forms import (CertificateRegisterForm, KpcAddressForm,
                     LicenseeCertificateForm, StatusUpdateForm, VoidForm)
-from .models import Certificate, Licensee, KpcAddress
+from .models import Certificate, KpcAddress, Licensee, Receipt
 from .utils import CertificatePreview, _to_mdy, apply_certificate_search
 
 User = get_user_model()
@@ -99,17 +100,27 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
     form_class = CertificateRegisterForm
     success_url = reverse_lazy('cert-register')
 
+    @staticmethod
+    def get_success_msg(count, receipt):
+        success_msg = f'''Generated {count} new certificates.
+                <a href="{receipt.get_absolute_url()}">
+                Click here to view the receipt
+                </a>
+            '''
+        return mark_safe(success_msg)  # nosec
+
     def form_valid(self, form):
         """Generate requested Certificates"""
         cert_kwargs = {'assignor': self.request.user, 'licensee': form.cleaned_data['licensee'],
                        'date_of_sale': form.cleaned_data['date_of_sale'],
                        'last_modified': datetime.datetime.now()}
         certs = form.get_cert_list()
+
         if certs:
             Certificate.objects.bulk_create(Certificate(
                 number=i, **cert_kwargs) for i in certs)
-        messages.success(
-            self.request, f'Generated {len(certs)} new certificates.')
+            receipt = form.save()
+            messages.success(self.request, self.get_success_msg(len(certs), receipt))
         return super().form_valid(form)
 
 
@@ -336,3 +347,14 @@ class KpcAddressDelete(BaseAddressView, DeleteView):
         message = f'Successfully deleted "{self.object.name}" from the address book.'
         messages.success(self.request, message)
         return response
+
+
+class ReceiptView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Receipt
+    template_name = 'receipt.html'
+
+    def test_func(self):
+        """administrative users only"""
+        if self.request.user.is_superuser:
+            return True
+        raise PermissionDenied
