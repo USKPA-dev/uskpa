@@ -73,7 +73,7 @@ Var | Value | Destination
 --- | --- | ---
 ADMINS | Comma delimited list of email addresses | ``settings.ADMINS``
 DEBUG | TRUE | ``settings.DEBUG``
-
+DJANGO_LOG_LEVEL | INFO, DEBUG, or ERROR | Controls logging level of Django process, defaults to ERROR in production
 
 ### Email - One time Setup
 
