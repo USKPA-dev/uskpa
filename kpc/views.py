@@ -107,7 +107,7 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
                 Click here to view the receipt
                 </a>
             '''
-        return mark_safe(success_msg)
+        return mark_safe(success_msg)  # nosec
 
     def form_valid(self, form):
         """Generate requested Certificates"""
