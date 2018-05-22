@@ -10,7 +10,7 @@ from django.urls import reverse
 from model_mommy import mommy
 
 from kpc.forms import LicenseeCertificateForm, StatusUpdateForm
-from kpc.models import Certificate
+from kpc.models import Certificate, CertificateConfig, Receipt
 from kpc.tests import CERT_FORM_KWARGS, load_initial_data
 from kpc.views import (CertificateRegisterView, CertificateView,
                        CertificateVoidView, ExportView, licensee_contacts)
@@ -147,7 +147,9 @@ class CertificateRegisterViewTests(TestCase):
         self.assertEqual(Certificate.objects.count(), 5)
 
         message = list(response.context['messages']).pop()
-        self.assertEqual(message.message, 'Generated 5 new certificates.')
+        receipt = Receipt.objects.first()
+        success_msg = CertificateRegisterView.get_success_msg(5, receipt)
+        self.assertEqual(message.message, success_msg)
 
     def test_list_generation(self):
         """
@@ -164,7 +166,29 @@ class CertificateRegisterViewTests(TestCase):
         self.assertEqual(Certificate.objects.count(), 2)
 
         message = list(response.context['messages']).pop()
-        self.assertEqual(message.message, 'Generated 2 new certificates.')
+        receipt = Receipt.objects.first()
+        success_msg = CertificateRegisterView.get_success_msg(2, receipt)
+        self.assertEqual(message.message, success_msg)
+
+    def test_receipt_generated_with_all_input(self):
+        """Receipt created containing all registration details"""
+        client = Client()
+        client.force_login(self.admin_user)
+        self.form_kwargs.update(self.list_kwargs)
+
+        client.post(reverse('cert-register'), self.form_kwargs)
+
+        receipt = Receipt.objects.first()
+        response = client.get(receipt.get_absolute_url())
+
+        self.assertContains(response, self.licensee.name)
+        self.assertContains(response, f'Receipt #{receipt.number}')
+        self.assertContains(response, self.licensee.address)
+        self.assertContains(response, self.user.profile)
+        self.assertContains(response, self.form_kwargs['payment_amount'])
+        self.assertContains(response, self.form_kwargs['cert_list'])
+        self.assertContains(response, f'${CertificateConfig.get_solo().price}')
+        self.assertContains(response, '2 certificates')
 
 
 class CertificateViewTests(CertTestCase):

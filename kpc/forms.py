@@ -5,7 +5,8 @@ from django.contrib.auth import get_user_model
 from django_countries import Countries
 from django_countries.fields import CountryField
 
-from .models import Certificate, CertificateConfig, KpcAddress, Licensee
+from .models import (Certificate, CertificateConfig, KpcAddress, Licensee,
+                     Receipt)
 
 User = get_user_model()
 
@@ -202,6 +203,12 @@ class CertificateRegisterForm(forms.Form):
             cert_list = self.cleaned_data['cert_list'].split(',')
             certs = [int(cert_number.strip()[2:]) for cert_number in cert_list]
         return certs
+
+    def save(self, commit=False):
+        """Generate receipt for this transaction"""
+        receipt = Receipt.from_registration_form(self)
+        receipt.save()
+        return receipt
 
 
 class StatusUpdateForm(forms.ModelForm):

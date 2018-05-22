@@ -1,0 +1,64 @@
+h1,
+h2 {
+    font-weight: bolder;
+}
+
+h3,
+h4 {
+    font-size: 1.5rem;
+    margin-top: 0.5em !important;
+}
+
+.receipt h1,
+.receipt h2,
+.receipt h3,
+.receipt h4 {
+    text-align: center;
+}
+
+.receipt p {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+.receipt p.indent {
+    margin-left: 2.5em;
+}
+
+.signed {
+    margin-top: 1em;
+}
+
+.signed p {
+    border-bottom: 1px solid;
+}
+
+.payable-box {
+    text-align: center;
+    border: 5px solid;
+}
+
+.payable-box p {
+    font-weight: bold;
+}
+
+@media print {
+    /* letter page size */
+    html,
+    body {
+        width: 220mm;
+        height: 280mm;
+    }
+    body * {
+        visibility: hidden;
+    }
+    #kpc-receipt,
+    #kpc-receipt * {
+        visibility: visible;
+    }
+    #kpc-receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+}

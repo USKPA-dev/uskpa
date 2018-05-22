@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from django.http import QueryDict
@@ -18,6 +19,7 @@ class CertificateConfig(SingletonModel):
     kp_countries = CountryField(multiple=True, blank=True,
                                 help_text='Countries available for selection as Country of Origin',
                                 verbose_name='KP Countries')
+
     history = HistoricalRecords()
 
     def __str__(self):
@@ -136,6 +138,56 @@ class KpcAddress(models.Model):
 
     def get_delete_url(self):
         return reverse('addressee-delete', args=[self.id])
+
+
+class Receipt(models.Model):
+    number = models.IntegerField(default=settings.LAST_RECEIPT_NUMBER, unique=True)
+    licensee_name = models.CharField(max_length=256)
+    licensee_address = models.TextField()
+    certificates = ArrayField(models.CharField(max_length=32))
+    total_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    certificates_sold = models.PositiveIntegerField()
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(max_length=256)
+    contact = models.CharField(max_length=256)
+    date_sold = models.DateField()
+
+    history = HistoricalRecords()
+
+    class Meta:
+        ordering = ['-number']
+
+    def save(self, *args, **kwargs):
+        """Auto-increment number"""
+        if not self.id:
+            last_receipt = Receipt.objects.first()
+            if last_receipt:
+                self.number = last_receipt.number + 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def from_registration_form(cls, form):
+        receipt = cls()
+        receipt.licensee_name = form.cleaned_data['licensee'].name
+        receipt.licensee_address = form.cleaned_data['licensee'].address_text
+        receipt.certificates = [f'US{num}' for num in form.get_cert_list()]
+        receipt.total_paid = form.cleaned_data['payment_amount']
+        receipt.certificates_sold = len(receipt.certificates)
+        receipt.unit_price = CertificateConfig.get_solo().price
+        receipt.payment_method = form.cleaned_data['payment_method']
+        receipt.contact = form.cleaned_data['contact'].profile.get_user_display_name()
+        receipt.date_sold = form.cleaned_data['date_of_sale']
+        return receipt
+
+    def __str__(self):
+        return f'Receipt ({self.id})'
+
+    def get_absolute_url(self):
+        return reverse('receipt', args=[self.id])
+
+    @property
+    def certificates_text(self):
+        return ', '.join(self.certificates)
 
 
 class Certificate(models.Model):
