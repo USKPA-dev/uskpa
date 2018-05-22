@@ -237,12 +237,12 @@ class StatusUpdateForm(forms.ModelForm):
         if new_status != self.instance.next_status_value:
             raise forms.ValidationError(self.UNEXPECTED_STATUS)
 
-        if new_status == Certificate.SHIPPED:
+        if date and new_status == Certificate.SHIPPED:
             if date < self.instance.date_of_issue:
                 raise forms.ValidationError(
                     self.SHIPPED_DATE % self.instance.date_of_issue)
 
-        if new_status == Certificate.DELIVERED:
+        if date and new_status == Certificate.DELIVERED:
             if date < self.instance.date_of_shipment:
                 raise forms.ValidationError(
                     self.DELIVERY_DATE % self.instance.date_of_shipment)
