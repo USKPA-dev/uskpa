@@ -242,7 +242,7 @@ class CertificateViewTests(CertTestCase):
         cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         """User gets an editable form if certificate is editable"""
         response = self.c.get(cert.get_absolute_url())
-        self.assertTemplateUsed(response, 'certificate/details-edit.html')
+        self.assertTemplateUsed(response, 'certificate/prepare.html')
 
     def test_non_editable_form_rendered_if_available(self):
         """User gets a non-editable form if certificate is editable"""
@@ -265,7 +265,7 @@ class CertificateViewTests(CertTestCase):
                                self.form_kwargs, follow=True)
         cert.refresh_from_db()
         self.assertEqual(cert.status, Certificate.AVAILABLE)
-        self.assertTemplateUsed(response, 'certificate/details-edit.html')
+        self.assertTemplateUsed(response, 'certificate/prepare.html')
         self.assertContains(response, 'required')
 
     def test_next_status_input_rendered_when_moddable(self):
@@ -313,7 +313,7 @@ class CertificateViewTests(CertTestCase):
         self.form_kwargs.pop('attested')
         for value in self.form_kwargs.values():
             self.assertContains(response, value)
-        self.assertTemplateUsed(response, 'certificate/details-edit.html')
+        self.assertTemplateUsed(response, 'certificate/prepare.html')
         message = list(response.context['messages']).pop()
         self.assertEqual(message.message, CertificateView.REVIEW_MSG)
 
@@ -337,7 +337,7 @@ class CertificateViewTests(CertTestCase):
         cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
         """User gets an editable form if certificate is editable"""
         response = self.c.get(cert.get_absolute_url())
-        self.assertTemplateUsed(response, 'certificate/details-edit.html')
+        self.assertTemplateUsed(response, 'certificate/prepare.html')
 
 
 class CertificateListViewTests(TestCase):

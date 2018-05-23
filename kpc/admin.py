@@ -115,9 +115,10 @@ class ReceiptAdmin(SimpleHistoryAdmin):
 
 
 @admin.register(EditRequest)
-class EditRequestAdmin(SimpleHistoryAdmin):
-    list_display = ('certificate', 'date_requested', 'contact', 'status')
-    list_filter = ('date_requested', 'contact', 'status')
+class EditRequestAdmin(admin.ModelAdmin):
+    change_form_template = "admin/edit-request-change.html"
+    list_display = ('id', 'certificate', 'date_requested', 'contact', 'status')
+    list_filter = ('status', 'date_requested', 'contact')
 
 
 admin.site.register(HSCode, KpcAdmin)

@@ -13,6 +13,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('become-a-licensee/', TemplateView.as_view(template_name='join.html'), name='join'),
     path('register-certificate/', kpc_views.CertificateRegisterView.as_view(), name='cert-register'),
+    path('edit-review/<int:pk>/', kpc_views.EditRequestView.as_view(), name='edit-review'),
+    path('certificates/<int:number>/edit', kpc_views.CertificateEditView.as_view(), name='edit'),
     path('certificates/<int:number>/confirm', kpc_views.CertificateConfirmView.as_view(), name='confirm'),
     path('certificates/<int:number>/void', kpc_views.CertificateVoidView.as_view(), name='void'),
     path('certificates/<int:number>', kpc_views.CertificateView.as_view(), name='cert-details'),

@@ -1,12 +1,8 @@
 
-{% if messages %}
-<section class="usa-grid alert-section">
-    {% for msg in messages %}
-        <div class="usa-alert usa-alert-{{msg.tags}}">
-            <div class="usa-alert-body">
-                <p class="usa-alert-text">{{msg}}</p>
-            </div>
+{% for msg in messages %}
+    <div class="usa-alert usa-alert-{{msg.tags}}">
+        <div class="usa-alert-body">
+            <p class="usa-alert-text">{{msg}}</p>
         </div>
-    {% endfor %}
-</section>
-{% endif %}
+    </div>
+{% endfor %}

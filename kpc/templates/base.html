@@ -39,7 +39,13 @@
   </header>
 
   <main id="main-content">
-    {% include 'messages.html' %}
+    {% block messages %}
+      {% if messages %}}
+        <section class="usa-grid alert-section">
+          {% include 'messages.html' %}
+        </section>
+      {% endif %}
+    {% endblock messages %}
     {% block content_title %}
     {% endblock content_title %}
     {% block content %}

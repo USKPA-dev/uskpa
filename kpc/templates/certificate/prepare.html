@@ -1,9 +1,7 @@
 {% extends 'certificate/base.html' %}
 
 {% block certificate-body-fields %}
-<form action="{{object.get_absolute_url}}" method="POST">
     {% csrf_token %}
-
     {% include 'certificate/fields_form.html' %}
     <div class="usa-grid">
         {% include 'certificate/fields-not-on-certificate.html' %}
@@ -19,9 +17,7 @@
                     <input id="id_attested" type="checkbox" name="attested" value="attested">
                     <label class="usa-input-error-label" for="id_attested">{{field.help_text}}</label>
                     <span class="usa-input-error-message" role="alert">
-                        {% for err in field.errors %}
-                            {{err}}
-                        {% endfor %}
+                        {% for err in field.errors %} {{err}} {% endfor %}
                     </span>
                 </li>
                 {% else %}
@@ -31,12 +27,16 @@
                 </li>
                 {% endif %}
             </ul>
-        <input type="submit" value="Submit" {% if not form.editable %}disabled{% endif %}>
+            <input type="submit" value="Submit" {% if not form.editable %}disabled{% endif %}>
         </fieldset>
     </div>
-    {% endwith %}
-</form>
+{% endwith %}
+{% endblock %}
 
+{% block edit-request %}
+{% endblock %}
+
+{% block scripts %}
 <script>
     var EXPIRY_DAYS = {{form.expiry_days}};
 
@@ -75,7 +75,5 @@
             }
         })
     });
-
 </script>
-
 {% endblock %}

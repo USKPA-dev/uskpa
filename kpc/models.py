@@ -19,6 +19,8 @@ class CertificateConfig(SingletonModel):
     kp_countries = CountryField(multiple=True, blank=True,
                                 help_text='Countries available for selection as Country of Origin',
                                 verbose_name='KP Countries')
+    reviewer_emails = models.TextField(blank=True,
+                                       help_text='Comma delimited list of email addresses to be notified upon submission of a request to edit a certificate.')
 
     history = HistoricalRecords()
 
@@ -28,6 +30,9 @@ class CertificateConfig(SingletonModel):
     class Meta:
         verbose_name = "Certificate Configuration"
         verbose_name_plural = "Certificate Configuration"
+
+    def get_reviewer_emails(self):
+        return self.reviewer_emails.split(',')
 
 
 class VoidReason(models.Model):
@@ -208,7 +213,8 @@ class BaseCertificate(models.Model):
                                               )
                            ]
                            )
-    country_of_origin = CountryField(blank=True, verbose_name='Country of Origin')
+    country_of_origin = CountryField(
+        blank=True, verbose_name='Country of Origin')
     date_of_issue = models.DateField(
         blank=True, null=True, help_text='Date of Issue')
     date_of_expiry = models.DateField(blank=True, null=True)
@@ -219,10 +225,12 @@ class BaseCertificate(models.Model):
                                                     ]
                                         )
     exporter = models.CharField(blank=True, max_length=256)
-    exporter_address = models.TextField(blank=True, help_text="Please include country name")
+    exporter_address = models.TextField(
+        blank=True, help_text="Please include country name")
     number_of_parcels = models.PositiveIntegerField(blank=True, null=True)
     consignee = models.CharField(blank=True, max_length=256)
-    consignee_address = models.TextField(blank=True, help_text="Please include country name")
+    consignee_address = models.TextField(
+        blank=True, help_text="Please include country name")
     carat_weight = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True,
                                        validators=[MinValueValidator(Decimal(0.009),
                                                                      message='Carat weight must be at least 0.01')
@@ -368,6 +376,13 @@ class Certificate(BaseCertificate):
     def user_can_edit(self, user):
         return self.user_can_access(user) and not user.profile.is_auditor
 
+    @property
+    def pending_edit(self):
+        try:
+            return self.edit_requests.filter(status=EditRequest.PENDING).latest("date_requested")
+        except EditRequest.DoesNotExist:
+            return None
+
     @classmethod
     def get_label_for_status(cls, status):
         return dict(cls.STATUS_CHOICES).get(status)
@@ -386,6 +401,7 @@ class Certificate(BaseCertificate):
 
 
 class EditRequest(BaseCertificate):
+    """Requested change to an existing Certificate record"""
     PENDING = 0
     APPROVED = 1
     REJECTED = 2
@@ -395,14 +411,62 @@ class EditRequest(BaseCertificate):
         (APPROVED, "Approved"),
         (REJECTED, "Rejected")
     )
-    """Requested change to an existing Certificate record"""
-    certificate = models.ForeignKey(Certificate, on_delete=models.PROTECT)
-    status = models.IntegerField(choices=STATUS_CHOICES)
-    contact = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='edit_requests')
-    date_requested = models.DateField(auto_now_add=True)
-    date_reviewed = models.DateField(blank=True, null=True)
-    reviewed_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='reviewed_edit_requests')
+    certificate = models.ForeignKey(
+        Certificate, on_delete=models.PROTECT, related_name='edit_requests')
+    status = models.IntegerField(choices=STATUS_CHOICES, default=PENDING)
+    contact = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='edit_requests')
+    date_requested = models.DateTimeField(auto_now_add=True)
+    date_reviewed = models.DateTimeField(blank=True, null=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                    on_delete=models.PROTECT, related_name='reviewed_edit_requests')
 
     class Meta:
         ordering = ['-date_requested']
+
+    def __str__(self):
+        return f'Edit Request: #{self.id} to modify {self.certificate}'
+
+    def get_absolute_url(self):
+        return reverse('edit-review', args=[self.id])
+
+    def cert_as_of_request(self):
+        """Certificate as of date this change was requested"""
+        return self.certificate.history.as_of(self.date_requested)
+
+    def changed_fields(self):
+        """yield requested changes for review"""
+        for field in BaseCertificate._meta.fields:
+            proposed_value = getattr(self, field.name, None)
+            if proposed_value:
+                yield field
+
+    def changed_fields_display(self):
+        """yield tuple for template rendering of changed values"""
+        cert = self.cert_as_of_request()
+        for field in self.changed_fields():
+            display_func = f'get_{field.name}_display'
+            get_display = display_func if hasattr(
+                self, display_func) else field.name
+            proposed_value = getattr(self, get_display, None)
+            current_value = getattr(cert, get_display)
+            yield (field.verbose_name, current_value, proposed_value)
+
+    def _apply_to_certificate(self):
+        """Apply requested changes to associated certificate"""
+        cert = self.certificate
+        for field in self.changed_fields():
+            new_value = getattr(self, field.name, None)
+            setattr(cert, field.name, new_value)
+        cert.save()
+
+    def approve(self):
+        self.status = self.APPROVED
+        self._apply_to_certificate()
+
+    def reject(self):
+        self.status = self.REJECTED
+
+    @property
+    def reviewed(self):
+        return self.status != self.PENDING
