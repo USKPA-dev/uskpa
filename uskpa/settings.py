@@ -74,6 +74,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "kpc.context_processors.contact_email",
+
             ],
         },
     },
@@ -163,11 +165,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # MAIL
 # default to mailhog for development, let env configure SendGrid otherwise
-EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+# email address used for all Contact Us links and FROM address on outgoing messages
+CONTACT_US = os.environ.get('CONTACT_US', 'NOT-CONFIGURED@LOCALHOST.ORG')
 DEFAULT_FROM_EMAIL = os.environ.get(
     'DJANGO_FROM_EMAIL',
-    default='NOT-CONFIGURED@LOCALHOST.ORG'
+    default=CONTACT_US
 )
+
+EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_SUBJECT_PREFIX = os.environ.get('DJANGO_EMAIL_SUBJECT_PREFIX', default='[LOCALHOST] ')
 
 if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
