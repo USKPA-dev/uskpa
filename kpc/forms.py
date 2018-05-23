@@ -59,8 +59,7 @@ class LicenseeCertificateForm(forms.ModelForm):
         self.expiry_days = Certificate.get_expiry_days()
         self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue'
         self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
-        self.fields['country_of_origin'] = CountryField(
-            countries=KPCountries, multiple=True).formfield()
+        self.fields['country_of_origin'] = CountryField(countries=KPCountries).formfield()
 
         if self.instance.licensee:
             addresses = self.instance.licensee.addresses.all()

@@ -88,11 +88,7 @@ class CertificatePreview(object):
             drawer(x, y, output)
 
     def format_country_of_origin(self, value):
-        """Prepend Multiple countries w/ ***"""
-        display = self.certificate.get_country_of_origin_display
-        if len(value) > 1:
-            return '***' + display
-        return display
+        return self.certificate.get_country_of_origin_display()
 
     def _paragraph_address(self, field):
         """Convert incoming address into list of Paragraphs"""

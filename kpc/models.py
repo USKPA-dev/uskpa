@@ -231,8 +231,7 @@ class Certificate(models.Model):
                                               )
                            ]
                            )
-    country_of_origin = CountryField(multiple=True,
-                                     blank=True, verbose_name='Country of Origin')
+    country_of_origin = CountryField(blank=True, verbose_name='Country of Origin')
     date_of_issue = models.DateField(
         blank=True, null=True, help_text='Date of Issue')
     date_of_expiry = models.DateField(blank=True, null=True)
@@ -372,7 +371,7 @@ class Certificate(models.Model):
     def get_void_reasons():
         return VoidReason.objects.all()
 
-    @property
-    def get_country_of_origin_display(self):
-        countries = [country.name for country in self.country_of_origin]
-        return ', '.join(countries)
+    # @property
+    # def get_country_of_origin_display(self):
+    #     countries = [country.name for country in self.country_of_origin]
+    #     return ', '.join(countries)
