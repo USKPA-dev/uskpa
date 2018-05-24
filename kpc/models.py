@@ -180,7 +180,7 @@ class Receipt(models.Model):
         return receipt
 
     def __str__(self):
-        return f'Receipt ({self.id})'
+        return f'Receipt ({self.number})'
 
     def get_absolute_url(self):
         return reverse('receipt', args=[self.id])

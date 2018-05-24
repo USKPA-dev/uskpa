@@ -46,7 +46,7 @@ prior to add-on installation. A payment method must be added to the account asso
     DJANGO_FROM_EMAIL=
     DJANGO_EMAIL_SUBJECT_PREFIX=
     ```
-    `DJANGO_FROM_EMAIL` will be the address which recipients see on the `FROM` line of incoming emails. It should be set to a monitored inbox unless reply instructions are included within the message.
+    `DJANGO_FROM_EMAIL` - Defaults to `CONTACT_US` value as configured in environment. Will be the address which recipients see on the `FROM` line of incoming emails. It should be set to a monitored inbox unless reply instructions are included within the message.
 
     `DJANGO_EMAIL_SUBJECT_PREFIX` helps differentiate deployed instances when the system generates emails to site administrators and should be set to the name of the Heroku instance.
 
