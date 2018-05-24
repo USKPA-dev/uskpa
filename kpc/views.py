@@ -14,6 +14,7 @@ from django.utils.safestring import mark_safe
 from django.views import View
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import DeleteView, FormView, UpdateView
+from django_countries import countries
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from djqscsv import render_to_csv_response
 
@@ -36,6 +37,9 @@ class ExportView(LoginRequiredMixin, View):
                "port_of_export__name",
                "notes"]
 
+    def _country_name_by_code(self, code):
+        return dict(countries)[code] if code else ''
+
     def get(self, request):
         """Return CSV of filtered certificates"""
         qs = apply_certificate_search(
@@ -52,7 +56,7 @@ class ExportView(LoginRequiredMixin, View):
             'date_of_shipment': _to_mdy,
             'date_of_delivery': _to_mdy,
             'date_voided': _to_mdy,
-            'country_of_origin': (lambda countries: Certificate(country_of_origin=countries).get_country_of_origin_display)
+            'country_of_origin': self._country_name_by_code
         }}
         return render_to_csv_response(qs, **export_kwargs)
 
