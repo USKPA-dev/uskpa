@@ -253,7 +253,7 @@ class LicenseeCertificateFormTests(TestCase):
 
     def test_countries_limited_by_config(self):
         """Selections limited by CertificateConfig"""
-        countries = [('FR', 'France'), ('IN', 'India')]
+        countries = [('', '---------'), ('FR', 'France'), ('IN', 'India')]
         config = CertificateConfig.get_solo()
         config.kp_countries = "FR,IN"
         config.save()

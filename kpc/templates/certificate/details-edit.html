@@ -1,9 +1,5 @@
 {% extends 'certificate/base.html' %}
 
-{% block header %}
-  {% include 'select2.html' %}
-{% endblock %}
-
 {% block certificate-body-fields %}
 <form action="{{object.get_absolute_url}}" method="POST">
     {% csrf_token %}
@@ -64,9 +60,6 @@
     }
 
     $(document).ready(function () {
-        $('#id_country_of_origin').select2({
-            placeholder: 'Select one or more countries'
-        });
 
         $('#id_exporter_addresses').change(prePopulateAddress);
         $('#id_consignee_addresses').change(prePopulateAddress);
