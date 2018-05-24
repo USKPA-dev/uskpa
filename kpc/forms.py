@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from django import forms
 from django.contrib.auth import get_user_model
@@ -8,6 +9,8 @@ from django.core.validators import RegexValidator
 
 from .models import (Certificate, CertificateConfig, KpcAddress, Licensee,
                      Receipt)
+
+LOGGER = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -277,6 +280,7 @@ class StatusUpdateForm(forms.ModelForm):
             self.instance.date_of_delivery = date
 
         self.instance.save()
+        LOGGER.info(f'{self.instance} status updated to: {self.instance.get_status_display()}')
         return self.instance
 
 
@@ -316,6 +320,7 @@ class VoidForm(forms.ModelForm):
         cert.notes = self.cleaned_data['notes'] or self.cleaned_data['reason']
         cert.date_voided = datetime.date.today()
         cert.save()
+        LOGGER.info(f'{self.instance} voided')
         return cert
 
 

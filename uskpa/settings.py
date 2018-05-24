@@ -28,7 +28,6 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '!!NOT-A-SECRET!!')
 DEBUG = os.environ.get('DEBUG', False) == "TRUE"
 CI_TESTING = os.environ.get('CI_TESTING', False) == "TRUE"
 IS_DEPLOYED = not DEBUG and not CI_TESTING
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -204,3 +203,54 @@ SOLO_CACHE = 'default'
 # Should only be modified upon initial release of the system
 # Sets starting value for Receipt.number field
 LAST_RECEIPT_NUMBER = 1300
+
+
+# LOGGING CONFIG
+DJANGO_LOG_LEVEL = os.getenv('DJANGO_LOG_LEVEL', 'ERROR' if IS_DEPLOYED else 'DEBUG')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] "
+                      "%(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S",
+        },
+        'simple': {
+            'format': "%(levelname)s %(message)s",
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': DJANGO_LOG_LEVEL,
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'kpc': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
+        'accounts': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
+    },
+}

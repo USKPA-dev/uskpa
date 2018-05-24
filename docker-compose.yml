@@ -29,5 +29,7 @@ services:
       - POSTGRES_USER=postgres
   mailhog:
     image: mailhog/mailhog:v1.0.0
+    logging:
+      driver: none
     ports:
       - "8025:8025"

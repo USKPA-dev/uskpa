@@ -1,5 +1,6 @@
 #migration data
 data
+staticfiles
 
 # python
 *.py[cod]
