@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 from django.core.exceptions import ImproperlyConfigured
 import dj_database_url
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,6 +28,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '!!NOT-A-SECRET!!')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False) == "TRUE"
 CI_TESTING = os.environ.get('CI_TESTING', False) == "TRUE"
+LOCAL_TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 IS_DEPLOYED = not DEBUG and not CI_TESTING
 # Application definition
 
@@ -254,6 +256,10 @@ LOGGING = {
         },
     },
 }
+
+# Silence loggers in testing, they're not under test
+if LOCAL_TESTING or CI_TESTING:
+    LOGGING = {}
 
 # Insert a country code for (Multiple Countries)
 COUNTRIES_OVERRIDE = {
