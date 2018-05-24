@@ -1,9 +1,10 @@
 {% extends "admin/change_form.html" %}
-{% load staticfiles %}
+{% load static%}
 
+{% comment %} select2.js ships with django, lets use it for our inputs {% endcomment %}
 {% block extrahead %}
-  <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+  <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'admin/js/vendor/select2/select2.full.min.js' %}"></script>
   {{ block.super }}
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/vendor/select2/select2.min.css' %}" rel="stylesheet" />
 {% endblock %}
