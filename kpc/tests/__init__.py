@@ -10,8 +10,8 @@ CERT_FORM_KWARGS = {"country_of_origin": "AQ", 'aes': 'X22222222222222',
                     'number_of_parcels': 1, 'date_of_issue': '01/01/2018',
                     'carat_weight': 1,
                     'harmonized_code': None, 'exporter': 'test',
-                    'exporter_address': '123', 'consignee': 'test',
-                    'consignee_address': 'test', 'shipped_value': 10,
+                    'exporter_address': '123 Antarctica', 'consignee': 'test',
+                    'consignee_address': '123 Antarctica', 'shipped_value': 10,
                     'attested': True}
 
 

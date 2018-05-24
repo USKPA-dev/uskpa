@@ -242,10 +242,10 @@ class Certificate(models.Model):
                                                     ]
                                         )
     exporter = models.CharField(blank=True, max_length=256)
-    exporter_address = models.TextField(blank=True)
+    exporter_address = models.TextField(blank=True, help_text="Please include country name")
     number_of_parcels = models.PositiveIntegerField(blank=True, null=True)
     consignee = models.CharField(blank=True, max_length=256)
-    consignee_address = models.TextField(blank=True)
+    consignee_address = models.TextField(blank=True, help_text="Please include country name")
     carat_weight = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True,
                                        validators=[MinValueValidator(Decimal(0.009),
                                                                      message='Carat weight must be at least 0.01')
