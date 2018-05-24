@@ -75,7 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                "kpc.context_processors.contact_email",
+                "kpc.context_processors.add_settings",
 
             ],
         },
@@ -261,6 +261,8 @@ LOGGING = {
 if LOCAL_TESTING or CI_TESTING:
     LOGGING = {}
 
+# Instance stage, as defined here https://18f.gsa.gov/dashboard/stages/
+STAGE = os.environ.get('STAGE', 'alpha')
 # Insert a country code for (Multiple Countries)
 COUNTRIES_OVERRIDE = {
     '***': '***',
