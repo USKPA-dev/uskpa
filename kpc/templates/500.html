@@ -1,0 +1,14 @@
+{% extends 'base.html' %} {% block title %} Error {% endblock title %} {% block content %}
+<div class="usa-grid ">
+  <h1>Error</h1>
+  <p>The USKPA website has encountered an unexpected error.</p>
+  <p>Site administrators have been notified.</p>
+  <p>If needed, please
+    <a href="mailto:{{CONTACT_US}}">contact us</a>
+     for assistance.
+  </p>
+  <p>
+    <a href="{% url 'home' %}">Return to the home page.</a>
+  </p>
+</div>
+{% endblock content %}

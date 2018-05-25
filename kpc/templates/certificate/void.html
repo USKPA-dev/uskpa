@@ -2,19 +2,8 @@
 
 {% block title %}Voiding Certificate: {{object}}{% endblock %}
 
-{% block content %}
-{% if form.non_form_errors %}
-<section class="alert-section">
-  <div class="usa-alert usa-alert-error usa-grid">
-    <ul class="usa-checklist">
-      {% for error in form.non_form_errors %}
-      <li>{{error.content}}</li>
-      {% endfor %}
-    </ul>
-  </div>
-</section>
-{% endif %}
 
+{% block content %}
 <div class="usa-grid">
   <h1>Voiding Certificate: {{object}}</h1>
   <p>This action cannot be reversed, please confirm and provide a reason.</p>
@@ -47,12 +36,22 @@
           {{choice}}
         {% endfor %}
       </select>
+      {% for error in form.reason.errors %}
+        <span class="usa-input-error-message" role="alert">
+          {{error}}
+        </span>
+      {% endfor %}
     </fieldset>
 
     <fieldset id="notes_fieldset"
         {% if form.reason.value != form.OTHER_CHOICE %}class="hidden"{% endif %}>
       <label for="id_notes">Other, specify:</label>
       <textarea name="notes" col="40" rows="10" id="id_notes"></textarea>
+      {% for error in form.notes.errors %}
+      <span class="usa-input-error-message" role="alert">
+        {{error}}
+      </span>
+      {% endfor %}
     </fieldset>
     <fieldset>
       <input type="submit" value="Void Certificate">

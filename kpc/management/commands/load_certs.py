@@ -91,9 +91,9 @@ class Command(BaseCommand):
         cert.number = prepare_number(row['CertNumber'])
 
         licensee_id = int(row['LicenseeID'])
-        # Ignore TEST(17) licensee records and
+        # Ignore TEST(17) or 34 licensee records and
         # and Certificate numbers with less than 5 digits
-        if licensee_id == 17 or cert.number < 10000:
+        if licensee_id in(17, 34) or cert.number < 10000:
             self.test_excluded += 1
             return
         if licensee_id in self.licensee_id_list:

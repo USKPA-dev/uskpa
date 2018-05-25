@@ -314,7 +314,6 @@ class VoidForm(forms.ModelForm):
     reason = forms.ChoiceField(choices=[])
     notes = forms.CharField(widget=forms.Textarea(), required=False)
 
-    SUCCESS_MSG = "Certificate has been successfully voided."
     REASON_REQUIRED = "Please provide a reason for this action."
 
     class Meta:
@@ -323,9 +322,10 @@ class VoidForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         """Set void reason choices"""
-        choices = [(reason.value, reason.value)
-                   for reason in Certificate.get_void_reasons()]
-        choices.append(('Other', 'Other'))
+        choices = [('', '---------')]
+        choices += [(reason.value, reason.value)
+                    for reason in Certificate.get_void_reasons()]
+        choices += [('Other', 'Other')]
         super().__init__(*args, **kwargs)
         self.fields['reason'].choices = choices
 
@@ -334,7 +334,7 @@ class VoidForm(forms.ModelForm):
         notes = self.cleaned_data.get('notes')
 
         if reason == self.OTHER_CHOICE and not notes:
-            raise forms.ValidationError(self.REASON_REQUIRED)
+            self.add_error('notes', self.REASON_REQUIRED)
 
     def save(self):
         """Set status to void"""

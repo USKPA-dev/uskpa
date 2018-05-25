@@ -248,11 +248,6 @@ class CertificateVoidView(BaseCertificateView):
             return redirect(obj.get_absolute_url())
         return super().dispatch(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, form.SUCCESS_MSG)
-        return response
-
 
 class CertificateConfirmView(BaseCertificateView):
     form_class = LicenseeCertificateForm
