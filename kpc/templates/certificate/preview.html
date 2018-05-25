@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Certificate US{{object.number}}{% endblock %}
+
+{% block header %}
+  <script src="{% static 'vendor/pdf.min.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 

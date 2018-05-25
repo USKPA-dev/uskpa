@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Certificate US{{object.number}}{% endblock %}
+
+{% block header %}
+    <script defer src="{% static 'vendor/moment.min.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 
