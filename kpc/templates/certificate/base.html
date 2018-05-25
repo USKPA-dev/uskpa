@@ -73,19 +73,10 @@
         </div>
         <div class="usa-width-one-third">
             <span class="attr-label">Licensee:
-            <a href="{{object.licensee.get_absolute_url}}">{{object.licensee}}</a>
+            {% if object.licensee %}
+                <a href="{{object.licensee.get_absolute_url}}">{{object.licensee}}</a>
+            {% endif %}
             </span>
-        </div>
-        <div class="usa-width-one-third">
-            <span class="attr-label">Assignor:</span> {{object.assignor}}
-        </div>
-    </div>
-    <div class="usa-grid">
-        <div class="usa-width-one-third">
-            <span class="attr-label">Modified:</span> {{object.last_modified}}
-        </div>
-        <div class="usa-width-one-third">
-            <span class="attr-label">Contact:</span> {{object.contact}}
         </div>
         <div class="usa-width-one-third">
             <span class="attr-label">Date Sold:</span> {{object.date_of_sale}}
@@ -114,12 +105,6 @@
             {{object.port_of_export}}
         {% endif %}
     </div>
-    {% if object.notes %}
-    <div class="usa-grid">
-        <span class="attr-label">Notes:</span> {{object.notes}}
-    </div>
-    {% endif %}
-
 </div>
 
 <div id="certificate-fields">
