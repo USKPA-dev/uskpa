@@ -48,6 +48,10 @@ class LicenseeCertificateForm(forms.ModelForm):
                                                                    'placeholder': 'Auto-filled from Date of Issue'}))
 
     SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
+    COUNTRY_MISSING = """Address must contain a
+                         participating KP country name,
+                         spelled identically to those listed in
+                         the Country of Origin field on this form."""
 
     def __init__(self, *args, **kwargs):
         """
@@ -59,7 +63,8 @@ class LicenseeCertificateForm(forms.ModelForm):
         self.expiry_days = Certificate.get_expiry_days()
         self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue'
         self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
-        self.fields['country_of_origin'] = CountryField(countries=KPCountries).formfield()
+        self.fields['country_of_origin'] = CountryField(
+            countries=KPCountries).formfield()
 
         if self.instance.licensee:
             addresses = self.instance.licensee.addresses.all()
@@ -82,6 +87,25 @@ class LicenseeCertificateForm(forms.ModelForm):
         fields = ('aes', 'country_of_origin', 'shipped_value', 'exporter', 'exporter_address',
                   'number_of_parcels', 'consignee', 'consignee_address', 'carat_weight', 'harmonized_code',
                   'date_of_issue', 'date_of_expiry', 'attested', 'port_of_export')
+
+    def find_kp_country(self, address):
+        """
+        Check for a KP country name in address
+        """
+        countries = [country.name.lower() for country in KPCountries()]
+        address = address.lower()
+        if not any(country in address for country in countries):
+            raise forms.ValidationError(self.COUNTRY_MISSING)
+
+    def clean_exporter_address(self):
+        address = self.cleaned_data.get('exporter_address')
+        self.find_kp_country(address)
+        return address
+
+    def clean_consignee_address(self):
+        address = self.cleaned_data.get('consignee_address')
+        self.find_kp_country(address)
+        return address
 
     def clean(self):
         date_of_issue = self.cleaned_data.get('date_of_issue')
@@ -279,7 +303,8 @@ class StatusUpdateForm(forms.ModelForm):
             self.instance.date_of_delivery = date
 
         self.instance.save()
-        LOGGER.info(f'{self.instance} status updated to: {self.instance.get_status_display()}')
+        LOGGER.info(
+            f'{self.instance} status updated to: {self.instance.get_status_display()}')
         return self.instance
 
 
