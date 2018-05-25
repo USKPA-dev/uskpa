@@ -1,5 +1,7 @@
 from django.conf import settings
 
 
-def contact_email(request):
-    return {'CONTACT_US': settings.CONTACT_US}
+def add_settings(request):
+    """make selected settings available in templates"""
+    return {'STAGE': settings.STAGE,
+            'CONTACT_US': settings.CONTACT_US}
