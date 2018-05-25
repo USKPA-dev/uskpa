@@ -21,8 +21,7 @@ class VoidFormTests(TestCase):
         """Other, specify field must be populated if OTHER_CHOICE selected"""
         form = self.form(self.form_kwargs)
         self.assertFalse(form.is_valid())
-        with self.assertRaisesRegex(forms.ValidationError, self.form.REASON_REQUIRED):
-            form.clean()
+        self.assertIn(form.REASON_REQUIRED, form.errors['notes'])
 
     def test_save_sets_void_w_fields(self):
         """Set Certificate.void and all associated fields"""
