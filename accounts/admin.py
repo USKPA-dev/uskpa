@@ -20,6 +20,8 @@ class ProfileUserAdmin(SimpleHistoryAdmin, UserAdmin):
     """Allow admins to create users with only a username & email"""
     inlines = (ProfileInline, )
     list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_superuser', 'date_joined', )
+    change_form_template = 'admin/user_change_form.html'
+    add_form_template = 'admin/user_add_form.html'
 
     add_form = UserCreationForm
     add_fieldsets = (
