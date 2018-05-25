@@ -49,8 +49,8 @@ Transformations performed upon incoming Certificate data fields.
   - Otherwise, map incoming status to `Certificate.SHIPPED` or `Certificate.DELIVERED`
 
 ##### Licensee
-  - Certificates excluded if `LicenseeID == 17 (TEST)`
-  - Licensee set to `None` if LicenseeID not found in `tblLicensee`
+  - Certificates excluded if `LicenseeID in (17, 34)` these are test licensees
+  - Licensee set to `None` if LicenseeID not found in `tblLicensee`, only expecting licensee ID: 23.
 
 ##### AES
  - Convert `x` to `X`
