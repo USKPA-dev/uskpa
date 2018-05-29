@@ -48,7 +48,7 @@ class LicenseeTests(TestCase):
         self.assertTrue(self.licensee.user_can_access(contact))
 
     def test_unaffiliated_user_cannot_access(self):
-        """Cannot access details as un-affliated user"""
+        """Cannot access details as un-affiliated user"""
         other_user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         self.assertFalse(self.licensee.user_can_access(other_user))
 

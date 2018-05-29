@@ -62,7 +62,7 @@ class CertificatePreview(object):
         'consignee': (240, LINE_3),
         'carat_weight': (665, LINE_3),
         'harmonized_code': (350, 175),
-        # Drawing in frame, place lower to accomodate border
+        # Drawing in frame, place lower to accommodate border
         'exporter_address': (300, LINE_2-5),
         'consignee_address': (300, LINE_3-5),
     }
