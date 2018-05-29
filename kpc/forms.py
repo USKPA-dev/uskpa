@@ -221,7 +221,7 @@ class CertificateRegisterForm(forms.Form):
             raise forms.ValidationError(
                 f"A payment of ${expected_payment} is required. ({requested_cert_count} requested certificates @ ${self.price} per certificate.)")
 
-        # Check for existence of requested certficates
+        # Check for existence of requested certificates
         existing = Certificate.objects.filter(
             number__in=requested_certs).exists()
         if existing:
@@ -256,7 +256,7 @@ class StatusUpdateForm(forms.ModelForm):
     SHIPPED_DATE = "The Shipped date must be on or after the certificate's date of issue (%s)."
     DELIVERY_DATE = "The Delivered date must be on or after the certificate's date of shipment (%s)."
     NOT_AVAILABLE = "This certificate has already been issued."
-    SUCCESS_MSG = 'Certificate status has been succesfully updated.'
+    SUCCESS_MSG = 'Certificate status has been successfully updated.'
 
     def __init__(self, *args, **kwargs):
         self.editable = kwargs.pop('editable', False)
