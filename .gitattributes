@@ -1,2 +1,3 @@
 Pipfile.lock binary
 static/vendor/** binary
+static/uskpa_documents/** binary
