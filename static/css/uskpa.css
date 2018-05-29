@@ -149,11 +149,11 @@ input[type="date"] {
     padding: 0;
 }
 
-.cert-listing {
+.listing {
     overflow-x: auto;
 }
 
-.address-block p {
+.licensee-address-block p {
     margin-top: 0em;
     margin-bottom: 0em;
 }
@@ -168,8 +168,4 @@ input[type="date"] {
 
 .preview-confirm input {
     display: inline;
-}
-
-.licensee-details-table {
-    margin: 0em;
 }

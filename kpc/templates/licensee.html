@@ -1,29 +1,32 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Licensee: {{object.name}}{% endblock %}
 
 {% block content %}
 <div class="usa-grid">
-  <div class='usa-width-one-half address-block'>
-
+  <div class="usa-width-one-half licensee-address-block">
     <div>
-      <h1>{{object.name}} {% if not object.is_active %} (inactive) {% endif %}</h1>
-      <p>{{object.address}}</p>
-      {% if object.address2 %}
-        <p>{{object.address2}}</p>
-      {% endif %}
-      <p>{{object.city}}, {{object.state}} {{object.zip_code}}</p>
-      <p><span class="attr-label">Tax ID:</span> {{object.tax_id}}</p>
-      {% if user.is_superuser %}
-        <a title='Edit licensee' href="{% url 'admin:kpc_licensee_change' object.id %}">
-          <i class="far fa-edit"></i>
-        </a>
-      {% endif %}
+      <h1>{{object.name}} {% if not object.is_active %} (inactive) {% endif %}
+        {% if user.is_superuser %}
+          <a title='Edit licensee' href="{% url 'admin:kpc_licensee_change' object.id %}">
+            <i class="far fa-edit"></i>
+          </a>
+        {% endif %}
+      </h1>
+      <div>
+        <p>{{object.address}}</p>
+        {% if object.address2 %}
+          <p>{{object.address2}}</p>
+        {% endif %}
+        <p>{{object.city}}, {{object.state}} {{object.zip_code}}</p>
+        <p><span class="attr-label">Tax ID:</span> {{object.tax_id}}</p>
+      </div>
     </div>
 
-    <div>
+    <div class="listing">
       <h2>Contacts</h2>
-      <table class="licensee-details-table">
+      <table class="cell-border">
         <thead>
           <th scope="col">Name</th>
           <th scope="col">Email</th>
@@ -42,12 +45,12 @@
     </div>
   </div>
 
-  <div class="usa-width-one-half">
+  <div class="usa-width-one-half listing">
     <h2>Address Book</h2>
     <span class="usa-form-hint">Made available as options to pre-populate 'Exporter' and 'Consignee' fields when preparing a certificate.</span>
     {% if object.addresses.all.exists %}
       <p><a href="{% url 'new-addressee' object.id %}">Click here to add a new addressee</a></p>
-      <table class="licensee-details-table">
+      <table class="cell-border">
         <thead>
           <th scope="col">Name</th>
           <th scope="col">Address</th>
