@@ -5,7 +5,7 @@ Documentation](../docs)
 All instances are hosted by [Heroku].
 
 * Development - https://uskpa-dev.herokuapp.com/
-* Production - TBD
+* Production - https://uskpa-prod.herokuapp.com/
 
 ### Heroku
 
@@ -23,12 +23,12 @@ discussed below is limited to those with the necessary permissions.
 ### Development
 *Heroku app: uskpa-dev*
 
-Deployed via Heroku Github Deploy from the [master] branch.
+Deployed automatically via Heroku Github integration from the [master] branch.
 
 The staging environment exists to test new releases prior
 to their production deployment.
 
-The staging database and application are indepedent of
+The staging database and application are independent of
 and share no data with the production instance.
 
 Example of a manual deploy using the [Heroku CLI]:
@@ -43,11 +43,11 @@ $ heroku run python manage.py migrate
 ```
 
 ### Production
-*Heroku app: TBD*
+*Heroku app: uskpa-prod*
 
-Deployed from: Tagged release
+Deployed from: Github [master] branch
 
-Future host of the production USKPA website.
+Application for the the production USKPA website.
 
 ### Initial Data
 

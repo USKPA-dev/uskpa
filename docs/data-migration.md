@@ -34,7 +34,7 @@ Tables utilized in migration:
 
 The address fields within the exported `tblCertificates.csv` file contain `\n` characters without surrounding field qualifiers. This corrupts the expected CSV format by having certificate records which span lines leading to truncated and otherwise unexpected data upon import.
 
-To remediate this file, regular expressions are used to identify and replace the offending `\n` characters with `|`. These character replacements will be reverted prior to final import to the new database.
+To re-mediate this file, regular expressions are used to identify and replace the offending `\n` characters with `|`. These character replacements will be reverted prior to final import to the new database.
 
 #### Data Transformation
 
@@ -54,7 +54,7 @@ Transformations performed upon incoming Certificate data fields.
 
 ##### AES
  - Convert `x` to `X`
- - If value is 14 digits, prepend with `X`.
+ - If value is 14 digits, pre-pend with `X`.
  - Imported as-is, even if AES format validation fails.
 
 ##### Port of Export
@@ -102,9 +102,9 @@ docker-compose run app python manage.py load_certs ./data/tblCertificate.csv > o
 
 ##### Steps to migrate data to a Heroku Instance:
 
-**Note:** These steps assume that a heroku app has already been established per the [deploy instructions.](./deploy.md)
+**Note:** These steps assume that a Heroku app has already been established per the [deploy instructions.](./deploy.md)
 
-Populating a heroku app with the migrated data will be accomplished by executing the migration scripts locally, against the heroku app's database. To do that we need to configure our local instance to establish a connection with the heroku application's database.
+Populating a Heroku app with the migrated data will be accomplished by executing the migration scripts locally, against the Heroku app's database. To do that we need to configure our local instance to establish a connection with the heroku application's database.
 
 1. Retrieve Heroku app database credentials as a database URL -- `postgres://{username}:{password}@{host}:{port}/{database name}`
 
