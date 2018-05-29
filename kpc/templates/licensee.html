@@ -3,12 +3,6 @@
 
 {% block title %}Licensee: {{object.name}}{% endblock %}
 
-{% block header %}
-    <link rel="stylesheet" type="text/css" href="{% static 'vendor/DataTables/datatables.min.css' %}">
-    <script defer src="{% static 'vendor/moment.min.js' %}"></script>
-    <script defer src="{% static 'vendor/DataTables/datatables.min.js' %}"></script>
-{% endblock header %}
-
 {% block content %}
 <div class="usa-grid">
   <div class="usa-width-one-half licensee-address-block">
