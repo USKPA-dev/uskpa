@@ -18,7 +18,7 @@ on each commit for which the unit test suite executes without error.
 Please see the Heroku CLI docs on [deploying with git](https://devcenter.heroku.com/articles/git).
 
 **Note:** Interacting with the specific Heroku Applications
-dicussed below is limited to those with the necessary permissions.
+discussed below is limited to those with the necessary permissions.
 
 ### Development
 *Heroku app: uskpa-dev*
@@ -52,7 +52,7 @@ Future host of the production USKPA website.
 ### Initial Data
 
 The USKPA system depends on several models being populated
-to enable a complete environment for both users and adminitrators.
+to enable a complete environment for both users and administrators.
 
 To load this initial data upon release to a new environment we
 use functionality provided by Django.
