@@ -6,7 +6,7 @@
 }
 
 .cert-listing td,
- .cert-listing table.dataTable.cell-border tbody td {
+.cert-listing table.dataTable.cell-border tbody td {
 	border: 0;
 	border-bottom: 1px solid #ddd;
 }
