@@ -18,9 +18,8 @@
   </div>
 
   <div class="usa-grid preview-confirm">
-    {% comment %}Disabled while PDF renders or until user requests plaintext preview{% endcomment %}
-    <input disabled type="submit" class="usa-button" value="Cancel" formaction="{{object.get_absolute_url}}" formmethod="GET">
-    <input disabled type="submit" class="usa-button" value="Confirm" formaction="{% url 'confirm' object.number %}">
+    <input type="submit" class="usa-button" value="Cancel" formaction="{{object.get_absolute_url}}" formmethod="GET">
+    <input type="submit" class="usa-button" value="Confirm" formaction="{% url 'confirm' object.number %}">
   </div>
 
   <div class="usa-grid">
@@ -59,7 +58,6 @@
         $('select option').attr('disabled', 'disabled');
 
         $('.alt-preview').click( function() {
-          $('.preview-confirm input').removeAttr('disabled');
           $('.pdf-preview').toggle();
           $('.text-preview').toggle();
         });
@@ -89,7 +87,6 @@
             var renderTask = page.render(renderContext);
             renderTask.then(function () {
               $('canvas').show();
-              $('.preview-confirm input').removeAttr('disabled');
             });
           });
         }, function (reason) {
