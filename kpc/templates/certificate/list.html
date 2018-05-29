@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'vendor/DataTables/datatables.min.css' %}">
     <script defer src="{% static 'vendor/moment.min.js' %}"></script>
     <script defer src="{% static 'vendor/DataTables/datatables.min.js' %}"></script>
+ <link rel="stylesheet" type="text/css" href="{% static 'css/certificate-filters.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/certificate.css' %}">
 {% endblock header %}
 
 {% block content %}
@@ -18,7 +20,7 @@
     </div>
     <div class="usa-width-two-thirds cert-listing">
 
-    <table id='certDataTable' class='compact'>
+    <table id='certDataTable' class='cell-border'>
         <thead>
             <th>Number</th>
             <th>Status</th>
