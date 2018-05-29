@@ -22,4 +22,16 @@ table.dataTable.no-footer {
 
 .listing table {
 	margin: 0em;
+	font-size: 1.5rem;
 }
+
+#addressList_filter input{
+	border: .1rem solid #5b616b;
+	margin-bottom: 1.5rem;
+}
+
+#addressList_filter label{
+	margin-top: 0rem;
+	font-size: 1.5rem;
+}
+
