@@ -1,0 +1,23 @@
+.certificate-filters label {
+	font-weight: bold;
+}
+
+.certificate-filters fieldset {
+	margin-top: 1em;
+}
+
+.certificate-filters label[for=id_status] {
+	margin-bottom: -1em;
+}
+
+.certificate-filter-buttons {
+	padding: 0;
+}
+
+.certificate-filters input[type=date] {
+	font-size: 1.3rem;
+}
+
+.certificate-filter-buttons .usa-button {
+	width: 100%;
+}
