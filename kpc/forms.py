@@ -182,7 +182,7 @@ class CertificateRegisterForm(forms.Form):
         cert_from = cleaned_data.get("cert_from")
         cert_to = cleaned_data.get("cert_to")
         cert_list = cleaned_data.get("cert_list")
-        payment_aount = cleaned_data.get("payment_amount")
+        payment_amount = cleaned_data.get("payment_amount")
         self.method = cleaned_data.get('registration_method')
 
         if licensee and contact:
@@ -217,7 +217,7 @@ class CertificateRegisterForm(forms.Form):
         """payment amount matches expected value"""
         requested_cert_count = len(requested_certs)
         expected_payment = requested_cert_count * self.price
-        if payment_aount != expected_payment:
+        if payment_amount != expected_payment:
             raise forms.ValidationError(
                 f"A payment of ${expected_payment} is required. ({requested_cert_count} requested certificates @ ${self.price} per certificate.)")
 
@@ -356,7 +356,7 @@ class KpcAddressForm(forms.ModelForm):
         """
         super().__init__(*args, **kwargs)
         self.fields['country'] = CountryField(countries=KPCountries).formfield(
-            help_text='Appended to address when pre-populating a Certificiate address field')
+            help_text='Appended to address when pre-populating a Certificate address field')
 
     class Meta:
         model = KpcAddress
