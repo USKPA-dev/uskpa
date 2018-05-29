@@ -164,5 +164,53 @@
       "name": "Cincinnati (OH)",
       "sort_order": 0
     }
+  },
+  {
+    "model": "kpc.VoidReason",
+    "pk": 0,
+    "fields": {
+      "value": "Printer error",
+      "sort_order": 0
+    }
+  },
+  {
+    "model": "kpc.VoidReason",
+    "pk": 1,
+    "fields": {
+      "value": "Certificate lost in transit",
+      "sort_order": 1
+    }
+  },
+  {
+    "model": "kpc.VoidReason",
+    "pk": 2,
+    "fields": {
+      "value": "Transposition error",
+      "sort_order": 2
+    }
+  },
+  {
+    "model": "kpc.VoidReason",
+    "pk": 3,
+    "fields": {
+      "value": "Customer canceled shipment",
+      "sort_order": 3
+    }
+  },
+  {
+    "model": "kpc.VoidReason",
+    "pk": 4,
+    "fields": {
+      "value": "Shipment returned",
+      "sort_order": 4
+    }
+  },
+  {
+    "model": "kpc.VoidReason",
+    "pk": 5,
+    "fields": {
+      "value": "Certificate surrendered",
+      "sort_order": 5
+    }
   }
 ]

@@ -88,6 +88,12 @@ h2 {
     margin-top: 0.5em !important;
 }
 
+h3 {
+    font-size: 1.6rem;
+    margin-top: 0.5em !important;
+}
+
+
 .cert-body,
 .cert-body-top {
     margin-top: 1em;
