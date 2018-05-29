@@ -1,42 +1,43 @@
 
-
+<a href="#" id="filter-toggle-link" class="filter-toggle-link"><i class="fas fa-caret-left"></i>Close filters</a>
 <form id="dataTable-filters" class="usa-form certificate-filters">
-    <div class="usa-grid certificate-filter-buttons">
-        <div class="usa-width-one-third">
-            <button id='filterApply' class="usa-button">Search</button>
-        </div>
-        <div class="usa-width-one-third">
-            <button id='resetFilters' class="usa-button">Reset</button>
-        </div>
-        <div class="usa-width-one-third">
-            <button id='export' class="usa-button">Export</button>
-        </div>
-    </div>
+    <div id="certificate-filters">
+	    <div class="usa-grid certificate-filter-buttons">
+		<div class="usa-width-one-third">
+		    <button id='filterApply' class="usa-button">Search</button>
+		</div>
+		<div class="usa-width-one-third">
+		    <button id='resetFilters' class="usa-button">Reset</button>
+		</div>
+		<div class="usa-width-one-third">
+		    <button id='export' class="usa-button">Export</button>
+		</div>
+	    </div>
 
-    <fieldset class="usa-fieldset-inputs">
-        <label for="certSearch">Certificate number starts with</label>
-        <input id="certSearch" class='table-search' name="search" type="number">
-        <small>Numeric portion only, don't include 'US'.</small>
-    </fieldset>
-    {% for field in filters.default_fields %}
-        <fieldset class="usa-fieldset-inputs">
-            {% include 'certificate/filter_field.html' %}
-        </fieldset>
-    {% endfor %}
-    <hr>
+	    <fieldset class="usa-fieldset-inputs">
+		<label for="certSearch">Certificate number starts with</label>
+		<input id="certSearch" class='table-search' name="search" type="number">
+		<small>Numeric portion only, don't include 'US'.</small>
+	    </fieldset>
+	    {% for field in filters.default_fields %}
+		<fieldset class="usa-fieldset-inputs">
+		    {% include 'certificate/filter_field.html' %}
+		</fieldset>
+	    {% endfor %}
+	    <hr>
 
-    <ul class="usa-accordion">
-        <li>
-            <button class="usa-accordion-button" aria-expanded="false" aria-controls="extra-filters">
-                Additional Filters
-            </button>
-            <div id="extra-filters" class="usa-accordion-content">
-                {% for field in filters.extra_fields %}
-                    {% include 'certificate/filter_field.html' %}
-                {% endfor %}
-            </div>
-        </li>
-    </ul>
-
+	    <ul class="usa-accordion">
+		<li>
+		    <button class="usa-accordion-button" aria-expanded="false" aria-controls="extra-filters">
+			Additional Filters
+		    </button>
+		    <div id="extra-filters" class="usa-accordion-content">
+			{% for field in filters.extra_fields %}
+			    {% include 'certificate/filter_field.html' %}
+			{% endfor %}
+		    </div>
+		</li>
+	    </ul>
+	    </div>
 </form>
 

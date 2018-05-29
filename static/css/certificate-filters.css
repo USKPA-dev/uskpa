@@ -1,3 +1,7 @@
+.certificate-filters {
+	margin-top: 1rem;
+}
+
 .certificate-filters label {
 	font-weight: bold;
 }
@@ -20,4 +24,25 @@
 
 .certificate-filter-buttons .usa-button {
 	width: 100%;
+}
+
+.filter-toggle-link:link,
+.filter-toggle-link:visited {
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 2rem;
+	color: #212121;
+}
+
+.filter-toggle-link .fa-caret-left,
+.filter-toggle-link .fa-caret-right {
+	font-size: 2.3rem;
+}
+
+.filter-toggle-link .fa-caret-left {
+	margin-right: 1rem;
+}
+
+.filter-toggle-link .fa-caret-right {
+	margin-left: 1rem;
 }
