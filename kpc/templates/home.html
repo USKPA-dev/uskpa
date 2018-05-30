@@ -123,15 +123,11 @@
     <div class='usa-width-one-third'>
       <h3>IRS Form 990</h3>
       <ul>
+        {% for path, filename in config.irs_docs %}
         <li>
-          <a href="{% static 'uskpa_documents/2016_IRS_Form_990.pdf' %}">2016 IRS Form 990.pdf</a>
+          <a href="{% static path %}">{{filename}}</a>
         </li>
-        <li>
-          <a href="{% static 'uskpa_documents/2015_IRS_Form_990.pdf' %}">2015 IRS Form 990.pdf</a>
-        </li>
-        <li>
-          <a href="{% static 'uskpa_documents/2014_IRS_Form_990.pdf' %}">2014 IRS Form 990.pdf</a>
-        </li>
+        {% endfor %}
       </ul>
     </div>
   </div>

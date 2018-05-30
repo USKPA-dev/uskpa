@@ -5,6 +5,9 @@ from django.views.generic import TemplateView
 
 from kpc import views as kpc_views
 
+from django.apps import apps
+kpc_config = apps.get_app_config('kpc')
+
 urlpatterns = [
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('become-a-licensee/', TemplateView.as_view(template_name='join.html'), name='join'),
@@ -22,5 +25,6 @@ urlpatterns = [
     path('licensee-contacts/', kpc_views.licensee_contacts, name='licensee-contacts'),
     path('receipt/<int:pk>', kpc_views.ReceiptView.as_view(), name='receipt'),
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('', TemplateView.as_view(template_name='home.html',
+                                  extra_context={'config': kpc_config}), name='home'),
 ]

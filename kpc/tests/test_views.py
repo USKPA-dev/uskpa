@@ -14,6 +14,7 @@ from kpc.models import Certificate, CertificateConfig, Receipt
 from kpc.tests import CERT_FORM_KWARGS, load_initial_data
 from kpc.views import (CertificateRegisterView, CertificateView,
                        CertificateVoidView, ExportView, licensee_contacts)
+from django.apps import apps
 
 
 def _get_expiry_date(date_of_issue):
@@ -22,6 +23,22 @@ def _get_expiry_date(date_of_issue):
     date_of_expiry = issued + \
         datetime.timedelta(days=Certificate.get_expiry_days())
     return date_of_expiry.strftime('%m/%d/%Y')
+
+
+class HomePageTests(TestCase):
+
+    def setUp(self):
+        self.c = Client()
+
+    def test_irs_docs_rendered_on_homepage(self):
+        """
+        Links to documents in ./static/uskpa_documents/irs/ are rendered on home page
+        """
+        response = self.c.get('')
+        kpc_config = apps.get_app_config('kpc')
+        irs_docs = [f[1] for f in kpc_config._get_irs_docs()]
+        for doc in irs_docs:
+            self.assertContains(response, doc)
 
 
 class CertTestCase(TestCase):
