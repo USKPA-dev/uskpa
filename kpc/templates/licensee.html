@@ -95,14 +95,13 @@
       });
 
       var addressTable = $('#addressList').DataTable({
-        "dom": "r"  //enable search field for addresses
+        "dom": "r"
       });
 
-      // Or on search form change
       $('#addressList_filter input').change(function () {
-      addressTable.search($('#addressList_filter input').val()).draw();
-    });
-  } )
+        addressTable.search(this.value).draw();
+      });
+  });
 </script>
 
 {% endblock content %}
