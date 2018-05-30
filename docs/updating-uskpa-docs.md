@@ -5,7 +5,7 @@ Documentation](../docs)
 This is only relevant to administrators of the USKPA site.
 
 ### IRS Form 990
-The USKPA, being a non-profit organization files an IRS Form 990 every year.  To meet the requirement in making these documents available to the public, the last 3 years of filings are posted to the uskpa.org site.  As such, each year the site needs to include the new filings. This change, along with all others to the site, must be committed to this
+The USKPA, being a non-profit organization, files an IRS Form 990 every year.  To meet the requirement in making these documents available to the public, the last 3 years of filings are posted to the uskpa.org site.  As such, each year the site needs to include the new filings. This change, along with all others to the site, must be committed to this
 git repository. Please see the [change workflow](./change-workflow.md).
 
 
