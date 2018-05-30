@@ -166,6 +166,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+IRS_DOCS_DIRECTORY = os.path.join(BASE_DIR, "static", 'uskpa_documents', 'irs')
+
 # MAIL
 # default to mailhog for development, let env configure SendGrid otherwise
 # email address used for all Contact Us links and FROM address on outgoing messages
