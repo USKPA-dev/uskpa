@@ -114,6 +114,12 @@ elif IS_DEPLOYED:
     # PRODUCTION SETTINGS
     # ------------------------------------------------------------------------------
     ALLOWED_HOSTS = ['.herokuapp.com']
+
+    extra_allowed_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', '')
+    if extra_allowed_hosts:
+        hosts = extra_allowed_hosts.split(',')
+        ALLOWED_HOSTS += hosts
+
     AUTH_PASSWORD_VALIDATORS = [
         {
             'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
