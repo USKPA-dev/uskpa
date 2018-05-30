@@ -24,14 +24,24 @@ logging functionality to capture platform and website activity along with select
 
 Upon release, the USKPA site utilizes [Papertrail] add-on at the [Choklad](https://elements.heroku.com/addons/papertrail#choklad) tier.
 
+At the time of this writing, this service tier provides the following log retention:
+
+Log volume per day | Search duration | Archive duration
+--- | --- | ---
+10 MB | 2 Days | 7 Days
+
+Logs may be exported from [Papertrail] if separate archival is
+desired. The service tier may also be upgraded to increase
+the archive duration to 365 days.
+
 As an authenticated administrator of the USKPA site, [Papertrail] may be accessed via the Heroku application dashboard.
 
 ### Logging Alerts
 
-  [Papertrail] Alerts have been configured to notify site administrators upon the detection of an `ERROR` log message produced by the application.
+[Papertrail] Alerts have been configured to notify site administrators upon the detection of an `ERROR` log message produced by the application.
 
-  At release time, the logs are scanned every 10 minutes for new errors.
+At release time, the logs are scanned every 10 minutes for new errors.
 
-  This alert is accessible and configurable via the alerts tab within [Papertrail].
+This alert is accessible and configurable via the alerts tab within [Papertrail].
 
 [Papertrail]: https://papertrailapp.com/

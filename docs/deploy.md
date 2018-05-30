@@ -45,9 +45,11 @@ $ heroku run python manage.py migrate
 ### Production
 *Heroku app: uskpa-prod*
 
-Deployed from: Github [master] branch
+Deployed manually from: Github [master] branch
 
 Application for the the production USKPA website.
+
+See [deploying changes](./change-workflow.md#deploying-changes) for details on making changes to the production instance.
 
 ### Initial Data
 

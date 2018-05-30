@@ -34,7 +34,7 @@ Tables utilized in migration:
 
 The address fields within the exported `tblCertificates.csv` file contain `\n` characters without surrounding field qualifiers. This corrupts the expected CSV format by having certificate records which span lines leading to truncated and otherwise unexpected data upon import.
 
-To re-mediate this file, regular expressions are used to identify and replace the offending `\n` characters with `|`. These character replacements will be reverted prior to final import to the new database.
+To remediate this file, regular expressions are used to identify and replace the offending `\n` characters with `|`. These character replacements will be reverted prior to final import to the new database.
 
 #### Data Transformation
 
@@ -54,7 +54,7 @@ Transformations performed upon incoming Certificate data fields.
 
 ##### AES
  - Convert `x` to `X`
- - If value is 14 digits, pre-pend with `X`.
+ - If value is 14 digits, prepend with `X`.
  - Imported as-is, even if AES format validation fails.
 
 ##### Port of Export
