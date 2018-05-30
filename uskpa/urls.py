@@ -1,11 +1,12 @@
+from django.apps import apps
 from django.contrib import admin
-from django.urls import path, include
-
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.urls import include, path
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 
 from kpc import views as kpc_views
 
-from django.apps import apps
 kpc_config = apps.get_app_config('kpc')
 
 urlpatterns = [
@@ -25,6 +26,10 @@ urlpatterns = [
     path('licensee-contacts/', kpc_views.licensee_contacts, name='licensee-contacts'),
     path('receipt/<int:pk>', kpc_views.ReceiptView.as_view(), name='receipt'),
     path('admin/', admin.site.urls),
+    path('favicon.ico',
+         RedirectView.as_view(url=staticfiles_storage.url('assets/icons/favicon.ico')),
+         name="favicon"
+         ),
     path('', TemplateView.as_view(template_name='home.html',
                                   extra_context={'config': kpc_config}), name='home'),
 ]
