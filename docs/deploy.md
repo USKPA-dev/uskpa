@@ -78,6 +78,7 @@ DEBUG | TRUE | ``settings.DEBUG``
 DJANGO_LOG_LEVEL | INFO, DEBUG, or ERROR | Controls logging level of Django process, defaults to ERROR in production
 CONTACT_US | email address | Email address used for all `contact-us` links through site, also used as default value for DJANGO_FROM_EMAIL
 STAGE | live | Set value to 'live' for production instance to toggle deployed instance status banner displayed at the top of each template.
+DJANGO_ALLOWED_HOSTS | Comma delimited list of allowed hosts for django application | ``settings.ALLOWED_HOSTS``
 
 ### Email - One time Setup
 
