@@ -3,6 +3,11 @@
 
 {% block title %}Licensee: {{object.name}}{% endblock %}
 
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static 'vendor/DataTables/datatables.min.css' %}">
+    <script defer src="{% static 'vendor/DataTables/datatables.min.js' %}"></script>
+{% endblock header %}
+
 {% block content %}
 <div class="usa-grid">
   <div class="usa-width-one-half licensee-address-block">
@@ -15,6 +20,7 @@
         {% endif %}
       </h1>
       <div>
+        <p><span class="attr-label">Address:</p>
         <p>{{object.address}}</p>
         {% if object.address2 %}
           <p>{{object.address2}}</p>
@@ -26,7 +32,7 @@
 
     <div class="listing">
       <h2>Contacts</h2>
-      <table class="cell-border">
+      <table id='contactList' class="cell-border">
         <thead>
           <th scope="col">Name</th>
           <th scope="col">Email</th>
@@ -49,8 +55,12 @@
     <h2>Address Book</h2>
     <span class="usa-form-hint">Made available as options to pre-populate 'Exporter' and 'Consignee' fields when preparing a certificate.</span>
     {% if object.addresses.all.exists %}
-      <p><a href="{% url 'new-addressee' object.id %}">Click here to add a new addressee</a></p>
-      <table class="cell-border">
+    <p><a href="{% url 'new-addressee' object.id %}" type="button" class="usa-button">Add address</a></p>
+    <div id="addressList_filter" class="usa-width-two-thirds dataTables_filter">
+      <label>Search Addresses:</label>
+      <input type="search" class="" placeholder="" aria-controls="addressList">
+    </div>
+      <table id='addressList' class="cell-border">
         <thead>
           <th scope="col">Name</th>
           <th scope="col">Address</th>
@@ -77,5 +87,21 @@
       {% endif %}
   </div>
 </div>
+
+<script>
+  $(document).ready( function () {
+      $('#contactList').DataTable({
+        "dom": "r"
+      });
+
+      var addressTable = $('#addressList').DataTable({
+        "dom": "r"
+      });
+
+      $('#addressList_filter input').change(function () {
+        addressTable.search(this.value).draw();
+      });
+  });
+</script>
 
 {% endblock content %}
