@@ -59,6 +59,23 @@
         return data;
     }
 
+    function getFilters(table) {
+        var filters = table.ajax.params();
+        delete filters.draw;
+        delete filters.columns;
+        delete filters.order;
+        delete filters.start;
+        delete filters.length;
+        delete filters.certDataTable_length;
+        return filters
+    }
+
+    function updateExportHref(table) {
+        var params = jQuery.param(getFilters(table));
+        var export_url = 'export?' + params;
+        $('#export').prop('href', export_url)
+    }
+
     $(document).ready(function() {
 
         var oTable = $('#certDataTable').DataTable({
@@ -187,12 +204,14 @@
         // Run our filtered search on submit
         $('#filterApply').click(function (event) {
             oTable.search($('#certSearch').val()).draw();
+            updateExportHref(oTable);
             event.preventDefault();
         });
 
         // Or on search form change
         $('#dataTable-filters').change(function () {
             oTable.search($('#certSearch').val()).draw();
+            updateExportHref(oTable);
         });
 
         // clear all search filters and refresh data
@@ -206,14 +225,6 @@
 
         $('[name=certDataTable_length]').change(function(){
             oTable.page.len($(this).val()).draw();
-        });
-
-        $('#export').click(function (){
-            event.preventDefault();
-            var filters = oTable.ajax.params();
-            var params = jQuery.param(filters);
-            var export_url = 'export?' + params;
-            window.open(export_url, '_blank');
         });
 
     });
