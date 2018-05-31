@@ -90,7 +90,7 @@ docker-compose run app bash
 
 ### Change Tracking
 
-We use [django-simple-history](https://github.com/treyhunner/django-simple-history) to record history for **all** models.
+We use [django-simple-history](https://github.com/treyhunner/django-simple-history) to record history for **all** kpc models.
 
 - ModelAdmins must be integrated with history.
     - Inherit from `simple_history.admin.SimpleHistoryAdmin`
