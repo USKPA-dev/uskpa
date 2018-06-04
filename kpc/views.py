@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
@@ -22,10 +22,10 @@ from .filters import CertificateFilter
 from .forms import (CertificateRegisterForm, EditRequestForm,
                     EditRequestReviewForm, KpcAddressForm,
                     LicenseeCertificateForm, StatusUpdateForm, VoidForm)
-from .models import Certificate, EditRequest, KpcAddress, Licensee, Receipt
+from .mail import notify_requester_of_completed_review, notify_reviewers
+from .models import (Certificate, CertificateConfig, EditRequest, KpcAddress,
+                     Licensee, Receipt)
 from .utils import CertificatePreview, _to_mdy, apply_certificate_search
-from .mail import notify_reviewers, notify_requester_of_completed_review
-
 
 User = get_user_model()
 
@@ -268,8 +268,11 @@ class CertificateEditView(BaseCertificateView):
 
     def dispatch(self, request, *args, **kwargs):
         """
+        404 if not enabled
         Only one pending certificate edit request may exist for a given certificate
         """
+        if not CertificateConfig.get_solo().edit_requests:
+            raise Http404
         obj = self.get_object()
         if obj.pending_edit:
             messages.warning(self.request, self.PENDING_EDIT)

@@ -117,7 +117,7 @@
                 </a>
                 {% endif %}
                 {% block edit-request %}
-                    {% if not object.pending_edit %}
+                    {% if object.show_edit_link %}
                     <a href='{% url "edit" object.number %}' id='edit' type='button' class="usa-button">
                         Submit edit request
                     </a>
