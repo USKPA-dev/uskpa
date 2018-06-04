@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -14,7 +15,6 @@ from kpc.models import Certificate, CertificateConfig, Receipt
 from kpc.tests import CERT_FORM_KWARGS, load_initial_data
 from kpc.views import (CertificateRegisterView, CertificateView,
                        CertificateVoidView, ExportView, licensee_contacts)
-from django.apps import apps
 
 
 def _get_expiry_date(date_of_issue):
@@ -464,6 +464,22 @@ class CertificateConfirmViewTest(CertTestCase):
         self.c.post(self.url, self.form_kwargs)
         self.cert.refresh_from_db()
         self.assertEqual(self.cert.status, Certificate.AVAILABLE)
+
+    def test_certificate_issued_on_post_w_multi_origins(self):
+        """
+        Certificate can be prepared with MULTIPLE_ORIGIN_COUNTRY_CODE for
+        origin option selected
+        """
+        # Add multi_origin as validate country of origin
+        multi_origin = settings.MULTIPLE_ORIGIN_COUNTRY_CODE
+        config = CertificateConfig.get_solo()
+        config.kp_countries = f'AQ,{multi_origin}'
+        config.save()
+
+        self.form_kwargs['country_of_origin'] = multi_origin
+        self.c.post(self.url, self.form_kwargs)
+        self.cert.refresh_from_db()
+        self.assertEqual(self.cert.status, Certificate.PREPARED)
 
 
 class CertificateJsonTests(SimpleTestCase):

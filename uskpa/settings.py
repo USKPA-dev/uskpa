@@ -273,7 +273,12 @@ if LOCAL_TESTING or CI_TESTING:
 
 # Instance stage, as defined here https://18f.gsa.gov/dashboard/stages/
 STAGE = os.environ.get('STAGE', 'alpha')
+
 # Insert a country code for (Multiple Countries)
+# Two character representation for database
+MULTIPLE_ORIGIN_COUNTRY_CODE = '**'
+MULTIPLE_ORIGIN_COUNTRY_DISPLAY_NAME = '***'
+
 COUNTRIES_OVERRIDE = {
-    '***': '***',
+    MULTIPLE_ORIGIN_COUNTRY_CODE: MULTIPLE_ORIGIN_COUNTRY_DISPLAY_NAME,
 }
