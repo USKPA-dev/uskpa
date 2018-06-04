@@ -19,5 +19,6 @@ def load_initial_data():
     """load initial data and configuration"""
     config = CertificateConfig.get_solo()
     config.kp_countries = 'AQ'
+    config.edit_requests = True
     config.save()
     call_command('loaddata', 'initial_data', verbosity=0)

@@ -555,6 +555,7 @@ class KpcAddressEditDeleteTests(TestCase):
 class CertEditTestCase(TestCase):
 
     def _make_edit_form_kwargs(self):
+        load_initial_data()
         form_kwargs = CERT_FORM_KWARGS.copy()
         form_kwargs.pop('attested')
         form_kwargs['harmonized_code'] = self.hs_code.id
@@ -583,6 +584,7 @@ class CertificateEditViewTests(CertEditTestCase):
 
     def setUp(self):
         super().setUp()
+
         self.url = reverse('edit', args=[self.cert.number])
 
     def test_edit_request_view_inaccessible_if_pending(self):

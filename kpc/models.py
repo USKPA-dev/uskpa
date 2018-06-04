@@ -21,7 +21,8 @@ class CertificateConfig(SingletonModel):
                                 verbose_name='KP Countries')
     reviewer_emails = models.TextField(blank=True,
                                        help_text='Comma delimited list of email addresses to be notified upon submission of a request to edit a certificate.')
-    edit_requests = models.BooleanField(default=False, verbose_name='Certificate Edit Requests', help_text='If True, users will be able to submit a request to modify a prepared certificate.')
+    edit_requests = models.BooleanField(default=False, verbose_name='Certificate Edit Requests',
+                                        help_text='If True, users will be able to submit a request to modify a prepared certificate.')
 
     history = HistoricalRecords()
 
