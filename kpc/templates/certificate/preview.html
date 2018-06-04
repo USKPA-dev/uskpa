@@ -4,6 +4,7 @@
 {% block title %}Certificate US{{object.number}}{% endblock %}
 
 {% block header %}
+  <script src="{% static 'vendor/pdf.worker.min.js' %}"></script>
   <script src="{% static 'vendor/pdf.min.js' %}"></script>
 {% endblock %}
 
