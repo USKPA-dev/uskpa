@@ -278,7 +278,8 @@ class CertificateEditView(BaseCertificateView):
 
     def test_func(self):
         obj = self.get_object()
-        if not obj.user_can_access(self.request.user):
+        user = self.request.user
+        if not obj.user_can_access(user) or user.profile.is_auditor:
             raise PermissionDenied
         return True
 

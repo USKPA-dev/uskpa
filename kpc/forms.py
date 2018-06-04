@@ -63,6 +63,9 @@ class EditRequestReviewForm(forms.ModelForm):
         if not approve and not reject:
             raise forms.ValidationError('Request must be approved or rejected.')
 
+        if approve and reject:
+            raise forms.ValidationError('Request must be approved or rejected, not both.')
+
     def save(self, reviewer=None):
         """Set reviewed status and reviewer"""
         approve, _ = self._get_review()

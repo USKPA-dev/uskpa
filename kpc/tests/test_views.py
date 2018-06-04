@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -8,13 +9,13 @@ from django.core.exceptions import PermissionDenied
 from django.test import Client, RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
 from model_mommy import mommy
+from django.core import mail
 
 from kpc.forms import LicenseeCertificateForm, StatusUpdateForm
-from kpc.models import Certificate, CertificateConfig, Receipt
+from kpc.models import Certificate, CertificateConfig, EditRequest, Receipt
 from kpc.tests import CERT_FORM_KWARGS, load_initial_data
 from kpc.views import (CertificateRegisterView, CertificateView,
                        CertificateVoidView, ExportView, licensee_contacts)
-from django.apps import apps
 
 
 def _get_expiry_date(date_of_issue):
@@ -45,7 +46,7 @@ class CertTestCase(TestCase):
 
     def get_form_kwargs(self):
         base_kwargs = CERT_FORM_KWARGS.copy()
-        base_kwargs['harmonized_code'] = mommy.make('HScode').id
+        base_kwargs['harmonized_code'] = mommy.make('HSCode').id
         base_kwargs['port_of_export'] = mommy.make('PortOfExport').id
         base_kwargs['date_of_expiry'] = _get_expiry_date(
             base_kwargs['date_of_issue'])
@@ -549,3 +550,109 @@ class KpcAddressEditDeleteTests(TestCase):
         """Licensee's contact can delete destination"""
         self.c.post(self.destination.get_delete_url())
         self.assertEqual(0, self.licensee.addresses.count())
+
+
+class CertEditTestCase(TestCase):
+
+    def _make_edit_form_kwargs(self):
+        form_kwargs = CERT_FORM_KWARGS.copy()
+        form_kwargs.pop('attested')
+        form_kwargs['harmonized_code'] = self.hs_code.id
+        form_kwargs['port_of_export'] = self.poe.id
+        form_kwargs['date_of_issue'] = '01/01/2018'
+        form_kwargs['date_of_expiry'] = '03/02/2018'
+        return form_kwargs
+
+    def setUp(self):
+        cert_kwargs = CERT_FORM_KWARGS.copy()
+        self.poe = mommy.make('PortOfExport')
+        self.hs_code = mommy.make('HSCode')
+        cert_kwargs['harmonized_code'] = self.hs_code
+        cert_kwargs['port_of_export'] = self.poe
+        cert_kwargs['date_of_issue'] = '2018-01-01'
+        cert_kwargs['date_of_expiry'] = '2018-03-02'
+
+        self.cert = mommy.make('Certificate', **cert_kwargs)
+        self.user = mommy.make(settings.AUTH_USER_MODEL,
+                               is_superuser=True, email='test@test.com')
+        self.c = Client()
+        self.c.force_login(self.user)
+
+
+class CertificateEditViewTests(CertEditTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('edit', args=[self.cert.number])
+
+    def test_edit_request_view_inaccessible_if_pending(self):
+        """Edit request not accessible if one already exists and is pending"""
+        mommy.make('EditRequest', certificate=self.cert,
+                   status=EditRequest.PENDING)
+        response = self.c.get(self.url)
+        self.assertRedirects(response, self.cert.get_absolute_url())
+
+    def test_auditors_cannot_create_edit_requests(self):
+        """Auditors cannot access edit request form"""
+        auditor = make_auditor()
+        self.c.force_login(auditor)
+        response = self.c.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_form_valid_no_change_redirects(self):
+        """No edit request created if no changes made on edit request form"""
+        form_kwargs = self._make_edit_form_kwargs()
+        response = self.c.post(self.url, form_kwargs, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(EditRequest.objects.exists())
+        self.assertFalse(self.cert.pending_edit)
+
+    def test_form_valid_change_creates_edit_request(self):
+        """Edit request created if changes made on edit request form"""
+        form_kwargs = self._make_edit_form_kwargs()
+        form_kwargs['consignee'] = 'NEW CONSIGNEE'
+        response = self.c.post(self.url, form_kwargs, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.cert.pending_edit.contact, self.user)
+
+
+class EditRequestViewTests(CertEditTestCase):
+
+    def setUp(self):
+        """EditRequest with a single change to consignee field"""
+        super().setUp()
+        self.edit = mommy.make('EditRequest', certificate=self.cert, contact=self.user,
+                               status=EditRequest.PENDING, consignee='NEWCONSIGNEE')
+        self.url = self.edit.get_absolute_url()
+
+    def test_non_superusers_cannot_access(self):
+        self.user.is_superuser = False
+        self.user.save()
+        response = self.c.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_modified_values_displayed_on_page(self):
+        """Previous and proposed values displayed on page"""
+        response = self.c.get(self.url)
+        self.assertContains(response, self.cert.consignee)
+        self.assertContains(response, self.edit.consignee)
+
+    def test_approve(self):
+        """Certificate modified, reviewer set, and notification generated"""
+        self.c.post(self.url, {'approve': True})
+        self.assertEqual(len(mail.outbox), 1)
+        self.edit.refresh_from_db()
+        self.cert.refresh_from_db()
+        self.assertEqual(self.edit.status, EditRequest.APPROVED)
+        self.assertEqual(self.cert.consignee, self.edit.consignee)
+        self.assertEqual(self.edit.reviewed_by, self.user)
+
+    def test_reject(self):
+        """Certificate NOT, reviewer set, and notification generated"""
+        self.c.post(self.url, {'reject': True})
+        self.assertEqual(len(mail.outbox), 1)
+        self.edit.refresh_from_db()
+        self.cert.refresh_from_db()
+        self.assertEqual(self.edit.status, EditRequest.REJECTED)
+        self.assertNotEqual(self.cert.consignee, self.edit.consignee)
+        self.assertEqual(self.edit.reviewed_by, self.user)

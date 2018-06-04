@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
@@ -170,3 +172,30 @@ class ReceiptTests(TestCase):
         receipt.save()
         receipt.refresh_from_db()
         self.assertEqual(receipt.number, settings.LAST_RECEIPT_NUMBER)
+
+
+class EditRequestTests(TestCase):
+
+    def setUp(self):
+        self.cert = mommy.make('Certificate', consignee='CURRENT')
+        self.edit = mommy.prepare('EditRequest', certificate=self.cert,
+                                  date_requested=datetime.now())
+
+    def test_changed_fields(self):
+        """return certificate fields with data"""
+        self.edit.consignee = 'NEW'
+        fields = [f.name for f in self.edit.changed_fields()]
+        self.assertEquals(fields, ['consignee'])
+
+    def test_changed_fields_display(self):
+        """return tuple of field.name, current, and proposed value for rendering"""
+        self.edit.consignee = 'NEW'
+        changes = [c for c in self.edit.changed_fields_display()]
+        self.assertEquals(changes, [('consignee', 'CURRENT', 'NEW')])
+
+    def test_changed_fields_applied(self):
+        """Proposed values are saved to certificate"""
+        self.edit.consignee = 'NEW'
+        self.edit.approve()
+        self.cert.refresh_from_db()
+        self.assertEquals(self.cert.consignee, self.edit.consignee)
