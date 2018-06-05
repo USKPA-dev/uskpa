@@ -249,7 +249,6 @@ class LicenseeCertificateFormTests(TestCase):
         kwargs['date_of_expiry'] = '12/12/9999'
         form = LicenseeCertificateForm(kwargs)
         self.assertFalse(form.is_valid())
-        self.assertIn(form.date_expiry_invalid, form.errors['date_of_expiry'])
 
     def test_countries_limited_by_config(self):
         """Selections limited by CertificateConfig"""
