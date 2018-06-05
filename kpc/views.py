@@ -95,10 +95,7 @@ class EditRequestView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.get_object().certificate.get_absolute_url()
 
     def test_func(self):
-        """administrative users only"""
-        if self.request.user.is_superuser:
-            return True
-        raise PermissionDenied
+        return True
 
     def form_valid(self, form):
         edit_request = form.save(reviewer=self.request.user)
