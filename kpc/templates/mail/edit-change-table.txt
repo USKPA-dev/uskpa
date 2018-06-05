@@ -1,0 +1,11 @@
+{% for field, old, new in edit_request.changed_fields_display %}
+Change #{{forloop.counter}}:
+Field: {{field|title}}
+
+Original Entry:
+{% if old%}{{old}}{% endif %}
+
+Change Entry to:
+{% if new %}{{new}}{% endif %}
+--------------------------------------------
+{% endfor %}

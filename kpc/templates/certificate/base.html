@@ -2,80 +2,55 @@
 {% load static %}
 {% block title %}Certificate US{{object.number}}{% endblock %}
 
-{% block header %}
-    <script defer src="{% static 'vendor/moment.min.js' %}"></script>
-{% endblock %}
+{% block header %}<script defer src="{% static 'vendor/moment.min.js' %}"></script>{% endblock %}
+
+{% block messages %}
+{% if messages or form.errors or form.non_field_errors or object.pending_edit or object.void %}
+<div class="usa-grid alert-section">
+        {% include 'messages.html' %}
+        {% include 'forms/errors.html' %}
+        {% if object.pending_edit %}
+        <div class="usa-alert usa-alert-info">
+            <div class="usa-alert-body">
+                <h3 class="usa-alert-heading">This certificate has a change request awaiting review.</h3>
+                <p class="usa-alert-text">
+                    <a href="{{object.pending_edit.get_absolute_url}}">Click here to review.</a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+        {% if object.void %}
+        <div class="usa-alert usa-alert-warning">
+            <div class="usa-alert-body">
+                <h3 class="usa-alert-heading">Voided on: {{object.date_voided}}</h3>
+                <p class="usa-alert-text">
+                    Reason: {{object.notes}}
+                </p>
+            </div>
+        </div>
+        {% endif %}
+</div>
+{% endif %}
+{% endblock messages %}
 
 {% block content %}
-
-{% if form.errors or form.non_field_errors or object.void %}
-<section class='alert-section'>
-{% endif %}
-{% if form.errors %}
-<div class="usa-grid">
-    <div class="usa-alert usa-alert-error">
-        <ul class="usa-checklist">
-            <li>Please correct the errors below.</li>
-        </ul>
-    </div>
-</div>
-{% endif %}
-{% if form.non_field_errors %}
-<div class="usa-grid">
-    <div class="usa-alert usa-alert-error">
-        <ul class="usa-checklist">
-            {% for error in form.non_field_errors %}
-            <li>{{error}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
-{% endif %}
-{% if object.void %}
-<div class="usa-grid">
-    <div class="usa-alert usa-alert-warning">
-        <div class="usa-alert-body">
-            <h3 class="usa-alert-heading">Voided on: {{object.date_voided}}</h3>
-            <p class="usa-alert-text">
-                Reason: {{object.notes}}
-            </p>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% if form.non_field_errors or object.void %}
-</section>
-{% endif %}
-
 <div class='cert-header'>
-
     <div class="usa-grid cert-row-one">
-        <div class="usa-width-one-half">
-            <h1>{{object}}
-                {% if user.is_superuser %}
-                <a title='Edit certificate' href="{% url 'admin:kpc_certificate_change' object.id %}">
-                    <i class="far fa-edit"></i>
-                </a>
-                {% endif %}
-            </h1>
-        </div>
-        <div class="usa-width-one-half">
-            {% if not object.void and form.editable %}
-                <a href='{% url "void" object.number %}' id='void' type='button' class="usa-button">
-                    Void this Certificate
-                </a>
+        <h1>{{object}} {% if user.is_superuser %}
+            <a title='Edit certificate' href="{% url 'admin:kpc_certificate_change' object.id %}">
+                <i class="far fa-edit"></i>
+            </a>
             {% endif %}
-        </div>
+        </h1>
     </div>
     <div class="usa-grid">
         <div class="usa-width-one-third">
             <span class="attr-label">Status: </span>{{object.get_status_display}}
         </div>
         <div class="usa-width-one-third">
-            <span class="attr-label">Licensee:
-            {% if object.licensee %}
+            <span class="attr-label">Licensee: {% if object.licensee %}
                 <a href="{{object.licensee.get_absolute_url}}">{{object.licensee}}</a>
-            {% endif %}
+                {% endif %}
             </span>
         </div>
         <div class="usa-width-one-third">
@@ -85,53 +60,74 @@
     <div class="usa-grid">
         <div class="usa-width-one-third">
             {% if object.date_of_issue %}
-            <span class="attr-label">Date Issued:</span> {{object.date_of_issue}}
-            {% endif %}
+            <span class="attr-label">Date Issued:</span> {{object.date_of_issue}} {% endif %}
         </div>
         <div class="usa-width-one-third">
             {% if object.date_of_shipment %}
-            <span class="attr-label">Date Shipped:</span> {{object.date_of_shipment}}
-            {% endif %}
+            <span class="attr-label">Date Shipped:</span> {{object.date_of_shipment}} {% endif %}
         </div>
         <div class="usa-width-one-third">
             {% if object.date_of_delivery %}
-            <span class="attr-label">Date Delivered:</span> {{object.date_of_delivery}}
-            {% endif %}
+            <span class="attr-label">Date Delivered:</span> {{object.date_of_delivery}} {% endif %}
         </div>
     </div>
     <div class="usa-grid">
         {% if object.port_of_export %}
-            <span class="attr-label">Port of Export:</span>
-            {{object.port_of_export}}
-        {% endif %}
+        <span class="attr-label">Port of Export:</span>
+        {{object.port_of_export}} {% endif %}
     </div>
 </div>
 
 <div id="certificate-fields">
-    {% block certificate-body-fields %}
-    {% endblock %}
+    <form action="" method="POST">
+        {% csrf_token %}
 
-    {% if object.status_can_be_updated and form.editable %}
-    <div id="status-update" class="usa-grid">
-        <hr>
-        <form action="" method="POST" class="usa-form">
-            {% csrf_token %}
-            <fieldset>
-                <label for="id_date">{{object.next_status_label}} as of:</label>
-                <input type="date" name="date" placeholder="mm/dd/yyyy" id="id_date" required>
-                {% for error in form.date.errors %}
+        {% block certificate-body-fields %}
+        {% endblock %}
+
+        {% block certificate-footer %}
+        {% if form.editable %}
+        <div class="usa-grid cert-controls">
+            <hr>
+
+            {% block cert-status %}
+            <div id="status-update" class="usa-width-one-half">
+                {% if object.status_can_be_updated %} {% csrf_token %}
+                <fieldset>
+                    <label for="id_date">{{object.next_status_label}} as of:</label>
+                    <input type="date" name="date" placeholder="mm/dd/yyyy" id="id_date" required> {% for error in form.date.errors %}
                     <span class="usa-input-error-message" role="alert">
                         {{error}}
                     </span>
-                {% endfor %}
-            </fieldset>
-            <fieldset>
-                <input type="hidden" name="next_status" value="{{object.next_status_value}}" id="id_next_status">
-                <input type="submit" class="usa-button" value="Set status to: {{object.next_status_label}}">
-            </fieldset>
-        </form>
-    </div>
-    {% endif %}
-</div>
+                    {% endfor %}
+                </fieldset>
+                <fieldset>
+                    <input type="hidden" name="next_status" value="{{object.next_status_value}}" id="id_next_status">
+                    <input type="submit" class="usa-button" value="Set status to: {{object.next_status_label}}">
+                </fieldset>
+                {% endif %}
+            </div>
+            {% endblock cert-status %}
 
-{% endblock %}
+            {% block cert-void-change %}
+            <div class="usa-width-one-half">
+                {% if not object.void %}
+                <a href='{% url "void" object.number %}' id='void' type='button' class="usa-button">
+                    Void this certificate
+                </a>
+                {% endif %}
+                {% block edit-request %}
+                    {% if object.show_edit_link %}
+                    <a href='{% url "edit" object.number %}' id='edit' type='button' class="usa-button">
+                        Submit edit request
+                    </a>
+                    {% endif %}
+                {% endblock edit-request %}
+            </div>
+            {% endblock cert-void-change %}
+        </div>
+        {% endif %}
+        {% endblock certificate-footer %}
+    </form>
+</div>
+{% endblock content %}

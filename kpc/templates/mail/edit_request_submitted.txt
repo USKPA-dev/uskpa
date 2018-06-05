@@ -1,0 +1,12 @@
+{% extends 'mail/base.txt' %}{% block content %}
+USKPA Certificate Change Request
+
+Date: {{edit_request.date_requested}}
+Licensee: {{edit_request.certificate.licensee.name}}
+Requestor: {{edit_request.contact.profile.get_user_display_name}}
+Requestor Email: {{edit_request.contact.email}}
+Certificate Number: {{edit_request.certificate}}
+
+{% include 'mail/edit-change-table.txt' %}
+--------------------------------------------
+{%endblock%}

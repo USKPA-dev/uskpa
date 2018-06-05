@@ -5,9 +5,10 @@ from django.conf import settings
 from django.test import TestCase
 from model_mommy import mommy
 
-from kpc.forms import (CertificateRegisterForm, LicenseeCertificateForm,
-                       StatusUpdateForm, VoidForm, KpcAddressForm)
-from kpc.models import Certificate, CertificateConfig
+from kpc.forms import (CertificateRegisterForm, EditRequestForm,
+                       EditRequestReviewForm, KpcAddressForm,
+                       LicenseeCertificateForm, StatusUpdateForm, VoidForm)
+from kpc.models import Certificate, CertificateConfig, EditRequest
 from kpc.tests import CERT_FORM_KWARGS
 
 
@@ -248,7 +249,6 @@ class LicenseeCertificateFormTests(TestCase):
         kwargs['date_of_expiry'] = '12/12/9999'
         form = LicenseeCertificateForm(kwargs)
         self.assertFalse(form.is_valid())
-        self.assertIn(form.date_expiry_invalid, form.errors['date_of_expiry'])
 
     def test_countries_limited_by_config(self):
         """Selections limited by CertificateConfig"""
@@ -287,3 +287,63 @@ class KpcAddressFormTests(TestCase):
         config.save()
         form = KpcAddressForm()
         self.assertEqual(countries, form.fields['country'].choices)
+
+
+class EditRequestReviewFormTests(TestCase):
+
+    def setUp(self):
+        self.cert = mommy.make('Certificate')
+        self.edit = mommy.make('EditRequest', status=EditRequest.PENDING,
+                               certificate=self.cert)
+        self.form = EditRequestReviewForm(instance=self.edit, data={})
+
+    def test_clean_already_reviewed(self):
+        """Instance must not already be reviewed"""
+        self.edit.status = EditRequest.APPROVED
+        self.edit.save()
+        self.assertFalse(self.form.is_valid())
+        with self.assertRaises(forms.ValidationError):
+            self.form.clean()
+
+    def test_clean_no_response(self):
+        """Form must be provided with review action"""
+        self.assertFalse(self.form.is_valid())
+        with self.assertRaises(forms.ValidationError):
+            self.form.clean()
+
+    def test_clean_multi_response(self):
+        """Form must be provided with only one review action"""
+        self.form.data = {'approve': True, 'reject': True}
+        self.assertFalse(self.form.is_valid())
+        with self.assertRaises(forms.ValidationError):
+            self.form.clean()
+
+    def test_approve(self):
+        """Approval updates status"""
+        self.form.data = {'approve': True}
+        self.assertTrue(self.form.is_valid())
+        edit = self.form.save()
+        self.assertEqual(edit.status, EditRequest.APPROVED)
+
+    def test_reject(self):
+        """Rejection updates status"""
+        self.form.data = {'reject': True}
+        self.assertTrue(self.form.is_valid())
+        edit = self.form.save()
+        self.assertEqual(edit.status, EditRequest.REJECTED)
+
+
+class EditRequestFormTests(TestCase):
+
+    def setUp(self):
+        self.user = mommy.make(settings.AUTH_USER_MODEL)
+        self.cert = mommy.make('Certificate')
+        self.form = EditRequestForm(instance=self.cert, data={})
+
+    def test_edit_request_created_with_changed_data(self):
+        """Modified values are stored in a new EditRequest"""
+        self.form.is_valid()
+        self.form.cleaned_data = {'consignee': 'NEW'}
+        self.form.changed_data = ['consignee']
+        edit = self.form.save(contact=self.user)
+        self.assertEqual(edit.consignee, 'NEW')

@@ -1,0 +1,10 @@
+{% if form.errors or form.non_field_errors %}
+<div class="usa-alert usa-alert-error">
+  <ul class="usa-checklist">
+    <li>Please correct the errors below.</li>
+    {% for error in form.non_field_errors %}
+    <li>{{error}}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}

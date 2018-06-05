@@ -3,12 +3,12 @@ import logging
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.core.validators import RegexValidator
 from django_countries import Countries
 from django_countries.fields import CountryField
-from django.core.validators import RegexValidator
 
-from .models import (Certificate, CertificateConfig, KpcAddress, Licensee,
-                     Receipt)
+from .models import (Certificate, CertificateConfig, EditRequest, KpcAddress,
+                     Licensee, Receipt)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -41,52 +41,75 @@ class KPCountries(Countries):
         return [country.code for country in countries]
 
 
-class LicenseeCertificateForm(forms.ModelForm):
-    date_of_issue = forms.DateField(
-        widget=forms.DateInput(attrs=DATE_ATTRS))
-    date_of_expiry = forms.DateField(widget=forms.DateInput(attrs={'readonly': 'readonly',
-                                                                   'placeholder': 'Auto-filled from Date of Issue'}))
+class EditRequestReviewForm(forms.ModelForm):
+    approve = forms.BooleanField(required=False)
+    reject = forms.BooleanField(required=False)
 
-    SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
+    class Meta:
+        model = EditRequest
+        fields = ()
+
+    def _get_review(self):
+        '''fetch review from incoming data'''
+        approve = self.cleaned_data.get('approve')
+        reject = self.cleaned_data.get('reject')
+        return approve, reject
+
+    def clean(self):
+        if self.instance.status != EditRequest.PENDING:
+            raise forms.ValidationError('This request has already been reviewed.')
+        approve, reject = self._get_review()
+
+        if not approve and not reject:
+            raise forms.ValidationError('Request must be approved or rejected.')
+
+        if approve and reject:
+            raise forms.ValidationError('Request must be approved or rejected, not both.')
+
+    def save(self, reviewer=None):
+        """Set reviewed status and reviewer"""
+        approve, _ = self._get_review()
+        edit_request = self.instance
+        edit_request.reviewed_by = reviewer
+        edit_request.date_reviewed = datetime.datetime.now()
+        if approve:
+            edit_request.approve()
+        else:
+            edit_request.reject()
+        edit_request.save()
+        return edit_request
+
+
+class BaseCertificateForm(forms.ModelForm):
+    date_of_issue = forms.DateField(widget=forms.DateInput(attrs=DATE_ATTRS))
+
     COUNTRY_MISSING = """Address must contain a
                          participating KP country name,
                          spelled identically to those listed in
                          the Country of Origin field on this form."""
-
-    def __init__(self, *args, **kwargs):
-        """
-        All fields are required for Licensee to complete certificate
-        """
-        self.editable = kwargs.pop('editable', True)
-        super().__init__(*args, **kwargs)
-
-        self.expiry_days = Certificate.get_expiry_days()
-        self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue'
-        self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
-        self.fields['country_of_origin'] = CountryField(
-            countries=KPCountries).formfield()
-
-        if self.instance.licensee:
-            addresses = self.instance.licensee.addresses.all()
-            self.initial.update({'exporter': self.instance.licensee.name,
-                                 'exporter_address': self.instance.licensee.address_text})
-        else:
-            addresses = Licensee.objects.none()
-
-        self.fields['addresses'] = forms.ModelChoiceField(
-            required=False, queryset=addresses)
-
-        for field in self.fields:
-            if field != 'addresses':
-                self.fields[field].required = True
-            if not self.editable:
-                self.fields[field].disabled = True
 
     class Meta:
         model = Certificate
         fields = ('aes', 'country_of_origin', 'shipped_value', 'exporter', 'exporter_address',
                   'number_of_parcels', 'consignee', 'consignee_address', 'carat_weight', 'harmonized_code',
                   'date_of_issue', 'date_of_expiry', 'attested', 'port_of_export')
+
+    def __init__(self, *args, **kwargs):
+        """
+        All fields are required
+        Populate address books
+        Set selectable countries
+        """
+        super().__init__(*args, **kwargs)
+        self.expiry_days = Certificate.get_expiry_days()
+        self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue (expected %s)'
+        self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
+        self.fields['country_of_origin'] = CountryField(countries=KPCountries).formfield()
+        addresses = self.instance.licensee.addresses.all() if self.instance.licensee else None
+        self.fields['addresses'] = forms.ModelChoiceField(required=False, queryset=addresses)
+        for field in self.fields:
+            if field != 'addresses':
+                self.fields[field].required = True
 
     def find_kp_country(self, address):
         """
@@ -114,8 +137,27 @@ class LicenseeCertificateForm(forms.ModelForm):
         # Date of expiry must be CertificateConfig.expiry_days after date of issue
         if date_of_issue and date_of_expiry:
             delta = date_of_expiry - date_of_issue
+            expected_date = date_of_issue + datetime.timedelta(days=self.expiry_days)
             if delta.days != self.expiry_days:
-                self.add_error('date_of_expiry', self.date_expiry_invalid)
+                self.add_error('date_of_expiry', self.date_expiry_invalid % expected_date.strftime('%m/%d/%Y'))
+
+
+class LicenseeCertificateForm(BaseCertificateForm):
+    date_of_expiry = forms.DateField(widget=forms.DateInput(attrs={'readonly': 'readonly',
+                                                                   'placeholder': 'Auto-filled from Date of Issue'}))
+
+    SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
+
+    def __init__(self, *args, **kwargs):
+        """prepopulate licensee field and disable if not editable"""
+        self.editable = kwargs.pop('editable', True)
+        super().__init__(*args, **kwargs)
+        if self.instance.licensee:
+            self.initial.update({'exporter': self.instance.licensee.name,
+                                 'exporter_address': self.instance.licensee.address_text})
+        for field in self.fields:
+            if not self.editable:
+                self.fields[field].disabled = True
 
     def save(self, commit=True):
         """Set status to PREPARED"""
@@ -123,6 +165,25 @@ class LicenseeCertificateForm(forms.ModelForm):
             self.instance.status = Certificate.PREPARED
             self.instance.save()
         return self.instance
+
+
+class EditRequestForm(BaseCertificateForm):
+    date_of_expiry = forms.DateField(widget=forms.DateInput(attrs=DATE_ATTRS))
+
+    def __init__(self, *args, **kwargs):
+        """Remove attestation field when requesting a certificate edit"""
+        super().__init__(*args, **kwargs)
+        self.fields.pop('attested')
+
+    def save(self, commit=True, contact=None):
+        """Save changed fields to an EditRequest instance"""
+        if self.has_changed():
+            edit_request = EditRequest(
+                certificate=self.instance, contact=contact)
+            for field in self.changed_data:
+                setattr(edit_request, field, self.cleaned_data.get(field))
+            edit_request.save()
+        return edit_request
 
 
 class CertificateRegisterForm(forms.Form):

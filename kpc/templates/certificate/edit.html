@@ -1,0 +1,28 @@
+{% extends 'certificate/base.html' %}
+
+{% block title %}Certificate Change Request Form{% endblock %}
+
+{% block certificate-body-fields %}
+<div class="usa-grid cert-change-form-header">
+  <h2>Certificate Change Request Form</h2>
+  <p>Edit the certificate fields below and a USKPA administrator will review your request.</p>
+</div>
+
+  {% csrf_token %}
+  {% include 'certificate/fields_form.html' %}
+  <div class="usa-grid">
+    {% include 'certificate/fields-not-on-certificate.html' %}
+    <hr>
+  </div>
+{% endblock %}
+
+{% block certificate-footer %}
+  <div class="usa-grid">
+    <div class="usa-width-one-half">
+      <a href='{{object.get_absolute_url}}' class='usa-button'>Cancel</a>
+    </div>
+    <div class="usa-width-one-half">
+      <input type="submit" value="Request Changes">
+    </div>
+  </div>
+{% endblock %}

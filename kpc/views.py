@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
@@ -19,9 +19,12 @@ from django_datatables_view.base_datatable_view import BaseDatatableView
 from djqscsv import render_to_csv_response
 
 from .filters import CertificateFilter
-from .forms import (CertificateRegisterForm, KpcAddressForm,
+from .forms import (CertificateRegisterForm, EditRequestForm,
+                    EditRequestReviewForm, KpcAddressForm,
                     LicenseeCertificateForm, StatusUpdateForm, VoidForm)
-from .models import Certificate, KpcAddress, Licensee, Receipt
+from .mail import notify_requester_of_completed_review, notify_reviewers
+from .models import (Certificate, CertificateConfig, EditRequest, KpcAddress,
+                     Licensee, Receipt)
 from .utils import CertificatePreview, _to_mdy, apply_certificate_search
 
 User = get_user_model()
@@ -78,6 +81,39 @@ def licensee_contacts(request):
     return JsonResponse(contacts_json, safe=False)
 
 
+class EditRequestView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = EditRequest
+    form_class = EditRequestReviewForm
+    template_name = 'certificate/edit-review.html'
+    SUCCESS = 'Edit request has been: %s'
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % self.get_object().get_status_display()
+
+    def get_success_url(self):
+        """redirect to certificate details"""
+        return self.get_object().certificate.get_absolute_url()
+
+    def dispatch(self, request, *args, **kwargs):
+        """Disallow POST if not a superuser"""
+        if request.method == 'POST' and not self.request.user.is_superuser:
+            raise PermissionDenied()
+        return super().dispatch(request, *args, **kwargs)
+
+    def test_func(self):
+        obj = self.get_object()
+        if not obj.user_can_access(self.request.user):
+            raise PermissionDenied
+        return True
+
+    def form_valid(self, form):
+        edit_request = form.save(reviewer=self.request.user)
+        messages.success(self.request, self.SUCCESS %
+                         self.get_object().get_status_display())
+        notify_requester_of_completed_review(self.request, edit_request)
+        return redirect(self.get_success_url())
+
+
 class LicenseeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Licensee
     template_name = 'licensee.html'
@@ -124,7 +160,8 @@ class CertificateRegisterView(LoginRequiredMixin, UserPassesTestMixin, FormView)
             Certificate.objects.bulk_create(Certificate(
                 number=i, **cert_kwargs) for i in certs)
             receipt = form.save()
-            messages.success(self.request, self.get_success_msg(len(certs), receipt))
+            messages.success(
+                self.request, self.get_success_msg(len(certs), receipt))
         return super().form_valid(form)
 
 
@@ -212,7 +249,7 @@ class CertificateView(BaseCertificateView):
 
     def get_template_names(self):
         if self.object.licensee_editable:
-            return ['certificate/details-edit.html']
+            return ['certificate/prepare.html']
         return ['certificate/details.html']
 
     def form_valid(self, form):
@@ -226,6 +263,42 @@ class CertificateView(BaseCertificateView):
             response = super().form_valid(form)
             messages.success(self.request, form.SUCCESS_MSG)
             return response
+
+
+class CertificateEditView(BaseCertificateView):
+    form_class = EditRequestForm
+    template_name = 'certificate/edit.html'
+    PENDING_EDIT = 'There is an outstanding change request for this certificate which must be reviewed before another may be submitted.'
+    NO_CHANGE = 'The submitted data was identical to the existing data. No change request was submitted.'
+    SUCCESS = 'Your change request has been submitted.'
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        404 if not enabled
+        Only one pending certificate edit request may exist for a given certificate
+        """
+        if not CertificateConfig.get_solo().edit_requests:
+            raise Http404
+        obj = self.get_object()
+        if obj.pending_edit:
+            messages.warning(self.request, self.PENDING_EDIT)
+            return redirect(obj.get_absolute_url())
+        return super().dispatch(request, *args, **kwargs)
+
+    def test_func(self):
+        obj = self.get_object()
+        user = self.request.user
+        if not obj.user_can_access(user) or user.profile.is_auditor:
+            raise PermissionDenied
+        return True
+
+    def form_valid(self, form):
+        if not form.has_changed():
+            messages.warning(self.request, self.NO_CHANGE)
+        else:
+            edit_request = form.save(contact=self.request.user)
+            notify_reviewers(self.request, edit_request)
+        return redirect(self.get_success_url())
 
 
 class CertificateVoidView(BaseCertificateView):

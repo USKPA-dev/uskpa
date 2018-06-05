@@ -19,6 +19,10 @@ class CertificateConfig(SingletonModel):
     kp_countries = CountryField(multiple=True, blank=True,
                                 help_text='Countries available for selection as Country of Origin',
                                 verbose_name='KP Countries')
+    reviewer_emails = models.TextField(blank=True,
+                                       help_text='Comma delimited list of email addresses to be notified upon submission of a request to edit a certificate.')
+    edit_requests = models.BooleanField(default=False, verbose_name='Certificate Edit Requests',
+                                        help_text='If True, users will be able to submit a request to modify a prepared certificate.')
 
     history = HistoricalRecords()
 
@@ -28,6 +32,9 @@ class CertificateConfig(SingletonModel):
     class Meta:
         verbose_name = "Certificate Configuration"
         verbose_name_plural = "Certificate Configuration"
+
+    def get_reviewer_emails(self):
+        return self.reviewer_emails.split(',')
 
 
 class VoidReason(models.Model):
@@ -92,7 +99,8 @@ class Licensee(models.Model):
                                                  )
                               ]
                               )
-    is_active = models.BooleanField(default=True, help_text="Licensee is active - able to request and access certificates")
+    is_active = models.BooleanField(
+        default=True, help_text="Licensee is active - able to request and access certificates")
     history = HistoricalRecords()
 
     class Meta:
@@ -124,7 +132,8 @@ class KpcAddress(models.Model):
     name = models.CharField(max_length=256)
     address = models.TextField()
     country = CountryField()
-    licensee = models.ForeignKey(Licensee, related_name='addresses', on_delete=models.PROTECT)
+    licensee = models.ForeignKey(
+        Licensee, related_name='addresses', on_delete=models.PROTECT)
 
     class Meta:
         unique_together = ('licensee', 'name',)
@@ -141,7 +150,8 @@ class KpcAddress(models.Model):
 
 
 class Receipt(models.Model):
-    number = models.IntegerField(default=settings.LAST_RECEIPT_NUMBER, unique=True)
+    number = models.IntegerField(
+        default=settings.LAST_RECEIPT_NUMBER, unique=True)
     licensee_name = models.CharField(max_length=256)
     licensee_address = models.TextField()
     certificates = ArrayField(models.CharField(max_length=32))
@@ -175,7 +185,8 @@ class Receipt(models.Model):
         receipt.certificates_sold = len(receipt.certificates)
         receipt.unit_price = CertificateConfig.get_solo().price
         receipt.payment_method = form.cleaned_data['payment_method']
-        receipt.contact = form.cleaned_data['contact'].profile.get_user_display_name()
+        receipt.contact = form.cleaned_data['contact'].profile.get_user_display_name(
+        )
         receipt.date_sold = form.cleaned_data['date_of_sale']
         return receipt
 
@@ -190,7 +201,51 @@ class Receipt(models.Model):
         return ', '.join(self.certificates)
 
 
-class Certificate(models.Model):
+class BaseCertificate(models.Model):
+    """Base model containing physical certificate fields"""
+    # Fields on physical certificate, excluding 'number'
+
+    aes = models.CharField(max_length=30,
+                           blank=True,
+                           help_text='AES Confirmation Number (ITN)',
+                           verbose_name='AES',
+                           validators=[
+                               RegexValidator(regex='X\d{14}',
+                                              message='AES Confirmation (ITN) format is 14 digits prepended by X: X##############'
+                                              )
+                           ]
+                           )
+    country_of_origin = CountryField(
+        blank=True, verbose_name='Country of Origin')
+    date_of_issue = models.DateField(
+        blank=True, null=True, help_text='Date of Issue')
+    date_of_expiry = models.DateField(blank=True, null=True)
+    shipped_value = models.DecimalField(max_digits=20, decimal_places=2,
+                                        blank=True, null=True, help_text="Value in USD",
+                                        validators=[MinValueValidator(Decimal(0.009),
+                                                                      message='Shipped value must be greater than 0')
+                                                    ]
+                                        )
+    exporter = models.CharField(blank=True, max_length=256)
+    exporter_address = models.TextField(
+        blank=True, help_text="Please include country name")
+    number_of_parcels = models.PositiveIntegerField(blank=True, null=True)
+    consignee = models.CharField(blank=True, max_length=256)
+    consignee_address = models.TextField(
+        blank=True, help_text="Please include country name")
+    carat_weight = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True,
+                                       validators=[MinValueValidator(Decimal(0.009),
+                                                                     message='Carat weight must be at least 0.01')
+                                                   ]
+                                       )
+    harmonized_code = models.ForeignKey(
+        HSCode, blank=True, null=True, on_delete=models.PROTECT)
+
+    class Meta:
+        abstract = True
+
+
+class Certificate(BaseCertificate):
     AVAILABLE = 0
     PREPARED = 1
     SHIPPED = 2
@@ -213,45 +268,13 @@ class Certificate(models.Model):
         ('cash', 'Cash'),
         ('check', 'Check'),
     )
+    # Physical fields
+    number = models.PositiveIntegerField(
+        help_text='USKPA Certificate ID number', unique=True)
 
-    # Fields on physical certificate
     PHYSICAL_FIELDS = ('number', 'country_of_origin', 'aes', 'date_of_issue', 'date_of_expiry',
                        'shipped_value', 'exporter', 'exporter_address', 'number_of_parcels',
                        'consignee', 'consignee_address', 'carat_weight', 'harmonized_code__value')
-
-    number = models.PositiveIntegerField(
-        help_text='USKPA Certificate ID number', unique=True)
-    aes = models.CharField(max_length=30,
-                           blank=True,
-                           help_text='AES Confirmation Number (ITN)',
-                           verbose_name='AES',
-                           validators=[
-                               RegexValidator(regex='X\d{14}',
-                                              message='AES Confirmation (ITN) format is 14 digits prepended by X: X##############'
-                                              )
-                           ]
-                           )
-    country_of_origin = CountryField(blank=True, verbose_name='Country of Origin')
-    date_of_issue = models.DateField(
-        blank=True, null=True, help_text='Date of Issue')
-    date_of_expiry = models.DateField(blank=True, null=True)
-    shipped_value = models.DecimalField(max_digits=20, decimal_places=2,
-                                        blank=True, null=True, help_text="Value in USD",
-                                        validators=[MinValueValidator(Decimal(0.009),
-                                                                      message='Shipped value must be greater than 0')
-                                                    ]
-                                        )
-    exporter = models.CharField(blank=True, max_length=256)
-    exporter_address = models.TextField(blank=True, help_text="Please include country name")
-    number_of_parcels = models.PositiveIntegerField(blank=True, null=True)
-    consignee = models.CharField(blank=True, max_length=256)
-    consignee_address = models.TextField(blank=True, help_text="Please include country name")
-    carat_weight = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True,
-                                       validators=[MinValueValidator(Decimal(0.009),
-                                                                     message='Carat weight must be at least 0.01')
-                                                   ]
-                                       )
-    harmonized_code = models.ForeignKey(HSCode, blank=True, null=True, on_delete=models.PROTECT)
 
     # Non certificate fields
     port_of_export = models.ForeignKey(
@@ -355,6 +378,13 @@ class Certificate(models.Model):
     def user_can_edit(self, user):
         return self.user_can_access(user) and not user.profile.is_auditor
 
+    @property
+    def pending_edit(self):
+        try:
+            return self.edit_requests.filter(status=EditRequest.PENDING).latest("date_requested")
+        except EditRequest.DoesNotExist:
+            return None
+
     @classmethod
     def get_label_for_status(cls, status):
         return dict(cls.STATUS_CHOICES).get(status)
@@ -370,3 +400,87 @@ class Certificate(models.Model):
     @staticmethod
     def get_void_reasons():
         return VoidReason.objects.all()
+
+    @property
+    def show_edit_link(self):
+        """Show link if feature enabled and no pending edit request"""
+        return CertificateConfig.get_solo().edit_requests and not self.pending_edit
+
+
+class EditRequest(BaseCertificate):
+    """Requested change to an existing Certificate record"""
+    PENDING = 0
+    APPROVED = 1
+    REJECTED = 2
+
+    STATUS_CHOICES = (
+        (PENDING, "Pending"),
+        (APPROVED, "Approved"),
+        (REJECTED, "Rejected")
+    )
+    certificate = models.ForeignKey(
+        Certificate, on_delete=models.PROTECT, related_name='edit_requests')
+    status = models.IntegerField(choices=STATUS_CHOICES, default=PENDING)
+    contact = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='edit_requests')
+    date_requested = models.DateTimeField(auto_now_add=True)
+    date_reviewed = models.DateTimeField(blank=True, null=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                    on_delete=models.PROTECT, related_name='reviewed_edit_requests')
+
+    class Meta:
+        ordering = ['-date_requested']
+
+    def __str__(self):
+        return f'Edit Request: #{self.id} to modify {self.certificate}'
+
+    def get_absolute_url(self):
+        return reverse('edit-review', args=[self.id])
+
+    def user_can_access(self, user):
+        """True if user can access the associated certificate"""
+        return user.profile.certificates().filter(id=self.certificate.id).exists()
+
+    def cert_as_of_request(self):
+        """Certificate as of date this change was requested"""
+        try:
+            return self.certificate.history.as_of(self.date_requested)
+        except Certificate.DoesNotExist:
+            return self.certificate.history.first() or self.certificate
+
+    def changed_fields(self):
+        """yield requested changes for review"""
+        for field in BaseCertificate._meta.fields:
+            proposed_value = getattr(self, field.name, None)
+            if proposed_value:
+                yield field
+
+    def changed_fields_display(self):
+        """yield tuple for template rendering of changed values"""
+        cert = self.cert_as_of_request()
+        for field in self.changed_fields():
+            display_func = f'get_{field.name}_display'
+            get_display = display_func if hasattr(
+                self, display_func) else field.name
+            proposed_value = getattr(self, get_display, None)
+            current_value = getattr(cert, get_display, None)
+            yield (field.verbose_name, current_value, proposed_value)
+
+    def _apply_to_certificate(self):
+        """Apply requested changes to associated certificate"""
+        cert = self.certificate
+        for field in self.changed_fields():
+            new_value = getattr(self, field.name, None)
+            setattr(cert, field.name, new_value)
+        cert.save()
+
+    def approve(self):
+        self.status = self.APPROVED
+        self._apply_to_certificate()
+
+    def reject(self):
+        self.status = self.REJECTED
+
+    @property
+    def reviewed(self):
+        return self.status != self.PENDING

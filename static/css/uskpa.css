@@ -127,11 +127,6 @@ h3 {
     margin-top: 0.5em;
 }
 
-#void {
-    float: right;
-    width: 100%;
-}
-
 .cert-number {
     font-size: 3rem;
     font-weight: 700;
@@ -168,4 +163,20 @@ input[type="date"] {
 
 .preview-confirm input {
     display: inline;
+}
+
+.licensee-details-table {
+    margin: 0em;
+}
+
+#edit-request-review input[type=submit] {
+    display: inline;
+}
+
+.cert-controls a[type=button] {
+    width: auto;
+}
+
+.cert-change-form-header {
+    text-align: center;
 }

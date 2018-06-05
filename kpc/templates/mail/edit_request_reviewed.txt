@@ -1,0 +1,21 @@
+{% extends 'mail/base.txt' %}{% block content %}
+USKPA Certificate Change Request
+
+Change Request: #{{edit_request.id}}
+Certificate Number: {{edit_request.certificate}}
+Submitted on: {{edit_request.date_requested}}
+Licensee: {{edit_request.certificate.licensee.name}}
+Requestor: {{edit_request.contact.profile.get_user_display_name}}
+Requestor Email: {{edit_request.contact.email}}
+Reviewed on: {{edit_request.date_reviewed}}
+
+--------------------------------------------
+
+Change request #{{edit_request.id}} has been {{edit_request.get_status_display}}.
+
+{% if edit_request.status == 1 %}The requested changes have been applied.{% endif %}
+{% endblock %}
+
+--------------------------------------------
+
+{% include 'mail/edit-change-table.txt' %}
