@@ -34,6 +34,14 @@
                 </a>
             </li>
             {% endif %}
+            {% if user.profile.get_address_book_url %}
+            <li>
+              <a class="usa-nav-link {% if request.resolver_match.url_name == 'licensee' %}usa-current{% endif %}"
+                 href="{{user.profile.get_address_book_url}}">
+                <span>Address Book</span>
+              </a>
+            </li>
+            {% endif %}
             {% if user.is_superuser %}
             <li>
                 <a class="usa-nav-link" href="{% url 'admin:index' %}">

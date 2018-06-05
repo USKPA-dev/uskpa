@@ -51,6 +51,13 @@ class Profile(models.Model):
             return Licensee.objects.all()
         return self.licensees.filter(is_active=True)
 
+    def get_address_book_url(self):
+        """URL to display as address book nav link"""
+        try:
+            return self.licensees.get().get_absolute_url()
+        except (Licensee.MultipleObjectsReturned, Licensee.DoesNotExist):
+            return None
+
     @property
     def is_auditor(self):
         return self.user.has_perm('accounts.can_review_certificates') \

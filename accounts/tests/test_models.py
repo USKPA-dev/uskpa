@@ -36,13 +36,13 @@ class ProfileTests(TestCase):
         self.assertEqual(user.profile.phone_number, 'NEW_VALUE')
 
     def test_certs_returns_all_for_superusers(self):
-        """Superusers can see all certiticates"""
+        """Superusers can see all certificates"""
         mommy.make('Certificate')
         user = mommy.make(User, is_superuser=True)
         self.assertEqual(user.profile.certificates().count(), 1)
 
     def test_certs_returns_all_for_auditors(self):
-        """Auditors can see all certiticates"""
+        """Auditors can see all certificates"""
         mommy.make('Certificate')
         user = mommy.make(User, is_superuser=False)
         user.groups.add(Group.objects.get(name='Auditor'))
@@ -68,3 +68,16 @@ class ProfileTests(TestCase):
         user.profile.licensees.add(licensee)
         user.profile.licensees.add(licensee_b)
         self.assertEqual(user.profile.certificates().count(), 1)
+
+    def test_address_book_url(self):
+        """Address book url only provided if a user associated with a single licensee"""
+        user = mommy.make(User)
+        self.assertIsNone(user.profile.get_address_book_url())
+
+        licensee = mommy.make('Licensee')
+        user.profile.licensees.add(licensee)
+        self.assertEqual(user.profile.get_address_book_url(), licensee.get_absolute_url())
+
+        licensee_b = mommy.make('Licensee')
+        user.profile.licensees.add(licensee_b)
+        self.assertIsNone(user.profile.get_address_book_url())
