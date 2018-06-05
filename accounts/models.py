@@ -1,26 +1,7 @@
-from django.db import models
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from simple_history.models import HistoricalRecords
-from simple_history import register
-
+from django.db import models
 
 from kpc.models import Certificate, Licensee
-
-
-class HistoryUser(get_user_model()):
-    """
-        Proxy User model here so we can register it
-        with django-simple-history and necessary migrations
-        are created within this app as opposed to within the
-        Django auth app.
-    """
-    class Meta:
-        proxy = True
-        verbose_name = 'User'
-
-
-register(HistoryUser)
 
 
 class Profile(models.Model):
@@ -30,8 +11,6 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=32, blank=True)
     licensees = models.ManyToManyField(
         'kpc.Licensee', blank=True, related_name='contacts')
-
-    history = HistoricalRecords()
 
     class Meta:
         permissions = (

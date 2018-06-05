@@ -3,10 +3,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
-from simple_history.admin import SimpleHistoryAdmin
 
 from .forms import UserCreationForm
-from .models import HistoryUser, Profile
+from .models import Profile
+
+User = get_user_model()
 
 
 class ProfileInline(admin.StackedInline):
@@ -16,7 +17,7 @@ class ProfileInline(admin.StackedInline):
     fk_name = 'user'
 
 
-class ProfileUserAdmin(SimpleHistoryAdmin, UserAdmin):
+class ProfileUserAdmin(UserAdmin):
     """Allow admins to create users with only a username & email"""
     inlines = (ProfileInline, )
     list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_superuser', 'date_joined', )
@@ -67,5 +68,5 @@ class ProfileUserAdmin(SimpleHistoryAdmin, UserAdmin):
         return super(ProfileUserAdmin, self).get_inline_instances(request, obj)
 
 
-admin.site.unregister(get_user_model())
-admin.site.register(HistoryUser, ProfileUserAdmin)
+admin.site.unregister(User)
+admin.site.register(User, ProfileUserAdmin)
