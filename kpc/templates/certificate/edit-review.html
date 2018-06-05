@@ -43,7 +43,7 @@
   {% if not object.reviewed %}
     {% if user.is_superuser %}
       <p>The following certificate changes were requested by <strong>{{object.contact.profile.get_user_display_name}}.</strong><br>
-       Please review the changes below and approve or reject. Upon approval, the changes will be applied to the certificate record.
+         Upon approval, the changes will be applied to the certificate record.
       </p>
     {% endif %}
   <p>Displayed "Previous Values" are the certificate values as of the date this change was requested.</p>
@@ -61,16 +61,17 @@
       {% for field, old, new in object.changed_fields_display %}
       <tr>
         <td>{{field|title}}</td>
-        <td>{{old}}</td>
-        <td>{{new}}</td>
+        <td>{% if old %}{{old}}{% endif %}</td>
+        <td>{% if new %}{{new}}{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 
-{% if not object.reviewed and user.is_superuser%}
+{% if not object.reviewed and user.is_superuser %}
 <div id='edit-request-review' class='usa-grid'>
+  <h2>Please review the changes above and approve or reject.</h2>
   <form action="" method="post">
     {% csrf_token %}
       <input type="submit" value='Reject' name='reject'>

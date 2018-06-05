@@ -14,22 +14,7 @@ Reviewed on: {{edit_request.date_reviewed}}<br>
 
 <hr>
 
-<table style="border: 1px solid black; border-collapse: collapse; width: 100%">
-  <thead>
-    <th style="border: 1px solid black; width: 20%">Certificate Field</th>
-    <th style="border: 1px solid black; width: 40%">Original Entry</th>
-    <th style="border: 1px solid black; width: 40%">Change Entry To</th>
-  </thead>
-  <tbody>
-  {% for field, old, new in edit_request.changed_fields_display %}
-    <tr>
-      <td style="border: 1px solid black">{{field|title}}</td>
-      <td style="border: 1px solid black">{{old}}</td>
-      <td style="border: 1px solid black">{{new}}</td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+{% include 'mail/edit-change-table.html' %}
 
 <hr>
 

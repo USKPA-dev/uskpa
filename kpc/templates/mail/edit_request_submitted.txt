@@ -7,14 +7,6 @@ Requestor: {{edit_request.contact.profile.get_user_display_name}}
 Requestor Email: {{edit_request.contact.email}}
 Certificate Number: {{edit_request.certificate}}
 
-{% for field, old, new in edit_request.changed_fields_display %}
-Change #{{forloop.counter}}:
-Field: {{field|title}}
-
-Original Entry:
-{{old}}
-
-Change Entry to:
-{{new}}
+{% include 'mail/edit-change-table.txt' %}
 --------------------------------------------
-{% endfor %}{%endblock%}
+{%endblock%}
