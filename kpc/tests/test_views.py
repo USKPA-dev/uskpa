@@ -627,12 +627,6 @@ class EditRequestViewTests(CertEditTestCase):
                                status=EditRequest.PENDING, consignee='NEWCONSIGNEE')
         self.url = self.edit.get_absolute_url()
 
-    def test_non_superusers_cannot_access(self):
-        self.user.is_superuser = False
-        self.user.save()
-        response = self.c.get(self.url)
-        self.assertEqual(response.status_code, 403)
-
     def test_modified_values_displayed_on_page(self):
         """Previous and proposed values displayed on page"""
         response = self.c.get(self.url)
