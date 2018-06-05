@@ -627,10 +627,11 @@ class EditRequestViewTests(CertEditTestCase):
                                status=EditRequest.PENDING, consignee='NEWCONSIGNEE')
         self.url = self.edit.get_absolute_url()
 
-    def test_non_superusers_cannot_access(self):
-        self.user.is_superuser = False
-        self.user.save()
-        response = self.c.get(self.url)
+    def test_non_superusers_cannot_post(self):
+        """Only superusers can POST to this view"""
+        user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        self.c.force_login(user)
+        response = self.c.post(self.url)
         self.assertEqual(response.status_code, 403)
 
     def test_modified_values_displayed_on_page(self):

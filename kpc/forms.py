@@ -83,6 +83,11 @@ class EditRequestReviewForm(forms.ModelForm):
 class BaseCertificateForm(forms.ModelForm):
     date_of_issue = forms.DateField(widget=forms.DateInput(attrs=DATE_ATTRS))
 
+    COUNTRY_MISSING = """Address must contain a
+                         participating KP country name,
+                         spelled identically to those listed in
+                         the Country of Origin field on this form."""
+
     class Meta:
         model = Certificate
         fields = ('aes', 'country_of_origin', 'shipped_value', 'exporter', 'exporter_address',
@@ -97,7 +102,7 @@ class BaseCertificateForm(forms.ModelForm):
         """
         super().__init__(*args, **kwargs)
         self.expiry_days = Certificate.get_expiry_days()
-        self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue'
+        self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue (expected %s)'
         self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
         self.fields['country_of_origin'] = CountryField(countries=KPCountries).formfield()
         addresses = self.instance.licensee.addresses.all() if self.instance.licensee else None
@@ -132,8 +137,9 @@ class BaseCertificateForm(forms.ModelForm):
         # Date of expiry must be CertificateConfig.expiry_days after date of issue
         if date_of_issue and date_of_expiry:
             delta = date_of_expiry - date_of_issue
+            expected_date = date_of_issue + datetime.timedelta(days=self.expiry_days)
             if delta.days != self.expiry_days:
-                self.add_error('date_of_expiry', self.date_expiry_invalid)
+                self.add_error('date_of_expiry', self.date_expiry_invalid % expected_date.strftime('%m/%d/%Y'))
 
 
 class LicenseeCertificateForm(BaseCertificateForm):
@@ -141,10 +147,6 @@ class LicenseeCertificateForm(BaseCertificateForm):
                                                                    'placeholder': 'Auto-filled from Date of Issue'}))
 
     SUCCESS_MSG = "Thank you! Your certificate has been successfully issued."
-    COUNTRY_MISSING = """Address must contain a
-                         participating KP country name,
-                         spelled identically to those listed in
-                         the Country of Origin field on this form."""
 
     def __init__(self, *args, **kwargs):
         """prepopulate licensee field and disable if not editable"""

@@ -437,9 +437,16 @@ class EditRequest(BaseCertificate):
     def get_absolute_url(self):
         return reverse('edit-review', args=[self.id])
 
+    def user_can_access(self, user):
+        """True if user can access the associated certificate"""
+        return user.profile.certificates().filter(id=self.certificate.id).exists()
+
     def cert_as_of_request(self):
         """Certificate as of date this change was requested"""
-        return self.certificate.history.as_of(self.date_requested)
+        try:
+            return self.certificate.history.as_of(self.date_requested)
+        except Certificate.DoesNotExist:
+            return self.certificate.history.first() or self.certificate
 
     def changed_fields(self):
         """yield requested changes for review"""
@@ -456,7 +463,7 @@ class EditRequest(BaseCertificate):
             get_display = display_func if hasattr(
                 self, display_func) else field.name
             proposed_value = getattr(self, get_display, None)
-            current_value = getattr(cert, get_display)
+            current_value = getattr(cert, get_display, None)
             yield (field.verbose_name, current_value, proposed_value)
 
     def _apply_to_certificate(self):

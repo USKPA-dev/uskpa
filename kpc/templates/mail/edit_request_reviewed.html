@@ -11,9 +11,18 @@ Requestor: {{edit_request.contact.profile.get_user_display_name}}<br>
 Requestor Email: {{edit_request.contact.email}}<br>
 Reviewed on: {{edit_request.date_reviewed}}<br>
 <br>
+
+<hr>
+
+{% include 'mail/edit-change-table.html' %}
+
+<hr>
+
 Change request #{{edit_request.id}} has been <strong>{{edit_request.get_status_display}}</strong>.
 <br>
 {% if edit_request.status == 1 %}
 The requested changes have been applied.
+{% else %}
+The requested changes have been discarded.
 {% endif %}
 {% endblock %}
