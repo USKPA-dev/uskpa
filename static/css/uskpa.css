@@ -180,3 +180,7 @@ input[type="date"] {
 .cert-change-form-header {
     text-align: center;
 }
+
+#useful-links *>h2{
+    margin-bottom: 1.5em;
+}
