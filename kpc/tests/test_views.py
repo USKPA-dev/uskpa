@@ -605,6 +605,7 @@ class CertificateEditViewTests(CertEditTestCase):
 
     def test_edit_request_view_inaccessible_if_pending(self):
         """Edit request not accessible if one already exists and is pending"""
+        load_initial_data()
         mommy.make('EditRequest', certificate=self.cert,
                    status=EditRequest.PENDING)
         response = self.c.get(self.url)
