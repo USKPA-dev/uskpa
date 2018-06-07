@@ -9,7 +9,6 @@ class KpcConfig(AppConfig):
     name = 'kpc'
 
     def ready(self):
-        # Setup signals
         self.irs_docs = self._get_irs_docs()
 
     def _get_irs_docs(self):

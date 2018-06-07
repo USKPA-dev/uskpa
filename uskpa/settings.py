@@ -203,19 +203,10 @@ elif EMAIL_BACKEND.startswith("anymail"):
 SHOW_CERT_PDF_ADDRESS_BOUNDARY = False
 KPC_BASE = os.path.join(BASE_DIR, 'kpc', 'resources', 'kpc_base.pdf')
 
-# Cache for CertificateConfig
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    },
-}
-SOLO_CACHE = 'default'
-
 # Last receipt number
 # Should only be modified upon initial release of the system
 # Sets starting value for Receipt.number field
 LAST_RECEIPT_NUMBER = 1300
-
 
 # LOGGING CONFIG
 DJANGO_LOG_LEVEL = os.getenv('DJANGO_LOG_LEVEL', 'ERROR' if IS_DEPLOYED else 'DEBUG')
