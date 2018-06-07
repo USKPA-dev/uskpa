@@ -17,6 +17,7 @@ USKPA website administration
 - [Application Logging](logging.md)
 - [Application Monitoring](monitoring.md)
 - [Modifying the USKPA website](change-workflow.md)
+- [Database Backups](backups.md)
 - [Updating USKPA documentation](updating-uskpa-docs.md)
 
 
