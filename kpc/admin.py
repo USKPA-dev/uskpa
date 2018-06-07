@@ -120,6 +120,10 @@ class EditRequestAdmin(admin.ModelAdmin):
     list_display = ('id', 'certificate', 'date_requested', 'contact', 'status')
     list_filter = ('status', 'date_requested', 'contact')
 
+    def get_readonly_fields(self, request, obj=None):
+        """Set all fields to read-only"""
+        return [f.name for f in self.model._meta.fields]
+
 
 admin.site.register(HSCode, KpcAdmin)
 admin.site.register(VoidReason, KpcAdmin)
