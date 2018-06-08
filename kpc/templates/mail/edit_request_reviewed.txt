@@ -3,6 +3,7 @@ USKPA Certificate Change Request
 
 Change Request: #{{edit_request.id}}
 Certificate Number: {{edit_request.certificate}}
+Edit Request: #{{edit_request.id}}
 Submitted on: {{edit_request.date_requested}}
 Licensee: {{edit_request.certificate.licensee.name}}
 Requestor: {{edit_request.contact.profile.get_user_display_name}}
