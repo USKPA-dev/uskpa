@@ -24,7 +24,7 @@
               "profile"
             ],
             [
-              "can_review_edit_requests",
+              "can_adjudicate_edit_requests",
               "accounts",
               "profile"
             ],
