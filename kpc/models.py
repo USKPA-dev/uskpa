@@ -19,8 +19,6 @@ class CertificateConfig(SingletonModel):
     kp_countries = CountryField(multiple=True, blank=True,
                                 help_text='Countries available for selection as Country of Origin',
                                 verbose_name='KP Countries')
-    reviewer_emails = models.TextField(blank=True,
-                                       help_text='Comma delimited list of email addresses to be notified upon submission of a request to edit a certificate.')
     edit_requests = models.BooleanField(default=False, verbose_name='Certificate Edit Requests',
                                         help_text='If True, users will be able to submit a request to modify a prepared certificate.')
 
@@ -32,9 +30,6 @@ class CertificateConfig(SingletonModel):
     class Meta:
         verbose_name = "Certificate Configuration"
         verbose_name_plural = "Certificate Configuration"
-
-    def get_reviewer_emails(self):
-        return self.reviewer_emails.split(',')
 
 
 class VoidReason(models.Model):
@@ -376,7 +371,7 @@ class Certificate(BaseCertificate):
         return user.profile.certificates().filter(id=self.id).exists()
 
     def user_can_edit(self, user):
-        return self.user_can_access(user) and not user.profile.is_auditor
+        return self.user_can_access(user) and user.profile.can_edit_certs()
 
     @property
     def pending_edit(self):

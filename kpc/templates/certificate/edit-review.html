@@ -41,7 +41,7 @@
   </p>
 
   {% if not object.reviewed %}
-    {% if user.is_superuser %}
+    {% if perms.accounts.can_review_edit_requests %}
       <p>The following certificate changes were requested by <strong>{{object.contact.profile.get_user_display_name}}.</strong><br>
          Upon approval, the changes will be applied to the certificate record.
       </p>
@@ -69,7 +69,7 @@
   </table>
 </div>
 
-{% if not object.reviewed and user.is_superuser %}
+{% if not object.reviewed and perms.accounts.can_review_edit_requests %}
 <div id='edit-request-review' class='usa-grid'>
   <h2>Please review the changes above and approve or reject.</h2>
   <form action="" method="post">

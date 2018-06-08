@@ -15,6 +15,7 @@ class Profile(models.Model):
     class Meta:
         permissions = (
             ('can_review_certificates', "Can Review all Certificates"),
+            ('can_review_edit_requests', "Can Review Certificate Edit Requests"),
         )
 
     def __str__(self):
@@ -37,14 +38,25 @@ class Profile(models.Model):
         except (Licensee.MultipleObjectsReturned, Licensee.DoesNotExist):
             return None
 
+    def _is_group_member(self, group):
+        """Check if user is member of specified group"""
+        return self.user.groups.filter(name=group).exists()
+
     @property
     def is_auditor(self):
-        return self.user.has_perm('accounts.can_review_certificates') \
-               and not self.user.is_superuser
+        return self._is_group_member('Auditor')
+
+    @property
+    def is_reviewer(self):
+        return self._is_group_member('Reviewer')
+
+    def can_edit_certs(self):
+        """User may prepare, void, or update the status of certificates"""
+        return not any([self.is_auditor, self.is_reviewer])
 
     def certificates(self):
         """Certificates which this user may access"""
-        if self.user.is_superuser or self.is_auditor:
+        if self.user.has_perm('accounts.can_review_certificates') or self.is_auditor:
             return Certificate.objects.all()
         else:
             return Certificate.objects.filter(licensee__in=self.get_licensees())

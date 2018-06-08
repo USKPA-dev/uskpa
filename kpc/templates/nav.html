@@ -42,7 +42,7 @@
               </a>
             </li>
             {% endif %}
-            {% if user.is_superuser %}
+            {% if user.is_staff %}
             <li>
                 <a class="usa-nav-link" href="{% url 'admin:index' %}">
                   <span>Admin</span>

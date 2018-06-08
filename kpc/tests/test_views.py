@@ -644,12 +644,36 @@ class EditRequestViewTests(CertEditTestCase):
                                status=EditRequest.PENDING, consignee='NEWCONSIGNEE')
         self.url = self.edit.get_absolute_url()
 
-    def test_non_superusers_cannot_post(self):
-        """Only superusers can POST to this view"""
+    def test_cannot_post_without_perm(self):
+        """
+        accounts.can_review_edit_requests required
+        to POST to this view
+        """
         user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
         self.c.force_login(user)
         response = self.c.post(self.url)
         self.assertEqual(response.status_code, 403)
+
+    def test_can_post_with_perm(self):
+        """
+        accounts.can_review_edit_requests allows
+        POSTing to this view
+
+        User can view edit request but not approve/reject
+        """
+        load_initial_data()
+        perm, _ = Permission.objects.get_or_create(codename='can_review_edit_requests')
+        user = mommy.make(settings.AUTH_USER_MODEL, is_superuser=False)
+        user.user_permissions.add(perm)
+        licensee = mommy.make("Licensee")
+        self.cert.licensee = licensee
+        self.cert.save()
+
+        user.profile.licensees.add(licensee)
+        self.c.force_login(user)
+
+        response = self.c.post(self.url)
+        self.assertNotEqual(response.status_code, 403)
 
     def test_modified_values_displayed_on_page(self):
         """Previous and proposed values displayed on page"""
