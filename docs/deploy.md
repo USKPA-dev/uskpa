@@ -74,7 +74,7 @@ The following variables can be set in Heroku to alter the site's behavior.
 Var | Value | Destination
 --- | --- | ---
 ADMINS | Comma delimited list of email addresses | ``settings.ADMINS``
-DEBUG | TRUE | ``settings.DEBUG``
+DEBUG | TRUE/FALSE | ``settings.DEBUG``should only be set to `TRUE` for development environments
 DJANGO_LOG_LEVEL | INFO, DEBUG, or ERROR | Controls logging level of Django process, defaults to ERROR in production
 CONTACT_US | email address | Email address used for all `contact-us` links through site, also used as default value for DJANGO_FROM_EMAIL
 STAGE | live | Set value to 'live' for production instance to toggle deployed instance status banner displayed at the top of each template.
