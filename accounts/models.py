@@ -44,7 +44,7 @@ class Profile(models.Model):
 
     def certificates(self):
         """Certificates which this user may access"""
-        if self.user.is_superuser or self.is_auditor:
+        if self.user.has_perm('accounts.can_review_certificates') or self.is_auditor:
             return Certificate.objects.all()
         else:
             return Certificate.objects.filter(licensee__in=self.get_licensees())
