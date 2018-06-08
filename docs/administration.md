@@ -96,3 +96,9 @@ Certain fields associated to KP certificates allow only a specific set of values
 6. Certificate Configuration - KP Countries (used for Country of Origin and Addresses)
 
 An administrator can configure the allowed values for each of these fields via the admin panel.
+
+## Avoid using the admin panel to edit the following:
+
+1. Certificates - Have licensees submit edit requests to keep an audit trail of requests.
+2. Receipts - Use `View on site` link to render the receipt.
+3. Edit requests - Have reviewers approve / reject requests from the site to keep an audit trail of approvals.
