@@ -5,6 +5,7 @@
 
 Change Request: #{{edit_request.id}}<br>
 Certificate Number: <a href="{{cert_url}}">{{edit_request.certificate}}</a><br>
+Edit Request: <a href="{{review_url}}">#{{edit_request.id}}</a><br>
 Submitted on: {{edit_request.date_requested}}<br>
 Licensee: {{edit_request.certificate.licensee.name}}<br>
 Requestor: {{edit_request.contact.profile.get_user_display_name}}<br>
@@ -18,7 +19,7 @@ Reviewed on: {{edit_request.date_reviewed}}<br>
 
 <hr>
 
-Change request #{{edit_request.id}} has been <strong>{{edit_request.get_status_display}}</strong>.
+Change request <a href="{{review_url}}">#{{edit_request.id}}</a> has been <strong>{{edit_request.get_status_display}}</strong>.
 <br>
 {% if edit_request.status == 1 %}
 The requested changes have been applied.
