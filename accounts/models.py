@@ -15,7 +15,7 @@ class Profile(models.Model):
     class Meta:
         permissions = (
             ('can_review_certificates', "Can Review all Certificates"),
-            ('can_review_edit_requests', "Can Review Certificate Edit Requests"),
+            ('can_adjudicate_edit_requests', "Can Adjudicate Edit Requests"),
         )
 
     def __str__(self):
