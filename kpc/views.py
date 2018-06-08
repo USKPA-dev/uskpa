@@ -102,7 +102,7 @@ class EditRequestView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         """Disallowed without permission"""
-        if not self.request.user.has_perm('accounts.can_review_edit_requests'):
+        if not self.request.user.has_perm('accounts.can_approve_or_reject_edit_requests'):
             raise PermissionDenied()
         return super().post(request, *args, **kwargs)
 
