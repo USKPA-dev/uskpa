@@ -3,9 +3,8 @@
 {% block content %}
 <p><strong>USKPA Certificate Change Request</strong></p>
 
-Change Request: #{{edit_request.id}}<br>
+Change Request: <a href="{{review_url}}">#{{edit_request.id}}</a><br>
 Certificate Number: <a href="{{cert_url}}">{{edit_request.certificate}}</a><br>
-Edit Request: <a href="{{review_url}}">#{{edit_request.id}}</a><br>
 Submitted on: {{edit_request.date_requested}}<br>
 Licensee: {{edit_request.certificate.licensee.name}}<br>
 Requestor: {{edit_request.contact.profile.get_user_display_name}}<br>
