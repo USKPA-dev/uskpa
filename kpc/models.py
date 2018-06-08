@@ -371,7 +371,7 @@ class Certificate(BaseCertificate):
         return user.profile.certificates().filter(id=self.id).exists()
 
     def user_can_edit(self, user):
-        return self.user_can_access(user) and not user.profile.is_auditor
+        return self.user_can_access(user) and user.profile.can_edit_certs()
 
     @property
     def pending_edit(self):

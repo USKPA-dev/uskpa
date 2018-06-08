@@ -38,9 +38,21 @@ class Profile(models.Model):
         except (Licensee.MultipleObjectsReturned, Licensee.DoesNotExist):
             return None
 
+    def _is_group_member(self, group):
+        """Check if user is member of specified group"""
+        return self.user.groups.filter(name=group).exists()
+
     @property
     def is_auditor(self):
-        return self.user.groups.filter(name='Auditor').exists()
+        return self._is_group_member('Auditor')
+
+    @property
+    def is_reviewer(self):
+        return self._is_group_member('Reviewer')
+
+    def can_edit_certs(self):
+        """User may prepare, void, or update the status of certificates"""
+        return not any([self.is_auditor, self.is_reviewer])
 
     def certificates(self):
         """Certificates which this user may access"""
