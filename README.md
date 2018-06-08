@@ -1,22 +1,31 @@
-# USKPA website
+# USKPA
+
+The United States Kimberley Process Authority (USKPA) is a not-for-profit trade association in the United States formed for the purpose of administering and controlling the usage of U.S. Kimberley Process (KP) certificates for the export of rough diamonds from the U.S.
+
+The USKPA is governed by a Board of Directors and is located in New York City.
+
+## USKPA.org
 
 [![CircleCI](https://circleci.com/gh/USKPA-dev/uskpa.svg?style=svg)](https://circleci.com/gh/USKPA-dev/uskpa)
 [![codecov](https://codecov.io/gh/USKPA-dev/uskpa/branch/master/graph/badge.svg)](https://codecov.io/gh/USKPA-dev/uskpa)
 
+This repository hosts the code that powers the uskpa.org website.  A key component of the site is a system that administers the usage of KP certificates.
 
-## Contributing
+### Frameworks
+
+Uskpa.org uses the [Django](https://www.djangoproject.com/) web framework along with a PostgreSQL(https://www.postgresql.org/) backend.  Given the limited developer resources on this project, the aim is to leverage the default services from these frameworks (for example: the Django admin panel) and minimize custom code.
+
+### Hosting
+
+The development and production instances of the uskpa.org are hosted on the cloud platform, Heroku. Deployment pipelines and processes are [documented here](docs/deploy.md).
+
+### Documentation
+
+Documentation is located wthin in the [docs](docs/) directory.  This documentation includes developer and site administration documentation.
+
+### Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for additional information.
-
-## Documentation
-
-Developer documentation is located wthin in the [docs](docs/) directory.
-To get started, see the [local development guide](docs/local-development.md).
-
-## Deploying
-
-The staging, and production instances of the USKPA website are deployed
-using Heroku, additional documentation is located in [deploy.md](docs/deploy.md).
 
 ## Public domain
 

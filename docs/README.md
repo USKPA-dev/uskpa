@@ -3,6 +3,10 @@
 Welcome to the USKPA website documentation. This documentation is written in
 [GitHub-flavored markdown][gh-md] and is best read using the GitHub interface.
 
+Developers should start with the [local development guide](local-development.md)
+
+USKPA admins, folks that manage the users of the site, should start with the [administration configuration guide](administration.md)
+
 ## Table of Contents
 
 ___
@@ -14,6 +18,7 @@ Development and deploying
 - [Legacy Data Migration](data-migration.md)
 ---
 USKPA website administration
+- [Administering users and roles](administration.md)
 - [Application Logging](logging.md)
 - [Application Monitoring](monitoring.md)
 - [Modifying the USKPA website](change-workflow.md)
