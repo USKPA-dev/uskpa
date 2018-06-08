@@ -15,6 +15,7 @@ class Profile(models.Model):
     class Meta:
         permissions = (
             ('can_review_certificates', "Can Review all Certificates"),
+            ('can_review_edit_requests', "Can Review Certificate Edit Requests"),
         )
 
     def __str__(self):
@@ -39,8 +40,7 @@ class Profile(models.Model):
 
     @property
     def is_auditor(self):
-        return self.user.has_perm('accounts.can_review_certificates') \
-               and not self.user.is_superuser
+        return self.user.groups.filter(name='Auditor').exists()
 
     def certificates(self):
         """Certificates which this user may access"""

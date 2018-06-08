@@ -94,17 +94,17 @@ class EditRequestView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """redirect to certificate details"""
         return self.get_object().certificate.get_absolute_url()
 
-    def dispatch(self, request, *args, **kwargs):
-        """Disallow POST if not a superuser"""
-        if request.method == 'POST' and not self.request.user.is_superuser:
-            raise PermissionDenied()
-        return super().dispatch(request, *args, **kwargs)
-
     def test_func(self):
         obj = self.get_object()
         if not obj.user_can_access(self.request.user):
             raise PermissionDenied
         return True
+
+    def post(self, request, *args, **kwargs):
+        """Disallowed without permission"""
+        if not self.request.user.has_perm('accounts.can_review_edit_requests'):
+            raise PermissionDenied()
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         edit_request = form.save(reviewer=self.request.user)

@@ -1,8 +1,10 @@
 
+from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
-from .models import CertificateConfig
+
+User = get_user_model()
 
 
 def edit_request_email_context(request, edit_request):
@@ -21,12 +23,17 @@ def _build_email(context, template_name):
     return subject, text, html
 
 
+def get_reviewer_emails():
+    """Return list of Reviewer user's email addresses"""
+    users = User.objects.filter(is_active=True, groups__name='Reviewer')
+    return [user.email for user in users]
+
+
 def notify_reviewers(request, edit_request):
     """Notify reviewers upon submission of a new EditRequest"""
     context = edit_request_email_context(request, edit_request)
     subject, text, html = _build_email(context, 'edit_request_submitted')
-    reviewers = CertificateConfig.get_solo().get_reviewer_emails()
-    msg = EmailMultiAlternatives(subject=subject, to=reviewers, body=text)
+    msg = EmailMultiAlternatives(subject=subject, to=get_reviewer_emails(), body=text)
     msg.attach_alternative(html, "text/html")
     msg.send()
 
