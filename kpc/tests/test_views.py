@@ -318,6 +318,18 @@ class CertificateViewTests(CertTestCase):
         message = list(response.context['messages']).pop()
         self.assertEqual(message.message, CertificateView.REVIEW_MSG)
 
+    def test_can_submit_changed_form_after_preview(self):
+        """
+        Cert form w/ prepopulated data from preview page
+        contains both GET and POST data
+        """
+        import urllib
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
+        post_url = cert.get_absolute_url() + f'?{urllib.parse.urlencode(self.form_kwargs)}'
+        response = self.c.post(post_url, self.form_kwargs)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'certificate/preview.html')
+
     def test_auditor_denied_on_post(self):
         """Auditors cannot POST"""
         load_initial_data()
@@ -499,7 +511,7 @@ def make_auditor():
     return user
 
 
-class KpcAdressViewTests(TestCase):
+class KpcAddressViewTests(TestCase):
 
     def setUp(self):
         self.destination = mommy.make('KpcAddress')
