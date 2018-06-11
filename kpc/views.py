@@ -237,12 +237,12 @@ class CertificateView(BaseCertificateView):
 
     def get_form(self):
         """
-        Check for incoming GET params
-        If present, populate form with values
+        Check for incoming GET params from canceled cert confirmation page
+        If present and method is GET, populate form with values
         """
         kwargs = self.get_form_kwargs()
         form = super().get_form()
-        if self.request.GET and isinstance(form, LicenseeCertificateForm):
+        if self.request.method == 'GET' and self.request.GET and isinstance(form, LicenseeCertificateForm):
             messages.info(self.request, self.REVIEW_MSG)
             return LicenseeCertificateForm(self.request.GET, **kwargs)
         return form
