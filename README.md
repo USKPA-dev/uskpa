@@ -15,15 +15,12 @@ This repository hosts the code that powers the uskpa.org website.  A key compone
 
 There are limited developer resources on this project; for both development and maintenance.  Thus the aim is to minimize custom code by leveraging as many open source frameworks (i.e. reuse) and their associated default services.  
 
-The project intentionally uses open source frameworks also allows USKPA.org to engage community at large of skilled developers that can contribute to feature enhancements and bug fixes going forward.
+The project intentionally uses open source frameworks which allows USKPA.org to engage community at large of skilled developers that can contribute to feature enhancements and bug fixes going forward.
 
 The frameworks this site uses are:
-
-**Front end** 
-* [Django](https://www.djangoproject.com/) web framework that includes an admin panel for user, group management.
+ 
+* [Django](https://www.djangoproject.com/) web framework to enable rapid development. It includes an admin panel for user, group management.
 * [U.S. Web Design System](https://designsystem.digital.gov/) that follows [design principles](https://designsystem.digital.gov/design-principles/) that create better experiences for USKPA.org's users.
-
-**Back end** 
 * [PostgreSQL](https://www.postgresql.org/) database.
 
 ### Hosting and Deployment
