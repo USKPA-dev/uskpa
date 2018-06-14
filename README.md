@@ -11,17 +11,34 @@ The USKPA is governed by a Board of Directors and is located in New York City.
 
 This repository hosts the code that powers the uskpa.org website.  A key component of the site is a system that administers the usage of KP certificates.
 
-### Frameworks
+### Open Source Frameworks
 
-Uskpa.org uses the [Django](https://www.djangoproject.com/) web framework along with a PostgreSQL(https://www.postgresql.org/) backend.  Given the limited developer resources on this project, the aim is to leverage the default services from these frameworks (for example: the Django admin panel) and minimize custom code.
+There are limited developer resources on this project; for both development and maintenance.  Thus the aim is to minimize custom code by leveraging as many open source frameworks (i.e. reuse) and their associated default services.  
 
-### Hosting
+The project intentionally uses open source frameworks also allows USKPA.org to engage community at large of skilled developers that can contribute to feature enhancements and bug fixes going forward.
 
-The development and production instances of the uskpa.org are hosted on the cloud platform, Heroku. Deployment pipelines and processes are [documented here](docs/deploy.md).
+The frameworks this site uses are:
+
+**Front end** 
+* [Django](https://www.djangoproject.com/) web framework that includes an admin panel for user, group management.
+* [U.S. Web Design System](https://designsystem.digital.gov/) that follows [design principles](https://designsystem.digital.gov/design-principles/) that create better experiences for USKPA.org's users.
+
+**Back end** 
+* [PostgreSQL](https://www.postgresql.org/) database.
+
+### Hosting and Deployment
+
+The development and production instances of the uskpa.org are hosted on the cloud platform, Heroku. Deployment pipelines (using [CircleCI](https://circleci.com/)) and processes are [documented here](docs/deploy.md).  The deployment pipelines includes automatically running the following checks to preserve quality:
+* Static code analysis using [Flake8](http://flake8.pycqa.org/en/latest/#) 
+* Vulnerability scans using [Snyk](https://snyk.io/)
+* Regression test suite
+* Test code coverage using [Codecov](https://codecov.io/)
+
+In addition to Heroku's monitoring, USKPA.org also uses [New Relic](https://newrelic.com/) monitoring  to keep administrators appraised of any operational issues with the site.
 
 ### Documentation
 
-Documentation is located wthin in the [docs](docs/) directory.  This documentation includes developer and site administration documentation.
+Documentation is located wthin in the [docs](docs/) directory.  This documentation includes developer and site administration documentation.  As code changes are introduced, this documentation should be kept up to date to facilitate engagement by future contributors.
 
 ### Contributing
 
