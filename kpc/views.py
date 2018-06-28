@@ -218,8 +218,8 @@ class CertificateView(BaseCertificateView):
         return True
 
     def dispatch(self, request, *args, **kwargs):
-        """Disallow POST if user cannot edit a certificate"""
-        if request.method == 'POST':
+        """Disallow POST if user authenticated and cannot edit certificate"""
+        if self.request.user.is_authenticated and request.method == 'POST':
             cert = self.get_object()
             if not cert.user_can_edit(self.request.user):
                 raise PermissionDenied()
