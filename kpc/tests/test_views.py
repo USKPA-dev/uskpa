@@ -352,6 +352,15 @@ class CertificateViewTests(CertTestCase):
         response = self.c.get(cert.get_absolute_url())
         self.assertTemplateUsed(response, 'certificate/prepare.html')
 
+    def test_post_w_expired_session(self):
+        """Redirects to login page if AnonymousUser posts"""
+        cert = mommy.make(Certificate, status=Certificate.AVAILABLE)
+        self.c.logout()
+        response = self.c.post(cert.get_absolute_url(),
+                               self.form_kwargs, follow=True)
+        cert.refresh_from_db()
+        self.assertTemplateUsed(response, 'login.html')
+
 
 class CertificateListViewTests(TestCase):
 
