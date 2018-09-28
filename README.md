@@ -8,6 +8,7 @@ The USKPA is governed by a Board of Directors and is located in New York City.
 
 [![CircleCI](https://circleci.com/gh/USKPA-dev/uskpa.svg?style=svg)](https://circleci.com/gh/USKPA-dev/uskpa)
 [![codecov](https://codecov.io/gh/USKPA-dev/uskpa/branch/master/graph/badge.svg)](https://codecov.io/gh/USKPA-dev/uskpa)
+[![Known Vulnerabilities](https://snyk.io/test/github/USKPA-DEV/uskpa/badge.svg)](https://snyk.io/test/github/USKPA-DEV/uskpa)
 
 This repository hosts the code that powers the uskpa.org website.  A key component of the site is a system that administers the usage of KP certificates.
 
