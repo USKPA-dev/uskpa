@@ -16,6 +16,7 @@ Development and deploying
 - [Email configuration for new instances](email.md)
 - [Change Tracking & Data Lineage](history.md)
 - [Legacy Data Migration](data-migration.md)
+- [Dependency Management](dependency-management.md)
 ---
 USKPA website administration
 - [Administering users and roles](administration.md)
