@@ -206,7 +206,7 @@ class CertificateRegisterForm(forms.Form):
     cert_to = forms.IntegerField(min_value=1, required=False, label='To')
     cert_list = forms.CharField(required=False, label='Certificate ID list',
                                 validators=[
-                                    RegexValidator(regex='^(\d+(,\d+)*)?$',
+                                    RegexValidator(regex=r'^(\d+(,\d+)*)?$',
                                                    message='Certificate list must be a comma delimited list of numeric IDs, without spaces.'
                                                    )
                                 ])

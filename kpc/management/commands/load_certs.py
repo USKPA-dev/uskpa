@@ -191,8 +191,8 @@ def rectify_csv(filepath):
     with `|` characters.
 
     The values of the first column have a known and expected format
-    An integer primary key value, followed by a 'US\d.' Certificate Identifier
-    regex; '/\d.,US/'
+    An integer primary key value, followed by a r'US\d.' Certificate Identifier
+    regex; r'/\d.,US/'
 
     We use this information to identify offending newlines
     Regex below captures new lines which are NOT followed
@@ -250,7 +250,7 @@ def prepare_poe(value):
 
 
 def prepare_aes(value):
-    pattern = re.compile('\d{14}')
+    pattern = re.compile(r'\d{14}')
     if value == 'NULL':
         value = ''
     value = value.replace('x', 'X')
