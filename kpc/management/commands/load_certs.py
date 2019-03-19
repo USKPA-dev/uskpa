@@ -189,10 +189,10 @@ def rectify_csv(filepath):
     Input CSV contains newlines embedded in address fields
     Identify these newlines and replace them
     with `|` characters.
-		
+
     The values of the first column have a known and expected format An integer primary key value, 
-	followed by a r`US\d.` Certificate Identifier regex; r`/\d.,US/`
-	
+    followed by a r`US\d.` Certificate Identifier regex; r`/\d.,US/`
+
     We use this information to identify offending newlines
     Regex below captures new lines which are NOT followed
     by the expected integer PK and Certificate identifier fields
