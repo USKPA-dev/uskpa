@@ -85,9 +85,7 @@ class CertificateTests(TestCase):
             self.cert.clean_fields()
 
     def test_accept_valid_aes_rejection(self):
-        """Accept valid AES identifiers
-            regex: r'X\d{14}'
-        """
+        """Accept valid AES identifiers regex: r'X\d{14}'"""
         self.cert.aes = 'X12345678901234'
         self.cert.clean_fields()
 
