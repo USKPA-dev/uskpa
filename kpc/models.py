@@ -89,7 +89,7 @@ class Licensee(models.Model):
     tax_id = models.CharField(max_length=10,
                               help_text='Tax Identification Number',
                               validators=[
-                                  RegexValidator(regex='\d{2}-\d{7}',
+                                  RegexValidator(regex=r'\d{2}-\d{7}',
                                                  message='TIN format: ##-#######'
                                                  )
                               ]
@@ -205,7 +205,7 @@ class BaseCertificate(models.Model):
                            help_text='AES Confirmation Number (ITN)',
                            verbose_name='AES',
                            validators=[
-                               RegexValidator(regex='X\d{14}',
+                               RegexValidator(regex=r'X\d{14}',
                                               message='AES Confirmation (ITN) format is 14 digits prepended by X: X##############'
                                               )
                            ]
