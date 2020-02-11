@@ -9,7 +9,7 @@ name = "pypi"
 
 dj-database-url = "*"
 pytz = "*"
-django = "<2.1"
+django = "<2.3"
 whitenoise = "*"
 "argon2-cffi" = "*"
 "psycopg2-binary" = "*"
