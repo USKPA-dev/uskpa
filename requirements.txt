@@ -20,10 +20,10 @@ psycopg2-binary==2.7.7
 pycparser==2.19
 pypdf2==1.26.0
 pytz==2018.9
-reportlab==3.5.13
+reportlab==3.5.34
 requests==2.22.0
 six==1.14.0
 sqlparse==0.3.0
 unicodecsv==0.14.1
-urllib3==1.25.8
+urllib3==1.25.9
 whitenoise==4.1.2
