@@ -7,23 +7,19 @@
             <img src="{% static 'vendor/uswds/img/close.svg' %}" alt="close">
           </button>
           <ul class="usa-nav-primary usa-accordion">
-             <li>
-              <a class="usa-nav-link" href="{% url 'home' %}#about">
-                <span>About Us</span>
-              </a>
-            </li>
-            <li>
-              <a class="usa-nav-link {% if request.resolver_match.url_name == 'export' %}usa-current{% endif %}"
-                 href="{% url 'export' %}">
-                <span>How to Export</span>
-              </a>
-            </li>      
+          
+            
             <li>
               <a class="usa-nav-link {% if request.resolver_match.url_name == 'join' %}usa-current{% endif %}"
                  href="{% url 'join' %}">
                 <span>Become A Licensee</span>
               </a>
             </li>
+            <li>
+              <a class="usa-nav-link" href="{% url 'home' %}#about">
+                <span>About Us</span>
+              </a>
+            </li>      
            
             {% if user.is_authenticated %}
             <li>
