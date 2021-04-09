@@ -7,14 +7,14 @@ jobs:
         environment:
           TZ: America/New_York
           PIPENV_VENV_IN_PROJECT: true
-          DATABASE_URL: postgres://postgres@localhost/uskpa
+          DATABASE_URL: postgres://postgres:postgres@localhost/uskpa
           CI_TESTING: "TRUE"
 
       - image: circleci/postgres:10
         environment:
           POSTGRES_USER: postgres
           POSTGRES_DB: uskpa
-
+          POSTGRES_PASSWORD: postgres
     steps:
       - checkout
       - restore_cache:
