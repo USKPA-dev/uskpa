@@ -12,6 +12,7 @@ kpc_config = apps.get_app_config('kpc')
 urlpatterns = [
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('become-a-licensee/', TemplateView.as_view(template_name='join.html'), name='join'),
+    path('how-to-export/', TemplateView.as_view(template_name='howtoexport.html'), name='how-to-export'),
     path('register-certificate/', kpc_views.CertificateRegisterView.as_view(), name='cert-register'),
     path('edit-review/<int:pk>/', kpc_views.EditRequestView.as_view(), name='edit-review'),
     path('certificates/<int:number>/edit', kpc_views.CertificateEditView.as_view(), name='edit'),
