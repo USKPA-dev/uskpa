@@ -9,7 +9,7 @@ name = "pypi"
 
 dj-database-url = "*"
 pytz = "*"
-django = "<2.3"
+django = "<4.0"
 whitenoise = "*"
 "argon2-cffi" = "*"
 "psycopg2-binary" = "*"
@@ -37,4 +37,4 @@ model-mommy = "*"
 
 [requires]
 
-python_version = "3.6"
+python_version = "3.13"
