@@ -27,3 +27,4 @@ sqlparse==0.3.0
 unicodecsv==0.14.1
 urllib3==1.25.8
 whitenoise==4.1.2
+setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
