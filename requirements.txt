@@ -21,7 +21,7 @@ pycparser==2.19
 pypdf2==1.26.0
 pytz==2018.9
 reportlab==3.5.13
-requests==2.22.0
+requests==2.32.0
 six==1.14.0
 sqlparse==0.3.0
 unicodecsv==0.14.1
