@@ -20,7 +20,7 @@ psycopg2-binary==2.7.7
 pycparser==2.19
 pypdf2==1.26.0
 pytz==2018.9
-reportlab==3.5.13
+reportlab==3.6.13
 requests==2.22.0
 six==1.14.0
 sqlparse==0.3.0
