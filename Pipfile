@@ -21,6 +21,7 @@ reportlab = "*"
 "pypdf2" = "*"
 django-solo = "*"
 django = "<2.3"
+six = "*"
 
 [dev-packages]
 "flake8" = "*"
