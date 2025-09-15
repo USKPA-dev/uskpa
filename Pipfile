@@ -1,15 +1,11 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 dj-database-url = "*"
 pytz = "*"
-django = "<2.3"
 whitenoise = "*"
 "argon2-cffi" = "*"
 "psycopg2-binary" = "*"
@@ -24,17 +20,14 @@ django-queryset-csv = "*"
 reportlab = "*"
 "pypdf2" = "*"
 django-solo = "*"
-
+django = "<2.3"
 
 [dev-packages]
-
 "flake8" = "*"
 bandit = "*"
 coverage = "*"
 codecov = "*"
 model-mommy = "*"
 
-
 [requires]
-
-python_version = "3.6"
+python_version = "3.10"
