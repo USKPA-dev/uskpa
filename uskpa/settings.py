@@ -10,11 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 from django.core.exceptions import ImproperlyConfigured
-import dj_database_url
+import uskpa.monkeypatch
 import os
-from django.db.backends.postgresql.base import DatabaseWrapper as PostgresDatabaseWrapper
-PostgresDatabaseWrapper.force_connection_timezone = True
 import sys
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -286,25 +285,6 @@ COUNTRIES_OVERRIDE = {
     MULTIPLE_ORIGIN_COUNTRY_CODE: MULTIPLE_ORIGIN_COUNTRY_DISPLAY_NAME,
 }
 
-from django.db.backends.signals import connection_created
-from django.dispatch import receiver
 
-@receiver(connection_created)
-def set_postgres_utc_timezone(sender, connection, **kwargs):
-    if connection.vendor == 'postgresql':
-        with connection.cursor() as cursor:
-            cursor.execute("SET TIME ZONE 'UTC';")
 
-            import django
-from django.db.backends.postgresql import utils
-
-def patched_utc_tzinfo_factory(offset):
-    # Log offset for debug
-    if offset != 0:
-        import warnings
-        warnings.warn(f"Non-zero offset detected: {offset} — continuing anyway.")
-    return None  # Let Django use default UTC
-
-utils.utc_tzinfo_factory = patched_utc_tzinfo_factory
-print(">>> Django's utc_tzinfo_factory offset override engaged.")
 
