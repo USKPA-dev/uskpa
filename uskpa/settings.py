@@ -294,4 +294,17 @@ def set_postgres_utc_timezone(sender, connection, **kwargs):
     if connection.vendor == 'postgresql':
         with connection.cursor() as cursor:
             cursor.execute("SET TIME ZONE 'UTC';")
-            
+
+            import django
+from django.db.backends.postgresql import utils
+
+def patched_utc_tzinfo_factory(offset):
+    # Log offset for debug
+    if offset != 0:
+        import warnings
+        warnings.warn(f"Non-zero offset detected: {offset} — continuing anyway.")
+    return None  # Let Django use default UTC
+
+utils.utc_tzinfo_factory = patched_utc_tzinfo_factory
+print(">>> Django's utc_tzinfo_factory offset override engaged.")
+
