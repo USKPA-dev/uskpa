@@ -87,6 +87,11 @@ WSGI_APPLICATION = 'uskpa.wsgi.application'
 DATABASES = {}
 DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
+# Force connection timezone to UTC
+DATABASES['default']['OPTIONS'] = {
+    'options': '-c timezone=UTC'
+}
+
 # PASSWORDS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/2.0/ref/settings/#password-hashers
