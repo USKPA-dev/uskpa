@@ -163,7 +163,7 @@ elif IS_DEPLOYED:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', True)
     SECURE_HSTS_PRELOAD = os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', True)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    USE_TZ = True
+    USE_TZ = False
 
 LOGIN_REDIRECT_URL = 'certificates'
 LOGOUT_REDIRECT_URL = '/'
