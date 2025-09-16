@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 from django.core.exceptions import ImproperlyConfigured
 import dj_database_url
 import os
+from django.db.backends.postgresql.base import DatabaseWrapper as PostgresDatabaseWrapper
+PostgresDatabaseWrapper.force_connection_timezone = True
 import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
