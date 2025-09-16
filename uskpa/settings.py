@@ -92,6 +92,11 @@ DATABASES['default']['OPTIONS'] = {
     'options': '-c timezone=UTC'
 }
 
+# Inject connection-level option: force timezone to UTC
+# (replacing or creating the OPTIONS dict)
+DATABASES['default']['OPTIONS'] = DATABASES['default'].get('OPTIONS', {})
+DATABASES['default']['OPTIONS']['options'] = '-c timezone=UTC'
+
 # PASSWORDS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/2.0/ref/settings/#password-hashers
