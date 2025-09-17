@@ -32,8 +32,8 @@ class AddressChoiceWidget(forms.widgets.Select):
 
 class KPCountries(Countries):
     def __init__(self, *args, **kwargs):
-        self.only = self._get_countries()
-        super().__init__(*args, **kwargs)
+    super().__init__(*args, **kwargs)
+    self.only = self._get_countries()
 
     def _get_countries(self):
         """Return list of selectable countries"""
