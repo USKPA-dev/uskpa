@@ -30,15 +30,21 @@ class AddressChoiceWidget(forms.widgets.Select):
     option_template_name = 'widgets/address_option.html'
 
 
+from django_countries.data import COUNTRIES
+
 class KPCountries(Countries):
 
     def __init__(self, *args, **kwargs):
+        # Add the special code if it's not already present
+        if '**' not in COUNTRIES:
+            COUNTRIES['**'] = 'Mixed Origin'
         self.only = self._get_countries()
+        super().__init__(*args, **kwargs)
 
     def _get_countries(self):
         """Return list of selectable countries"""
         countries = CertificateConfig.get_solo().kp_countries
-        return [country.code for country in countries]
+        return [country.code for country in countries] + ['**']
 
 
 class EditRequestReviewForm(forms.ModelForm):
