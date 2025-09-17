@@ -114,7 +114,7 @@ class BaseCertificateForm(forms.ModelForm):
         self.expiry_days = Certificate.get_expiry_days()
         self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue (expected %s)'
         self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
-        self.fields['country_of_origin'] = CountryField(countries=KPCountries()).formfield()
+        self.fields['country_of_origin'] = CountryField(countries=KPCountries(), countries_class=None).formfield()
         addresses = self.instance.licensee.addresses.all() if self.instance.licensee else None
         self.fields['addresses'] = forms.ModelChoiceField(required=False, queryset=addresses)
         for field in self.fields:
