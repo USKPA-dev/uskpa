@@ -33,6 +33,7 @@ class AddressChoiceWidget(forms.widgets.Select):
 class KPCountries(Countries):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._countries = None
         self.only = self._get_countries()
 
     def _get_countries(self):
