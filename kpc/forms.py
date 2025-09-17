@@ -29,16 +29,22 @@ class UserModelChoiceField(forms.ModelChoiceField):
 class AddressChoiceWidget(forms.widgets.Select):
     option_template_name = 'widgets/address_option.html'
 
-
 class KPCountries(Countries):
-
     def __init__(self, *args, **kwargs):
         self.only = self._get_countries()
 
     def _get_countries(self):
         """Return list of selectable countries"""
         countries = CertificateConfig.get_solo().kp_countries
-        return [country.code for country in countries]
+        return [country.code for country in countries] + ['**']
+
+    def __contains__(self, code):
+        return code == '**' or super().__contains__(code)
+
+    def __getitem__(self, code):
+        if code == '**':
+            return 'Mixed Origin'
+        return super().__getitem__(code)
 
 
 class EditRequestReviewForm(forms.ModelForm):
