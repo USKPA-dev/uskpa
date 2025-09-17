@@ -30,24 +30,22 @@ class UserModelChoiceField(forms.ModelChoiceField):
 class AddressChoiceWidget(forms.widgets.Select):
     option_template_name = 'widgets/address_option.html'
 
+
 class KPCountries(Countries):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._countries = None
         self.only = self._get_countries()
+        self._countries = None
+        super().__init__(*args, **kwargs)
 
     def _get_countries(self):
-        """Return list of selectable countries"""
         countries = CertificateConfig.get_solo().kp_countries
         return [country.code for country in countries] + ['**']
 
     @property
     def countries(self):
-        """Build countries dict and handle special fallback for '**'"""
         if self._countries is None:
             countries_dict = COUNTRIES.copy()
-            if '**' not in countries_dict:
-                countries_dict['**'] = 'Mixed Origin'
+            countries_dict['**'] = 'Mixed Origin'  # Add '**' if not already present
             self._countries = {code: countries_dict[code] for code in self.only}
         return self._countries
 
@@ -114,7 +112,7 @@ class BaseCertificateForm(forms.ModelForm):
         self.expiry_days = Certificate.get_expiry_days()
         self.date_expiry_invalid = f'Date of Expiry must be {self.expiry_days} days after Date of Issue (expected %s)'
         self.fields['date_of_expiry'].label = f"Date of Expiry ({self.expiry_days} days from date issued)"
-        self.fields['country_of_origin'] = CountryField(countries=KPCountries(), countries_class=None).formfield()
+        self.fields['country_of_origin'] = CountryField(countries=KPCountries).formfield()
         addresses = self.instance.licensee.addresses.all() if self.instance.licensee else None
         self.fields['addresses'] = forms.ModelChoiceField(required=False, queryset=addresses)
         for field in self.fields:
