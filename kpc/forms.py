@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from django_countries import Countries
 from django_countries.fields import CountryField
+from django_countries.data import COUNTRIES
 
 from .models import (Certificate, CertificateConfig, EditRequest, KpcAddress,
                      Licensee, Receipt)
@@ -32,20 +33,22 @@ class AddressChoiceWidget(forms.widgets.Select):
 class KPCountries(Countries):
     def __init__(self, *args, **kwargs):
         self.only = self._get_countries()
+        super().__init__(*args, **kwargs)
 
     def _get_countries(self):
         """Return list of selectable countries"""
         countries = CertificateConfig.get_solo().kp_countries
         return [country.code for country in countries] + ['**']
 
-    def __contains__(self, code):
-        return code == '**' or super().__contains__(code)
-
-    def __getitem__(self, code):
-        if code == '**':
-            return 'Mixed Origin'
-        return super().__getitem__(code)
-
+    @property
+    def countries(self):
+        """Build countries dict and handle special fallback for '**'"""
+        if self._countries is None:
+            countries_dict = COUNTRIES.copy()
+            if '**' not in countries_dict:
+                countries_dict['**'] = 'Mixed Origin'
+            self._countries = {code: countries_dict[code] for code in self.only}
+        return self._countries
 
 class EditRequestReviewForm(forms.ModelForm):
     approve = forms.BooleanField(required=False)
