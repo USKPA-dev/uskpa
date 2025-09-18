@@ -2,7 +2,7 @@ import base64
 import io
 
 from django.conf import settings
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from PyPDF2 import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfgen import canvas
@@ -126,8 +126,7 @@ class CertificatePreview(object):
 
         # draw values
         self._draw_string('number', draw_func='drawString', formatter=str)
-        self._draw_string(
-            'country_of_origin', formatter=self.format_country_of_origin)
+        self._draw_string('country_of_origin', formatter=self.format_country_of_origin)
         self._draw_string('aes')
         self._draw_string('date_of_issue', formatter=_to_mdy)
         self._draw_string('date_of_expiry', formatter=_to_mdy)
@@ -145,16 +144,16 @@ class CertificatePreview(object):
 
         # render as PDF
         kpc_text.seek(0)
-        new_pdf = PdfFileReader(kpc_text)
+        new_pdf = PdfReader(kpc_text)
 
         # read base PDF
-        existing_pdf = PdfFileReader(open(self.BASE_IMAGE, "rb"))
-        output = PdfFileWriter()
+        existing_pdf = PdfReader(open(self.BASE_IMAGE, "rb"))
+        output = PdfWriter()
 
         # add the "watermark" (which is our new text) on the base kpc pdf
-        page = existing_pdf.getPage(0)
-        page.mergePage(new_pdf.getPage(0))
-        output.addPage(page)
+        page = existing_pdf.pages[0]
+        page.merge_page(new_pdf.pages[0])
+        output.add_page(page)
 
         # return base64 string for rendering in template
         pdf_out = io.BytesIO()
