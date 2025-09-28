@@ -5,9 +5,12 @@ staticfiles
 # python
 *.py[cod]
 .cache
-.python-version
 .pytest_cache
 .coverage
+__pycache__/
+*.pyc
+venv/
+env/
 
 # Logs
 logs
@@ -75,3 +78,29 @@ typings/
 .vscode
 
 .DS_STORE
+
+# DDEV local development environment
+.ddev/
+.ddev-docker-compose-*.yaml
+.dbimageBuild/
+.webimageBuild/
+.homeadditions/
+apache/
+commands/
+config.yaml
+db-build/
+docker-compose.override.yaml
+homeadditions/
+mutagen/
+nginx_full/
+php/
+postgres/
+providers/
+traefik/
+web-build/
+web-entrypoint.d/
+xhprof/
+
+# Database backups
+*.dump
+*_backup.dump
