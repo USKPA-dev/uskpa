@@ -2,7 +2,7 @@ import base64
 import io
 
 from django.conf import settings
-from PyPDF2 import PdfFileReader as PdfReader, PdfFileWriter as PdfWriter
+from pypdf import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfgen import canvas
