@@ -24,7 +24,7 @@ whitenoise==6.11.0
 
 # PDF and reporting
 reportlab==4.4.4
-PyPDF2==3.0.1
+PyPDF2==3.0.2
 
 # HTTP and utilities
 requests==2.32.5
@@ -51,3 +51,4 @@ sqlparse==0.5.3
 typing_extensions==4.15.0
 urllib3==2.5.0
 argon2-cffi-bindings==25.1.0
+zipp>=3.19.1  # Security fix for vulnerability in zipfile handling
