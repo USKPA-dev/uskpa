@@ -26,6 +26,8 @@ from .mail import notify_requester_of_completed_review, notify_reviewers
 from .models import (Certificate, CertificateConfig, EditRequest, KpcAddress,
                      Licensee, Receipt)
 from .utils import CertificatePreview, _to_mdy, apply_certificate_search
+import django
+import sys
 
 User = get_user_model()
 
@@ -430,3 +432,16 @@ class ReceiptView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         if self.request.user.is_superuser:
             return True
         raise PermissionDenied
+
+
+def version_info(request):
+    """Simple version info view"""
+    import psycopg
+    return HttpResponse(f"""
+    <h2>USKPA System Information</h2>
+    <ul>
+    <li><strong>Django:</strong> {django.get_version()}</li>
+    <li><strong>Python:</strong> {sys.version.split()[0]}</li>
+    <li><strong>psycopg:</strong> {psycopg.__version__}</li>
+    </ul>
+    """, content_type='text/html')

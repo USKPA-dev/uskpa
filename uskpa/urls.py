@@ -28,6 +28,7 @@ urlpatterns = [
     path('addressee/<int:pk>/delete', kpc_views.KpcAddressDelete.as_view(), name='addressee-delete'),
     path('licensee-contacts/', kpc_views.licensee_contacts, name='licensee-contacts'),
     path('receipt/<int:pk>', kpc_views.ReceiptView.as_view(), name='receipt'),
+    path('version/', kpc_views.version_info, name='version'),
     path('admin/', admin.site.urls),
     path('favicon.ico',
          RedirectView.as_view(url=staticfiles_storage.url('assets/icons/favicon.ico')),

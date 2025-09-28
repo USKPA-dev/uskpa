@@ -121,6 +121,13 @@ MANAGERS = ADMINS
 if not IS_DEPLOYED:
     AUTH_PASSWORD_VALIDATORS = []
     ALLOWED_HOSTS = ['*']
+    # Django 5.x CSRF trusted origins for development
+    CSRF_TRUSTED_ORIGINS = [
+        'https://uskpa.ddev.site:8081',
+        'https://uskpa.ddev.site',
+        'http://uskpa.ddev.site:8081',
+        'http://uskpa.ddev.site',
+    ]
 elif IS_DEPLOYED:
     # PRODUCTION SETTINGS
     # ------------------------------------------------------------------------------
@@ -274,7 +281,7 @@ if LOCAL_TESTING or CI_TESTING:
     LOGGING = {}
 
 # Instance stage, as defined here https://18f.gsa.gov/dashboard/stages/
-STAGE = os.environ.get('STAGE', 'alpha')
+STAGE = os.environ.get('STAGE', 'live')
 
 # Insert a country code for (Multiple Countries)
 # Two character representation for database
