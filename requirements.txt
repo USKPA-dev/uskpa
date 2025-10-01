@@ -2,7 +2,7 @@
 # Compatible with latest Heroku stack and Python 3.11+
 
 # Core Django and database
-Django==5.2.6
+Django==5.2.7
 dj-database-url==3.0.1
 psycopg==3.2.10
 
