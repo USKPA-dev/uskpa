@@ -15,8 +15,8 @@ logger = logging.getLogger('accounts')
 
 @receiver(post_save, sender=User, dispatch_uid="save_user_profile")
 def update_user_profile(sender, instance, created, **kwargs):
-    Profile.objects.get_or_create(user=instance)
-    instance.profile.save()
+    profile, created = Profile.objects.get_or_create(user=instance)
+    profile.save()
 
 
 @receiver(user_logged_in, sender=User, dispatch_uid='successful_login')
