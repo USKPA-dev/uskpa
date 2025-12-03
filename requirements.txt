@@ -2,7 +2,7 @@
 # Compatible with latest Heroku stack and Python 3.11+
 
 # Core Django and database
-Django==5.2.8  # Updated for CVE-2025-64458, CVE-2025-64459 (SQL injection fixes)
+Django==5.2.9  # Updated for CVE-2025-64458, CVE-2025-64459 (SQL injection fixes)
 dj-database-url==3.0.1
 psycopg==3.2.10
 
