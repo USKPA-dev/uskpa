@@ -146,14 +146,13 @@ class CertificatePreview(object):
         kpc_text.seek(0)
         new_pdf = PdfReader(kpc_text)
 
-        # read base PDF
-        existing_pdf = PdfReader(open(self.BASE_IMAGE, "rb"))
-        output = PdfWriter()
+        # read base PDF into a writer (pypdf 7+ requires merged pages to be
+        # attached to a writer)
+        with open(self.BASE_IMAGE, "rb") as base_file:
+            output = PdfWriter(clone_from=base_file)
 
         # add the "watermark" (which is our new text) on the base kpc pdf
-        page = existing_pdf.pages[0]
-        page.merge_page(new_pdf.pages[0])
-        output.add_page(page)
+        output.pages[0].merge_page(new_pdf.pages[0])
 
         # return base64 string for rendering in template
         pdf_out = io.BytesIO()
